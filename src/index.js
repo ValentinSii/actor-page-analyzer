@@ -332,14 +332,23 @@ Apify.main(async () => {
         const tests = input.tests || ['SCHEMA.ORG', 'JSON-LD', 'WINDOW', 'XHR', 'META', 'HTML'];
         output = new OutputGenerator(tests);
 
-        const launchPuppeteerOptions = {};
+        const launchPuppeteerContext = {
+            // fix CORS error
+            launchOptions: {
+                args: [
+                    '--disable-web-security',
+                    '--disable-features=IsolateOrigins',
+                    '--disable-site-isolation-trials'
+                ]
+            }
+        };
 
         if (process.env.PROXY_GROUP && process.env.PROXY_PASSWORD) {
             const { PROXY_PASSWORD, PROXY_GROUP, PROXY_ADDRESS } = process.env;
             const proxyAddress = PROXY_ADDRESS || 'proxy.apify.com:8000';
-            launchPuppeteerOptions.proxyUrl = `http://groups-${PROXY_GROUP}:${PROXY_PASSWORD}@${proxyAddress}`;
+            launchPuppeteerContext.proxyUrl = `http://groups-${PROXY_GROUP}:${PROXY_PASSWORD}@${proxyAddress}`;
         }
-        const browser = await Apify.launchPuppeteer(launchPuppeteerOptions);
+        const browser = await Apify.launchPuppeteer(launchPuppeteerContext);
 
         let pageToAnalyze = null;
         for (let i = 0; i < input.pages.length; i++) {
