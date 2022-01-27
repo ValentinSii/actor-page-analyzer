@@ -12,6 +12,7 @@ class OutputGenerator {
         if (this.fields) this.finishedData.push(this.fields);
         this.fields = {
             url,
+            searchFor: [],
             analysisStarted: null,
             scrappingStarted: null,
             pageNavigated: null,
@@ -57,9 +58,12 @@ class OutputGenerator {
         return this.fields[field];
     }
 
+    finish() {
+        console.log('Pushing data to finishedData');
+        this.finishedData.push(this.fields);
+    }
     async writeOutput() {
-        const allData = this.finishedData.length ? [...this.finishedData, this.fields] : this.fields;
-        const data = JSON.stringify(allData, null, 2);
+        const data = JSON.stringify(this.finishedData, null, 2);
         try {
             await Apify.setValue('OUTPUT', data, { contentType: 'application/json' });
             if (this.fields.crawler) this.fields.outputFinished = true;

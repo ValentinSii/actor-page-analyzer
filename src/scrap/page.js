@@ -200,11 +200,13 @@ class PageScrapper {
                 nativeWindowsProperties = await getNativeWindowProperties(this.page);
             }
             this.page.on('request', this.onRequest);
+            // page = await this.browser.newPage(); browser = await Apify.launchPuppeteer(launchPuppeteerContext);
             this.page.on('response', this.onResponse);
 
             this.call('started', { url, timestamp: new Date() });
 
             try {
+                // networkidle2 - consider navigation to be finished when there are no more than 2 network connections for at least 500 ms.
                 await this.page.goto(url, { waitUntil: 'networkidle2' });
             } catch (error) {
                 this.call('error', error);

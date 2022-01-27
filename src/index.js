@@ -1,8 +1,8 @@
 const cheerio = require('cheerio');
 const Apify = require('apify');
-const { typeCheck } = require('type-check');
 const { isString } = require('lodash');
 
+const InputReader = require('./input/inputReader')
 const PageScrapper = require('./scrap/page');
 const parseMetadata = require('./parse/metadata');
 const parseSchemaOrgData = require('./parse/schema-org');
@@ -19,19 +19,6 @@ const log = (message) => {
     console.log(new Date(), `${Math.round((currentLog - lastLog) / 10) / 100}s`, message);
     lastLog = currentLog;
 };
-
-// Definition of the global input
-const INPUT_TYPE = `{
-    pages: Array,
-    tests: Maybe Array
-}`;
-
-// Definition of the page input
-const PAGE_INPUT_TYPE = `{
-    url: String,
-    searchFor: Array,
-    tests: Maybe Array
-}`;
 
 function wait(timeout) {
     return new Promise((resolve) => {
@@ -53,6 +40,7 @@ async function waitForEnd(field) {
 
 async function analysePage(browser, url, searchFor, tests) {
     output.setNewUrl(url);
+    output.set('searchFor', searchFor);
     console.log('================================');
     console.log(url);
     console.log('================================');
@@ -64,6 +52,7 @@ async function analysePage(browser, url, searchFor, tests) {
         html: '<body></body>',
     };
 
+    // browser = await Apify.launchPuppeteer(launchPuppeteerContext);
     const scrapper = new PageScrapper(browser, tests);
 
     scrapper.on('started', (data) => {
@@ -286,6 +275,8 @@ async function analysePage(browser, url, searchFor, tests) {
         await waitForEnd('analysisEnded');
         // force last write of output data
         log('Force write of output with await');
+        // push all data to finishedData
+        output.finish();
         await output.writeOutput();
     } catch (error) {
         console.error(error);
@@ -295,42 +286,12 @@ async function analysePage(browser, url, searchFor, tests) {
 Apify.main(async () => {
     log('Loading data from input');
     try {
+
+
         // Fetch the input and check it has a valid format
-        // You don't need to check the input, but it's a good practice.
-        let input = await Apify.getValue('INPUT');
+        let input = await InputReader.readInputAsync();
 
-        const isSinglePageInput = typeCheck(PAGE_INPUT_TYPE, input);
-        const isMultiPageInput = typeCheck(INPUT_TYPE, input);
-
-        if (!isMultiPageInput && !isSinglePageInput) {
-            log('Expected input:');
-            log(INPUT_TYPE);
-            log('or');
-            log(PAGE_INPUT_TYPE);
-            log('Received input:');
-            console.dir(input);
-            throw new Error('Received invalid input');
-        }
-        if (isMultiPageInput) {
-            input.pages.forEach(page => {
-                if (!typeCheck(PAGE_INPUT_TYPE, page) && !isSinglePageInput) {
-                    log('Expected input:');
-                    log(INPUT_TYPE);
-                    log('Received input:');
-                    console.dir(input);
-                    throw new Error('Received invalid input');
-                }
-            });
-        } else if (isSinglePageInput) {
-            input = {
-                pages: [
-                    input,
-                ],
-            };
-        }
-
-        const tests = input.tests || ['SCHEMA.ORG', 'JSON-LD', 'WINDOW', 'XHR', 'META', 'HTML'];
-        output = new OutputGenerator(tests);
+        output = new OutputGenerator(input.tests);
 
         const launchPuppeteerContext = {
             // fix CORS error
@@ -354,7 +315,9 @@ Apify.main(async () => {
         for (let i = 0; i < input.pages.length; i++) {
             pageToAnalyze = input.pages[i];
             // eslint-disable-next-line no-await-in-loop
-            await analysePage(browser, pageToAnalyze.url, pageToAnalyze.searchFor, pageToAnalyze.tests || tests);
+            await analysePage(browser, pageToAnalyze.url, pageToAnalyze.searchFor, input.tests);
+            
+
         }
 
         log('Analyzer finished');
