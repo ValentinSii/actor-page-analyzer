@@ -14,7 +14,7 @@ const PAGE_INPUT_TYPE = `{
     tests: Maybe Array
 }`;
 
-const TESTS = ['SCHEMA.ORG', 'JSON-LD', 'WINDOW', 'XHR', 'META', 'HTML'];
+const TESTS_ALL = ['SCHEMA.ORG', 'JSON-LD', 'WINDOW', 'XHR', 'META', 'HTML'];
 
 class input {
 
@@ -30,7 +30,7 @@ class input {
 async function readInputAsync() {
 
     let inputObject = new input();
-    console.log('Loading data from input');
+    console.log('This is console.log from inputReader: Loading data from input');
     try {
         // Fetch the input and check it has a valid format
         // You don't need to check the input, but it's a good practice.
@@ -66,7 +66,7 @@ async function readInputAsync() {
             inputObject.pages = [input];
         }
 
-        inputObject.tests = input.tests || TESTS;
+        inputObject.tests = input.tests || TESTS_ALL;
         // TODO: fix and verify for all possible inputs 
 
         return inputObject;

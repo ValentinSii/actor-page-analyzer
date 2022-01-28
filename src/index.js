@@ -11,6 +11,7 @@ const DOMSearcher = require('./search/DOMSearcher');
 const TreeSearcher = require('./search/TreeSearcher');
 const OutputGenerator = require('./generate/Output');
 const { findCommonAncestors } = require('./utils');
+const fs = require('fs');
 
 let lastLog = Date.now();
 
@@ -36,6 +37,115 @@ async function waitForEnd(field) {
         done = output.get(field);
     }
     return done;
+}
+async function validate() {
+    this.initialjsonld = {};
+    this.$ = null;
+    await tryCheerioCrawlerExample();
+    
+
+    //deserialzie output from file /home/vladopisko/source/apify/actor-page-analyzer/apify_storage/key_value_stores/default/OUTPUT.json
+    const file = '/home/vladopisko/source/apify/actor-page-analyzer/apify_storage/key_value_stores/default/OUTPUT.json';
+    const fileContents = fs.readFileSync(file, 'utf8');
+    const outputData = JSON.parse(fileContents);
+    const jsonld = outputData[0].jsonLDData;
+    const jsonldFound = outputData[0].jsonLDDataFound;
+
+    // validate html selectors 
+    const htmlDataFound = outputData[0].htmlFound;
+
+    //insert html that wont be found
+    htmlDataFound.push({
+        selector: "nonexistentSelector",
+        text: "Non existent html text"
+
+    });
+
+
+    htmlDataFound.map(htmlData => {
+
+        const htmlExpected = htmlData.text;
+        const htmlFound = ($(htmlData.selector)).text();
+        console.log('\x1b[30m%s\x1b[0m', `Html selector found: ${htmlData.selector}`);
+        console.log('\x1b[30m%s\x1b[0m', `Html expected: ${htmlExpected}`);
+        console.log('\x1b[30m%s\x1b[0m', `Html found in initial response with selector: ${htmlFound}`);        
+
+        if (htmlExpected == htmlFound) {
+            console.log('\x1b[32m%s\x1b[0m', `Expected html was found in initial reposnse, can be scraped with plain HTTP client.`);
+
+        } else {
+            console.log('\x1b[31m%s\x1b[0m', `Expected html was NOT found in initial reposnse, can be scraped with plain HTTP client.`);
+
+        }
+        console.log('==========================================================================');
+
+
+    })
+
+    
+    // validate jsonld
+    console.log(jsonldFound);
+
+    jsonldFound.map(data => {
+        console.log(data.path);
+        console.log(data.value);
+
+        const words = data.path.split('.');
+        // const value = initialjsonld.;
+
+        //find data based on selector
+
+    })
+
+
+
+
+}
+async function tryCheerioCrawlerExample() {
+    try {
+
+        // Prepare a list of URLs to crawl
+        const requestList = new Apify.RequestList({
+            sources: [{ url: 'https://www.yelp.com/biz/cuisine-of-nepal-san-francisco' }],
+        });
+        await requestList.initialize();
+
+        // Crawl the URLs
+        const crawler = new Apify.CheerioCrawler({
+            requestList,
+            handlePageFunction: async ({ request, response, body, contentType, $ }) => {
+                const data = [];
+
+                // Extract data from the page using cheerio.
+                const title = $('title').text();
+                // console.log(`Title: ${title}`);
+                this.initialjsonld = $('script[type="application/ld+json"]');
+                // console.log(`Json-LD: ${initialjsonld}`);
+
+                this.$ = $;
+                const h1texts = [];
+                $('h2').each((index, el) => {
+                    h1texts.push({
+                        text: $(el).text(),
+                    });
+                });
+
+                h1texts.map((h2) => {
+                    console.log(`H2: ${h2.text} from: ${request.url}`);
+                });
+
+            },
+        });
+
+        await crawler.run();
+        console.log('Crawler finishedd.');
+
+
+
+    } catch (err) {
+        console.log(err);
+        throw err;
+    }
 }
 
 async function analysePage(browser, url, searchFor, tests) {
@@ -277,6 +387,7 @@ async function analysePage(browser, url, searchFor, tests) {
         log('Force write of output with await');
         // push all data to finishedData
         output.finish();
+
         await output.writeOutput();
     } catch (error) {
         console.error(error);
@@ -316,9 +427,16 @@ Apify.main(async () => {
             pageToAnalyze = input.pages[i];
             // eslint-disable-next-line no-await-in-loop
             await analysePage(browser, pageToAnalyze.url, pageToAnalyze.searchFor, input.tests);
-            
+
 
         }
+
+        // const validator = new Validator(output, input.url, input.pages);
+        // await validator.tryExample();
+
+        await tryCheerioCrawlerExample(input.pages, input.tests);
+        await validate();
+
 
         log('Analyzer finished');
     } catch (error) {
