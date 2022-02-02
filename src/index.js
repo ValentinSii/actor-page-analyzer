@@ -1,5 +1,6 @@
 const cheerio = require('cheerio');
 const Apify = require('apify');
+const { log } = Apify.utils;
 const { isString } = require('lodash');
 
 const InputReader = require('./input/inputReader')
@@ -11,15 +12,19 @@ const DOMSearcher = require('./search/DOMSearcher');
 const TreeSearcher = require('./search/TreeSearcher');
 const OutputGenerator = require('./generate/Output');
 const { findCommonAncestors } = require('./utils');
+const { Validator } = require('./validate/validator');
+
 const fs = require('fs');
 
 let lastLog = Date.now();
 
-const log = (message) => {
-    const currentLog = Date.now();
-    console.log(new Date(), `${Math.round((currentLog - lastLog) / 10) / 100}s`, message);
-    lastLog = currentLog;
-};
+
+// TODO: fix logging
+// const log = (message) => {
+//     const currentLog = Date.now();
+//     console.log(new Date(), `${Math.round((currentLog - lastLog) / 10) / 100}s`, message);
+//     lastLog = currentLog;
+// };
 
 function wait(timeout) {
     return new Promise((resolve) => {
@@ -38,115 +43,7 @@ async function waitForEnd(field) {
     }
     return done;
 }
-async function validate() {
-    this.initialjsonld = {};
-    this.$ = null;
-    await tryCheerioCrawlerExample();
-    
 
-    //deserialzie output from file /home/vladopisko/source/apify/actor-page-analyzer/apify_storage/key_value_stores/default/OUTPUT.json
-    const file = '/home/vladopisko/source/apify/actor-page-analyzer/apify_storage/key_value_stores/default/OUTPUT.json';
-    const fileContents = fs.readFileSync(file, 'utf8');
-    const outputData = JSON.parse(fileContents);
-    const jsonld = outputData[0].jsonLDData;
-    const jsonldFound = outputData[0].jsonLDDataFound;
-
-    // validate html selectors 
-    const htmlDataFound = outputData[0].htmlFound;
-
-    //insert html that wont be found
-    htmlDataFound.push({
-        selector: "nonexistentSelector",
-        text: "Non existent html text"
-
-    });
-
-
-    htmlDataFound.map(htmlData => {
-
-        const htmlExpected = htmlData.text;
-        const htmlFound = ($(htmlData.selector)).text();
-        console.log('\x1b[30m%s\x1b[0m', `Html selector found: ${htmlData.selector}`);
-        console.log('\x1b[30m%s\x1b[0m', `Html expected: ${htmlExpected}`);
-        console.log('\x1b[30m%s\x1b[0m', `Html found in initial response with selector: ${htmlFound}`);        
-
-        if (htmlExpected == htmlFound) {
-            console.log('\x1b[32m%s\x1b[0m', `Expected html was found in initial reposnse, can be scraped with plain HTTP client.`);
-
-        } else {
-            console.log('\x1b[31m%s\x1b[0m', `Expected html was NOT found in initial reposnse, can be scraped with plain HTTP client.`);
-
-        }
-        console.log('==========================================================================');
-
-
-    })
-
-    
-    // validate jsonld
-    console.log(jsonldFound);
-
-    jsonldFound.map(data => {
-        console.log(data.path);
-        console.log(data.value);
-
-        const words = data.path.split('.');
-        // const value = initialjsonld.;
-
-        //find data based on selector
-
-    })
-
-
-
-
-}
-async function tryCheerioCrawlerExample() {
-    try {
-
-        // Prepare a list of URLs to crawl
-        const requestList = new Apify.RequestList({
-            sources: [{ url: 'https://www.yelp.com/biz/cuisine-of-nepal-san-francisco' }],
-        });
-        await requestList.initialize();
-
-        // Crawl the URLs
-        const crawler = new Apify.CheerioCrawler({
-            requestList,
-            handlePageFunction: async ({ request, response, body, contentType, $ }) => {
-                const data = [];
-
-                // Extract data from the page using cheerio.
-                const title = $('title').text();
-                // console.log(`Title: ${title}`);
-                this.initialjsonld = $('script[type="application/ld+json"]');
-                // console.log(`Json-LD: ${initialjsonld}`);
-
-                this.$ = $;
-                const h1texts = [];
-                $('h2').each((index, el) => {
-                    h1texts.push({
-                        text: $(el).text(),
-                    });
-                });
-
-                h1texts.map((h2) => {
-                    console.log(`H2: ${h2.text} from: ${request.url}`);
-                });
-
-            },
-        });
-
-        await crawler.run();
-        console.log('Crawler finishedd.');
-
-
-
-    } catch (err) {
-        console.log(err);
-        throw err;
-    }
-}
 
 async function analysePage(browser, url, searchFor, tests) {
     output.setNewUrl(url);
@@ -154,7 +51,7 @@ async function analysePage(browser, url, searchFor, tests) {
     console.log('================================');
     console.log(url);
     console.log('================================');
-    log('analysisStarted');
+    log.debug('analysisStarted');
     output.set('analysisStarted', new Date());
 
     const scrappedData = {
@@ -166,19 +63,19 @@ async function analysePage(browser, url, searchFor, tests) {
     const scrapper = new PageScrapper(browser, tests);
 
     scrapper.on('started', (data) => {
-        log('scrapping started');
+        log.debug('scrapping started');
         scrappedData.loadingStarted = data;
         output.set('scrappingStarted', data.timestamp);
     });
 
     scrapper.on('loaded', (data) => {
-        log('loaded');
+        log.debug('loaded');
         scrappedData.loadingFinished = data;
         output.set('pageNavigated', data.timestamp);
     });
 
     scrapper.on('initial-response', async (response) => {
-        log('initial response');
+        log.debug('initial response');
 
         output.set('initialResponse', {
             url: response.url,
@@ -189,10 +86,10 @@ async function analysePage(browser, url, searchFor, tests) {
         const html = response.responseBody;
         const treeSearcher = new TreeSearcher();
 
-        await Apify.setValue('html', html, { contentType: 'text/html' });
+        //wait Apify.setValue('html', html, { contentType: 'text/html' });
 
         try {
-            log(`start of html: ${html && html.substr && html.substr(0, 500)}`);
+            log.debug(`start of html: ${html && html.substr && html.substr(0, 500)}`);
             const $ = cheerio.load(html);
             if (tests.includes('META')) {
                 const metadata = parseMetadata({ $ });
@@ -205,7 +102,7 @@ async function analysePage(browser, url, searchFor, tests) {
                 await output.set('metaData', []);
                 await output.set('metaDataFound', []);
             }
-            log('metadata searched');
+            log.debug('metadata searched');
             await output.set('metadataSearched', new Date());
 
             if (tests.includes('JSON-LD')) {
@@ -227,7 +124,7 @@ async function analysePage(browser, url, searchFor, tests) {
                 await output.set('jsonLDDataFound', []);
                 await output.set('jsonLDData', []);
             }
-            log('json-ld searched');
+            log.debug('json-ld searched');
             await output.set('jsonLDSearched', new Date());
 
             if (tests.includes('SCHEMA.ORG')) {
@@ -249,7 +146,7 @@ async function analysePage(browser, url, searchFor, tests) {
                 await output.set('schemaOrgDataFound', []);
                 await output.set('schemaOrgData', []);
             }
-            log('schema org searched');
+            log.debug('schema org searched');
             await output.set('schemaOrgSearched', new Date());
 
 
@@ -261,7 +158,7 @@ async function analysePage(browser, url, searchFor, tests) {
             } else {
                 await output.set('htmlFound', []);
             }
-            log('initial html searched');
+            log.debug('initial html searched');
         } catch (error) {
             console.error('Intitial response parsing failed');
             console.error(error);
@@ -269,7 +166,7 @@ async function analysePage(browser, url, searchFor, tests) {
     });
 
     scrapper.on('html', async (html) => {
-        log('html');
+        log.debug('html');
         scrappedData.html = html;
         output.set('htmlFullyParsed', true);
         try {
@@ -285,12 +182,12 @@ async function analysePage(browser, url, searchFor, tests) {
             console.error('HTML search failed');
             console.error(error);
         }
-        log('html searched');
+        log.debug('html searched');
         await output.set('htmlSearched', new Date());
     });
 
     scrapper.on('window-properties', async (properties) => {
-        log('window properties');
+        log.debug('window properties');
         scrappedData.windowProperties = properties;
         output.set('windowPropertiesParsed', true);
         output.set('allWindowProperties', properties);
@@ -308,7 +205,7 @@ async function analysePage(browser, url, searchFor, tests) {
                     true,
                 ),
             );
-            log('window properties searched');
+            log.debug('window properties searched');
         } catch (error) {
             console.error('Window properties parsing failed');
             console.error(error);
@@ -317,12 +214,12 @@ async function analysePage(browser, url, searchFor, tests) {
     });
 
     scrapper.on('screenshot', (data) => {
-        log('screenshot');
+        log.debug('screenshot');
         output.set('screenshot', data);
     });
 
     scrapper.on('requests', async (requests) => {
-        log('requests');
+        log.debug('requests');
         scrappedData.xhrRequests = requests;
         output.set('xhrRequestsParsed', true);
         output.set('xhrRequests', requests);
@@ -353,27 +250,27 @@ async function analysePage(browser, url, searchFor, tests) {
                 }
             });
             output.set('xhrRequestsFound', xhrRequestResults);
-            log('xhrRequests searched');
+            log.debug('xhrRequests searched');
         } catch (err) {
-            log('XHR Request search failed');
+            log.debug('XHR Request search failed');
             console.error(err);
         }
         output.set('xhrRequestsSearched', new Date());
     });
 
     scrapper.on('done', (data) => {
-        log('scrapping finished');
+        log.debug('scrapping finished');
         output.set('scrappingFinished', data.timestamp);
     });
 
     scrapper.on('page-error', (data) => {
-        log('page error');
+        log.debug('page error');
         scrappedData.pageError = data;
         output.set('pageError', data);
     });
 
     scrapper.on('error', (data) => {
-        log('error');
+        log.debug('error');
         scrappedData.pageError = data;
         output.set('error', data);
     });
@@ -384,7 +281,7 @@ async function analysePage(browser, url, searchFor, tests) {
         // prevent act from closing before all data is asynchronously parsed and searched
         await waitForEnd('analysisEnded');
         // force last write of output data
-        log('Force write of output with await');
+        log.debug('Force write of output with await');
         // push all data to finishedData
         output.finish();
 
@@ -395,7 +292,9 @@ async function analysePage(browser, url, searchFor, tests) {
 }
 
 Apify.main(async () => {
-    log('Loading data from input');
+
+
+    log.debug('Loading data from input');
     try {
 
 
@@ -404,43 +303,45 @@ Apify.main(async () => {
 
         output = new OutputGenerator(input.tests);
 
-        const launchPuppeteerContext = {
-            // fix CORS error
-            launchOptions: {
-                args: [
-                    '--disable-web-security',
-                    '--disable-features=IsolateOrigins',
-                    '--disable-site-isolation-trials'
-                ]
+        const performAnalysis = true;
+
+        if (performAnalysis) {
+
+            const launchPuppeteerContext = {
+                // fix CORS error
+                launchOptions: {
+                    args: [
+                        '--disable-web-security',
+                        '--disable-features=IsolateOrigins',
+                        '--disable-site-isolation-trials'
+                    ]
+                }
+            };
+
+            if (process.env.PROXY_GROUP && process.env.PROXY_PASSWORD) {
+                const { PROXY_PASSWORD, PROXY_GROUP, PROXY_ADDRESS } = process.env;
+                const proxyAddress = PROXY_ADDRESS || 'proxy.apify.com:8000';
+                launchPuppeteerContext.proxyUrl = `http://groups-${PROXY_GROUP}:${PROXY_PASSWORD}@${proxyAddress}`;
             }
-        };
+            const browser = await Apify.launchPuppeteer(launchPuppeteerContext);
 
-        if (process.env.PROXY_GROUP && process.env.PROXY_PASSWORD) {
-            const { PROXY_PASSWORD, PROXY_GROUP, PROXY_ADDRESS } = process.env;
-            const proxyAddress = PROXY_ADDRESS || 'proxy.apify.com:8000';
-            launchPuppeteerContext.proxyUrl = `http://groups-${PROXY_GROUP}:${PROXY_PASSWORD}@${proxyAddress}`;
-        }
-        const browser = await Apify.launchPuppeteer(launchPuppeteerContext);
-
-        let pageToAnalyze = null;
-        for (let i = 0; i < input.pages.length; i++) {
-            pageToAnalyze = input.pages[i];
-            // eslint-disable-next-line no-await-in-loop
-            await analysePage(browser, pageToAnalyze.url, pageToAnalyze.searchFor, input.tests);
-
-
+            let pageToAnalyze = null;
+            for (let i = 0; i < input.pages.length; i++) {
+                pageToAnalyze = input.pages[i];
+                // eslint-disable-next-line no-await-in-loop
+                await analysePage(browser, pageToAnalyze.url, pageToAnalyze.searchFor, input.tests);
+            }
         }
 
-        // const validator = new Validator(output, input.url, input.pages);
-        // await validator.tryExample();
-
-        await tryCheerioCrawlerExample(input.pages, input.tests);
-        await validate();
+        const validator = new Validator(input.pages[0], input.tests);
+        await validator.validate();
 
 
-        log('Analyzer finished');
+
+
+        log.debug('Analyzer finished');
     } catch (error) {
-        log('Top level error');
+        log.debug('Top level error');
         console.error(error);
     }
 });
