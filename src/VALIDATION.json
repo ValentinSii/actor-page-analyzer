@@ -1,0 +1,67 @@
+[
+  {
+    "url": "http://www.imdb.com/title/tt1856101/?pf_rd_m=A2FGELUUNOQJNL&pf_rd_p=2773216402&pf_rd_r=10DBXD6JX4H7D7C8FEJD&pf_rd_s=right-7&pf_rd_t=15061&pf_rd_i=homepage&ref_=hm_cht_t1",
+    "searchFor": [
+      "Blade Runner 2049",
+      "8.5",
+      "Ryan Gosling"
+    ],
+    "htmlDataValidated": [
+      {
+        "selector": ".TitleHeader__TitleText-sc-1wu6n3d-0",
+        "htmlExpected": "Blade Runner 2049",
+        "htmlFound": "Blade Runner 2049"
+      },
+      {
+        "selector": ".ipc-poster-card__title--clamp-1",
+        "htmlExpected": "Blade Runner 2049",
+        "htmlFound": null
+      },
+      {
+        "selector": ".AnswersCTA__QuestionText-sc-1bimoq7-5",
+        "htmlExpected": "What is the streaming release date of Blade Runner 2049 (2017) in India?",
+        "htmlFound": "What is the streaming release date of Blade Runner 2049 (2017) in India?"
+      },
+      {
+        "selector": ".ipc-sub-grid--wraps-at-above-l > div:nth-child(2) > div.StyledComponents__CastItemSummary-sc-y9ygcu-9.hLoKtW > a.StyledComponents__ActorName-sc-y9ygcu-1.ezTgkS",
+        "htmlExpected": "Ryan Gosling",
+        "htmlFound": "Ryan Gosling"
+      },
+      {
+        "selector": ".PrincipalCredits__PrincipalCreditsPanelWideScreen-sc-hdn81t-0 > ul.ipc-metadata-list.ipc-metadata-list--dividers-all.title-pc-list.ipc-metadata-list--baseAlt > li.ipc-metadata-list-item--link > div.ipc-metadata-list-item__content-container > ul.ipc-inline-list.ipc-inline-list--show-dividers.ipc-inline-list--inline.ipc-metadata-list-item__list-content.baseAlt > li:nth-child(2) > a.ipc-metadata-list-item__list-content-item.ipc-metadata-list-item__list-content-item--link",
+        "htmlExpected": "Ryan Gosling",
+        "htmlFound": "Ryan Gosling"
+      },
+      {
+        "selector": ".ExpandablePrincipalCreditsPanel__PrincipalCredits-sc-krzxv6-1 > ul.ipc-metadata-list.ipc-metadata-list--dividers-all.title-pc-list.ipc-metadata-list--baseAlt > li.ipc-metadata-list-item--link > div.ipc-metadata-list-item__content-container > ul.ipc-inline-list.ipc-inline-list--show-dividers.ipc-inline-list--inline.ipc-metadata-list-item__list-content.baseAlt > li:nth-child(2) > a.ipc-metadata-list-item__list-content-item.ipc-metadata-list-item__list-content-item--link",
+        "htmlExpected": "Ryan Gosling",
+        "htmlFound": "Ryan Gosling"
+      },
+      {
+        "selector": ".BTFWrapper__MainColumnContent-sc-1g8jgrg-1 > section:nth-child(9) > div.styles__MetaDataContainer-sc-12uhu9s-0.cgqHBf > ul.ipc-metadata-list.ipc-metadata-list--dividers-all.ipc-metadata-list--base > li > div.ipc-metadata-list-item__content-container > a.ipc-link.ipc-link--base.Faqs__StyledLink-sc-10p3xr2-0.hZDsCc",
+        "htmlExpected": "What is Blade Runner 2049 about?",
+        "htmlFound": null
+      },
+      {
+        "selector": "div.ipc-sub-grid.ipc-sub-grid--page-span-2.ipc-sub-grid--nowrap.ipc-shoveler__grid > div:nth-child(2) > div.ipc-slate-card__content > div.ipc-slate-card__text-container > a.ipc-slate-card__title.ipc-slate-card__title--clickable.VideoSlate__title > div.ipc-slate-card__title-text.ipc-slate-card__title-text--clamp-2",
+        "htmlExpected": "'Blade Runner 2049' Trailer With Director's Commentary",
+        "htmlFound": "'Blade Runner 2049' Trailer With Director's Commentary"
+      },
+      {
+        "selector": "div.SidebarList__ListCardContainer-sc-ewg640-3.fXTqwl > div:nth-child(2) > div:nth-child(2) > a.ListPreviewCard__PreviewListCardLink-sc-1vudher-5.gUXWTU > div.ListPreviewCard__ListCardContainer-sc-1vudher-2.iPvUtC > div.ListPreviewCard__TextContainer-sc-1vudher-6.wxCMv > div.ListPreviewCard__ListName-sc-1vudher-1.jbenKV.listName",
+        "htmlExpected": "Face-Off: 'Blade Runner' vs. 'Blade Runner 2049'",
+        "htmlFound": null
+      },
+      {
+        "selector": "div.ipc-overflowText.ipc-overflowText--pageSection.ipc-overflowText--height-long.ipc-overflowText--long.ipc-overflowText--base > div.ipc-html-content.ipc-html-content--base > div:nth-child(1)",
+        "htmlExpected": "Thirty years after the events of Blade Runner (1982), a new Blade Runner, L.A.P.D. Officer \"K\" (Ryan Gosling), unearths a long-buried secret that has the potential to plunge what's left of society into chaos. K's discovery leads him on a quest to find Rick Deckard (Harrison Ford), a former L.A.P.D. Blade Runner, who has been missing for thirty years. —Warner Bros. Pictures",
+        "htmlFound": "Thirty years after the events of Blade Runner (1982), a new Blade Runner, L.A.P.D. Officer \"K\" (Ryan Gosling), unearths a long-buried secret that has the potential to plunge what's left of society into chaos. K's discovery leads him on a quest to find Rick Deckard (Harrison Ford), a former L.A.P.D. Blade Runner, who has been missing for thirty years. —Warner Bros. Pictures"
+      },
+      {
+        "selector": "nonexistentSelector",
+        "htmlExpected": "Non existent html text",
+        "htmlFound": null
+      }
+    ]
+  }
+]

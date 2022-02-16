@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+        body {font-family: Arial;}
+        
+        /* Style the tab */
+        .tab {
+          overflow: hidden;
+          border: 1px solid #ccc;
+          background-color: #f1f1f1;
+        }
+        
+        /* Style the buttons inside the tab */
+        .tab button {
+          background-color: inherit;
+          float: left;
+          border: none;
+          outline: none;
+          cursor: pointer;
+          padding: 14px 16px;
+          transition: 0.3s;
+          font-size: 17px;
+        }
+        
+        /* Change background color of buttons on hover */
+        .tab button:hover {
+          background-color: #ddd;
+        }
+        
+        /* Create an active/current tablink class */
+        .tab button.active {
+          background-color: #ccc;
+        }
+        
+        /* Style the tab content */
+        .tabcontent {
+          display: none;
+          padding: 6px 12px;
+          border: 1px solid #ccc;
+          border-top: none;
+        }
+        .London {
+            background-color: aquamarine;
+        }
+
+        .htmlRow {
+          border: 1px solid #ccc;
+          margin-bottom: 14px;
+          margin-left: 0px;
+        }
+        .green {
+          background-color: #b5e3af;
+        }
+        .red {
+          background-color: #f88687;
+        }
+        p {
+          padding-left: 14px;
+        }
+        h3 {
+          padding: 6px 14px;
+        }
+
+        </style>
+        </head><body><div class="tab">
+    <button class="tablinks" onclick="openTab(event, 'HTML')">HTML</button>
+    <button class="tablinks" onclick="openTab(event, 'JSONLD')">JSONLD</button>
+    <button class="tablinks" onclick="openTab(event, 'SCHEMA')">SCHEMA.ORG</button>
+    <button class="tablinks" onclick="openTab(event, 'XHR')">XHR</button>
+    <button class="tablinks" onclick="openTab(event, 'WINDOW')">WINDOW</button>
+    <button class="tablinks" onclick="openTab(event, 'META')">META</button>
+    </div><div id="HTML" class="tabcontent" >
+          <div class="green htmlRow">
+          <h3>Selector: .TitleHeader__TitleText-sc-1wu6n3d-0</h3>
+          <p><b>Html expected</b>: Blade Runner 2049</p>
+          <p><b>Html found</b>: Blade Runner 2049</p>
+          </div>          
+          
+          <div class="red htmlRow">
+          <h3>Selector: .ipc-poster-card__title--clamp-1</h3>
+          <p><b>Html expected</b>: Blade Runner 2049</p>
+          <p><b>Html found</b>: null</p>
+          </div>          
+          
+          <div class="green htmlRow">
+          <h3>Selector: .AnswersCTA__QuestionText-sc-1bimoq7-5</h3>
+          <p><b>Html expected</b>: What is the streaming release date of Blade Runner 2049 (2017) in India?</p>
+          <p><b>Html found</b>: What is the streaming release date of Blade Runner 2049 (2017) in India?</p>
+          </div>          
+          
+          <div class="green htmlRow">
+          <h3>Selector: .ipc-sub-grid--wraps-at-above-l > div:nth-child(2) > div.StyledComponents__CastItemSummary-sc-y9ygcu-11.keoaUD > a.StyledComponents__ActorName-sc-y9ygcu-1.ezTgkS</h3>
+          <p><b>Html expected</b>: Ryan Gosling</p>
+          <p><b>Html found</b>: Ryan Gosling</p>
+          </div>          
+          
+          <div class="green htmlRow">
+          <h3>Selector: .PrincipalCredits__PrincipalCreditsPanelWideScreen-sc-hdn81t-0 > ul.ipc-metadata-list.ipc-metadata-list--dividers-all.title-pc-list.ipc-metadata-list--baseAlt > li.ipc-metadata-list-item--link > div.ipc-metadata-list-item__content-container > ul.ipc-inline-list.ipc-inline-list--show-dividers.ipc-inline-list--inline.ipc-metadata-list-item__list-content.baseAlt > li:nth-child(2) > a.ipc-metadata-list-item__list-content-item.ipc-metadata-list-item__list-content-item--link</h3>
+          <p><b>Html expected</b>: Ryan Gosling</p>
+          <p><b>Html found</b>: Ryan Gosling</p>
+          </div>          
+          
+          <div class="green htmlRow">
+          <h3>Selector: .ExpandablePrincipalCreditsPanel__PrincipalCredits-sc-krzxv6-1 > ul.ipc-metadata-list.ipc-metadata-list--dividers-all.title-pc-list.ipc-metadata-list--baseAlt > li.ipc-metadata-list-item--link > div.ipc-metadata-list-item__content-container > ul.ipc-inline-list.ipc-inline-list--show-dividers.ipc-inline-list--inline.ipc-metadata-list-item__list-content.baseAlt > li:nth-child(2) > a.ipc-metadata-list-item__list-content-item.ipc-metadata-list-item__list-content-item--link</h3>
+          <p><b>Html expected</b>: Ryan Gosling</p>
+          <p><b>Html found</b>: Ryan Gosling</p>
+          </div>          
+          
+          <div class="red htmlRow">
+          <h3>Selector: .BTFWrapper__MainColumnContent-sc-1g8jgrg-1 > section:nth-child(9) > div.styles__MetaDataContainer-sc-12uhu9s-0.cgqHBf > ul.ipc-metadata-list.ipc-metadata-list--dividers-all.ipc-metadata-list--base > li > div.ipc-metadata-list-item__content-container > a.ipc-link.ipc-link--base.Faqs__StyledLink-sc-10p3xr2-0.hZDsCc</h3>
+          <p><b>Html expected</b>: What is Blade Runner 2049 about?</p>
+          <p><b>Html found</b>: null</p>
+          </div>          
+          
+          <div class="green htmlRow">
+          <h3>Selector: div.ipc-sub-grid.ipc-sub-grid--page-span-2.ipc-sub-grid--nowrap.ipc-shoveler__grid > div:nth-child(2) > div.ipc-slate-card__content > div.ipc-slate-card__text-container > a.ipc-slate-card__title.ipc-slate-card__title--clickable.VideoSlate__title > div.ipc-slate-card__title-text.ipc-slate-card__title-text--clamp-2</h3>
+          <p><b>Html expected</b>: 'Blade Runner 2049' Trailer With Director's Commentary</p>
+          <p><b>Html found</b>: 'Blade Runner 2049' Trailer With Director's Commentary</p>
+          </div>          
+          
+          <div class="red htmlRow">
+          <h3>Selector: div.SidebarList__ListCardContainer-sc-ewg640-3.fXTqwl > div:nth-child(2) > div:nth-child(2) > a.ListPreviewCard__PreviewListCardLink-sc-1vudher-5.gUXWTU > div.ListPreviewCard__ListCardContainer-sc-1vudher-2.iPvUtC > div.ListPreviewCard__TextContainer-sc-1vudher-6.wxCMv > div.ListPreviewCard__ListName-sc-1vudher-1.jbenKV.listName</h3>
+          <p><b>Html expected</b>: Face-Off: 'Blade Runner' vs. 'Blade Runner 2049'</p>
+          <p><b>Html found</b>: null</p>
+          </div>          
+          
+          <div class="green htmlRow">
+          <h3>Selector: div.ipc-overflowText.ipc-overflowText--pageSection.ipc-overflowText--height-long.ipc-overflowText--long.ipc-overflowText--base > div.ipc-html-content.ipc-html-content--base > div:nth-child(1)</h3>
+          <p><b>Html expected</b>: Thirty years after the events of Blade Runner (1982), a new Blade Runner, L.A.P.D. Officer "K" (Ryan Gosling), unearths a long-buried secret that has the potential to plunge what's left of society into chaos. K's discovery leads him on a quest to find Rick Deckard (Harrison Ford), a former L.A.P.D. Blade Runner, who has been missing for thirty years. —Warner Bros. Pictures</p>
+          <p><b>Html found</b>: Thirty years after the events of Blade Runner (1982), a new Blade Runner, L.A.P.D. Officer "K" (Ryan Gosling), unearths a long-buried secret that has the potential to plunge what's left of society into chaos. K's discovery leads him on a quest to find Rick Deckard (Harrison Ford), a former L.A.P.D. Blade Runner, who has been missing for thirty years. —Warner Bros. Pictures</p>
+          </div>          
+          
+          <div class="red htmlRow">
+          <h3>Selector: nonexistentSelector</h3>
+          <p><b>Html expected</b>: Non existent html text</p>
+          <p><b>Html found</b>: null</p>
+          </div>          
+          </div>      
+              
+        <div id="Paris" class="tabcontent">
+          <h3>Paris</h3>
+          <p>Paris is the capital of France.</p> 
+        </div>        
+        <div id="Tokyo" class="tabcontent">
+          <h3>Tokyo</h3>
+          <p>Tokyo is the capital of Japan.</p>
+        </div>        
+        <script src="htmlPage.js"></script>           
+        </body>
+        </html> 

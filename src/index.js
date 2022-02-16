@@ -85,8 +85,9 @@ async function analysePage(browser, url, searchFor, tests) {
 
         const html = response.responseBody;
         const treeSearcher = new TreeSearcher();
+        const htmlJson = JSON.stringify(response.responseBody);
 
-        //wait Apify.setValue('html', html, { contentType: 'text/html' });
+        await Apify.setValue('html', htmlJson, { contentType: 'text/html' });
 
         try {
             log.debug(`start of html: ${html && html.substr && html.substr(0, 500)}`);
@@ -303,6 +304,7 @@ Apify.main(async () => {
 
         output = new OutputGenerator(input.tests);
 
+        // this is here for dev purposes, validation step can be performed using OUTPUT.json file from previous runs
         const performAnalysis = true;
 
         if (performAnalysis) {
@@ -333,7 +335,7 @@ Apify.main(async () => {
             }
         }
 
-        const validator = new Validator(input.pages[0], input.tests);
+        const validator = new Validator(input.pages[0], input.tests, input.pages[0].searchFor);
         await validator.validate();
 
 

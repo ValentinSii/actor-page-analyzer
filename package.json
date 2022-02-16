@@ -36,10 +36,11 @@
     },
     "dependencies": {
         "apify": "^2.1",
-        "puppeteer": "*",
         "cheerio": "^1.0.0-rc.3",
         "html-entities": "^1.2.1",
+        "jsonpath-plus": "^6.0.1",
         "lodash": "^4.17.21",
+        "puppeteer": "*",
         "type-check": "^0.4"
     },
     "devDependencies": {

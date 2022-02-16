@@ -1,17 +1,26 @@
 const fs = require('fs');
 const Apify = require('apify');
 const { log } = Apify.utils;
+const { gotScraping } = require('got-scraping');
+const {JSONPath} = require('jsonpath-plus');
+const parseJsonLD = require('../parse/json-ld');
+const html = require('../generate/HtmlOutput');
+
+
+// const got = require('got');
 
 
 
 class Validator {
 
-    constructor (inputPage, inputTests, analyzerOutput = null) {
+    constructor (inputPage, inputTests, inputSearchFor, analyzerOutput = null) {
         this.inputPageUrl = inputPage.url;
         this.inputTests = inputTests;
+        this.inputSearchFor = inputSearchFor;
 
         this.analyzerOutputData = null;
         this.validatorOutputData = [];
+        this.currentlyValidatedData = {};
         this.$ = null;
 
         // populate anlyzerOutputData
@@ -19,7 +28,11 @@ class Validator {
         this.readOutput();
 
 
+        this.currentlyValidatedData.url = this.inputPageUrl;
+        this.currentlyValidatedData.searchFor = this.inputSearchFor;
+
         log.info('Information message', { someData: 123 }); // prints message
+        
 
     }
 
@@ -34,14 +47,54 @@ class Validator {
 
         this.validateHtml();
 
+
+        // following will be done in similiar fashion as validateHtml
         // this.validateJsonLD();
         // this.validateSchemaOrg();
-        // this.validate
+        // this.validateWindowProperties();
+
+        await this.validateXhrRequests();
+
+        // await gotScraping
+        //             .get( {
+        //                 url: requestUrl,
+        //                 headerGeneratorOptions:{
+        //                     browsers: [
+        //                         {
+        //                             name: 'chrome',
+        //                             minVersion: 87,
+        //                             maxVersion: 89
+        //                         }
+        //                     ],
+        //                     devices: ['desktop'],
+        //                     locales: ['de-DE', 'en-US'],
+        //                     operatingSystems: ['windows', 'linux']
+        //                 }
+        //             })
+        //             .then(({body}) => console.log(body));
+
+
         await this.dumpValidatorData();
+    }
+    async validateXhrRequests() {
+        this.analyzerOutputData[0].xhrRequestsFound.map( (xhrRequest) => {
+            console.log(xhrRequest);
+
+            const splitRequest = xhrRequest.request.split(' ');
+            const requestMethod = splitRequest[0];
+            const requestUrl = splitRequest[1];
+
+            
+
+        });
     }
 
     validateJsonLD() {
+
+        const jsonldmfk = this.initialjsonld;
         this.analyzerOutputData[0].jsonLDDataFound.map( (jsonLDDataFound) => {
+            const result = JSONPath({path: jsonLDDataFound.path, json: jsonldmfk});
+            console.log(result);
 
         });
     }
@@ -79,9 +132,7 @@ class Validator {
         });
 
         
-        this.validatorOutputData.push({
-            htmlDataValidated : htmlDataValidated
-        });
+        this.currentlyValidatedData.htmlDataValidated = htmlDataValidated; 
         console.log('==========================================================================');
 
         if (allDataFound) {
@@ -95,12 +146,19 @@ class Validator {
 
         console.log('==========================================================================');
         console.log('==========================================================================');
+
+        const htmlGen = new html(this.currentlyValidatedData);
+        htmlGen.generateHtmlFile();
     }
 
 
     async dumpValidatorData() {
-        const data = JSON.stringify(this.validatorOutputData, null, 2);
+        
+        
+
         try {
+            this.validatorOutputData.push(this.currentlyValidatedData);
+            const data = JSON.stringify(this.validatorOutputData, null, 2);
             await Apify.setValue('VALIDATION', data, { contentType: 'application/json' });
             log.debug('VALIDATION written into file');
             
@@ -128,8 +186,10 @@ class Validator {
                 // Extract data from the page using cheerio.
                 const title = $('title').text();
                 log.debug(`Title: ${title}`);
-                this.initialjsonld = $('script[type="application/ld+json"]');
                 // console.log(`Json-LD: ${initialjsonld}`);
+
+                this.initialjsonld = parseJsonLD({ $ });
+
 
                 this.$ = $;
                 const h1texts = [];
