@@ -89,6 +89,7 @@ class PageScrapper {
             rec = {
                 url: null,
                 method: null,
+                requestHeaders: null,
                 responseStatus: null,
                 responseHeaders: null,
             };
@@ -112,6 +113,7 @@ class PageScrapper {
         const rec = this.getOrCreateRequestRecord(request.url());
         rec.url = request.url();
         rec.method = request.method();
+        rec.requestHeaders = request.headers();
         this.call('request', request);
 
         if (rec.url === this.url || rec.url.replace(this.url, '') === '/') {

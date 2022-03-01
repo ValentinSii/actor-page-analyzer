@@ -17,22 +17,87 @@ class htmlGenerator {
 
   }
 
-  generateHtmlFile(jsonValidator) {
+  generateHtmlFile() {
     this.generateHeaderAndCss();
     this.htmlOutput.push(`<body>`);
     this.tabs();
     this.htmlTab();
+    
+    this.jsonLDDataTab();
+    this.xhrTab();
     this.generateContent();
 
 
 
-
-    fs.writeFile('page.html', this.htmlOutput.join(""), function (err) {
+    console.log(this.htmlOutput.join(""));
+    fs.writeFileSync('page.html', this.htmlOutput.join(""), function (err) {
       if (err) return console.log(err);
     });
 
   }
 
+  tabs() {
+    const tabs = `<div class="tab">
+    <button class="tablinks" onclick="openTab(event, 'HTML')">HTML</button>
+    <button class="tablinks" onclick="openTab(event, 'JSONLD')">JSONLD</button>
+    <button class="tablinks" onclick="openTab(event, 'SCHEMA')">SCHEMA.ORG</button>
+    <button class="tablinks" onclick="openTab(event, 'XHR')">XHR</button>
+    <button class="tablinks" onclick="openTab(event, 'WINDOW')">WINDOW</button>
+    <button class="tablinks" onclick="openTab(event, 'META')">META</button>
+    </div>`;
+    this.htmlOutput.push(tabs);
+  }
+  htmlTab() {
+    this.htmlOutput.push(`<div id="HTML" class="tabcontent" >`);
+    this.validatorOutput.htmlDataValidated.forEach(htmlValidated => {
+      const color = htmlValidated.htmlExpected === htmlValidated.htmlFound ? "green" : "red";
+
+      this.htmlOutput.push(`
+          <div class="${color} htmlRow">
+          <h3>Selector: ${htmlValidated.selector}</h3>
+          <p><b>Html expected</b>: ${htmlValidated.htmlExpected}</p>
+          <p><b>Html found</b>: ${htmlValidated.htmlFound}</p>
+          </div>          
+          `);
+    });
+    this.htmlOutput.push(`</div>`);
+
+  }
+
+  jsonLDDataTab() {
+    this.htmlOutput.push(`<div id="JSONLD" class="tabcontent" >`);
+    this.validatorOutput.jsonLDDValidated.forEach(jsonldValidated => {
+      const color = jsonldValidated.htmlExpected === jsonldValidated.htmlFound ? "green" : "red";
+
+      this.htmlOutput.push(`
+            <div class="${color} htmlRow">
+            <h3>Path: ${jsonldValidated.path}</h3>
+            <p><b>Jsonld data expected</b>: ${jsonldValidated.dataExpected}</p>
+            <p><b>Data found</b>: ${jsonldValidated.dataFound}</p>
+            </div>          
+            `);
+    });
+    this.htmlOutput.push(`</div>`);
+
+  }
+  xhrTab() {
+    this.htmlOutput.push(`<div id="XHR" class="tabcontent" >`);
+
+    const xhr = this.validatorOutput.xhr;
+
+    const color = "green";
+
+    this.htmlOutput.push(`
+            <div class="${color} htmlRow">
+            <h3>Request: ${xhr.url}</h3>
+            <p><b>Method</b>: ${xhr.method}</p>
+            <p><b>Headers</b>: ${JSON.stringify(xhr.headers, null, 2)}</p>
+            <p><b>Response body</b>: ${JSON.stringify(xhr.responseBody, null, 2)}</p>
+            </div>          
+            `);
+
+    this.htmlOutput.push(`</div>`);
+  }
 
   generateHeaderAndCss() {
     const header = `<!DOCTYPE html>
@@ -105,33 +170,7 @@ class htmlGenerator {
 
     this.htmlOutput.push(header);
   }
-  tabs() {
-    const tabs = `<div class="tab">
-    <button class="tablinks" onclick="openTab(event, 'HTML')">HTML</button>
-    <button class="tablinks" onclick="openTab(event, 'JSONLD')">JSONLD</button>
-    <button class="tablinks" onclick="openTab(event, 'SCHEMA')">SCHEMA.ORG</button>
-    <button class="tablinks" onclick="openTab(event, 'XHR')">XHR</button>
-    <button class="tablinks" onclick="openTab(event, 'WINDOW')">WINDOW</button>
-    <button class="tablinks" onclick="openTab(event, 'META')">META</button>
-    </div>`;
-    this.htmlOutput.push(tabs);
-  }
-  htmlTab() {
-    this.htmlOutput.push(`<div id="HTML" class="tabcontent" >`);
-    this.validatorOutput.htmlDataValidated.forEach(htmlValidated => {
-    const color = htmlValidated.htmlExpected === htmlValidated.htmlFound ? "green" : "red";
 
-    this.htmlOutput.push(`
-          <div class="${color} htmlRow">
-          <h3>Selector: ${htmlValidated.selector}</h3>
-          <p><b>Html expected</b>: ${htmlValidated.htmlExpected}</p>
-          <p><b>Html found</b>: ${htmlValidated.htmlFound}</p>
-          </div>          
-          `);
-    });
-    this.htmlOutput.push(`</div>`);
-
-  }
   generateContent() {
     const content = `      
               

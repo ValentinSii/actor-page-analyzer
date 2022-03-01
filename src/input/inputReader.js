@@ -27,14 +27,14 @@ class input {
        
 }
 
-async function readInputAsync() {
+async function readInputAsync(inputFileName) {
 
     let inputObject = new input();
     console.log('This is console.log from inputReader: Loading data from input');
     try {
         // Fetch the input and check it has a valid format
         // You don't need to check the input, but it's a good practice.
-        let input = await Apify.getValue('INPUT');
+        let input = await Apify.getValue(inputFileName);
 
         const isSinglePageInput = typeCheck(PAGE_INPUT_TYPE, input);
         const isMultiPageInput = typeCheck(INPUT_TYPE, input);

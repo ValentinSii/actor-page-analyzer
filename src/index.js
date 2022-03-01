@@ -244,7 +244,9 @@ async function analysePage(browser, url, searchFor, tests) {
                 }
                 if (results.length > 0) {
                     xhrRequestResults.push({
-                        request: `${request.method} ${request.url}`,
+                        requestUrl: request.url,
+                        requestMethod: request.method,
+                        requestHeaders: request.requestHeaders,
                         response: request.responseBody,
                         searchResults: results,
                     });
@@ -300,7 +302,9 @@ Apify.main(async () => {
 
 
         // Fetch the input and check it has a valid format
-        let input = await InputReader.readInputAsync();
+        // const exampleInputsDir = '/key_value_stores/default/example_inputs/';
+        // const inputFileName = 'INPUT_ALZA';
+        let input = await InputReader.readInputAsync('INPUT');
 
         output = new OutputGenerator(input.tests);
 
