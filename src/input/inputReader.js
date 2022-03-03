@@ -40,11 +40,11 @@ async function readInputAsync(inputFileName) {
         const isMultiPageInput = typeCheck(INPUT_TYPE, input);
 
         if (!isMultiPageInput && !isSinglePageInput) {
-            log('Expected input:');
-            log(INPUT_TYPE);
-            log('or');
-            log(PAGE_INPUT_TYPE);
-            log('Received input:');
+            console.log('Expected input:');
+            console.log(INPUT_TYPE);
+            console.log('or');
+            console.log(PAGE_INPUT_TYPE);
+            console.log('Received input:');
             console.dir(input);
             throw new Error('Received invalid input');
         }
@@ -52,9 +52,9 @@ async function readInputAsync(inputFileName) {
         if (isMultiPageInput) {
             input.pages.forEach(page => {
                 if (!typeCheck(PAGE_INPUT_TYPE, page) && !isSinglePageInput) {
-                    log('Expected input:');
-                    log(INPUT_TYPE);
-                    log('Received input:');
+                    console.log('Expected input:');
+                    console.log(INPUT_TYPE);
+                    console.log('Received input:');
                     console.dir(input);
                     throw new Error('Received invalid input');
                 }

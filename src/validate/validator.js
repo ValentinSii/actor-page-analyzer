@@ -65,7 +65,12 @@ class Validator {
                 //     headers: requestHeaders
                 // });
 
-                const requestResponse = await gotScraping.post(requestUrl, { headers: requestHeaders, json: { commodityId: 6398627 } });
+                const requestResponse = await gotScraping.post(
+                    requestUrl, 
+                    { 
+                        headers: requestHeaders, 
+                        json: { commodityId: 6398627 } 
+                    });
                 console.log(requestResponse);
                 console.log(requestResponse.body);
 
