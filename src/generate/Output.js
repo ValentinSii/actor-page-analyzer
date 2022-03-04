@@ -48,6 +48,7 @@ class OutputGenerator {
             outputFinished: null,
             error: null,
             pageError: null,
+            validation: null
         };
         this.writeTimeout = null;
         this.writeOutput = this.writeOutput.bind(this);

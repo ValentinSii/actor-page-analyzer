@@ -11,6 +11,8 @@ const DOMSearcher = require('./search/DOMSearcher');
 const TreeSearcher = require('./search/TreeSearcher');
 const OutputGenerator = require('./generate/Output');
 const { findCommonAncestors } = require('./utils');
+const { readInputAsync } = require('./input/inputReader');
+const { Validator } = require('./validate/validator');
 
 let lastLog = Date.now();
 
@@ -163,6 +165,7 @@ async function analysePage(browser, url, searchFor, tests) {
                 await output.set('htmlFound', []);
             }
             log('initial html searched');
+
         } catch (error) {
             console.error('Intitial response parsing failed');
             console.error(error);
@@ -286,6 +289,11 @@ async function analysePage(browser, url, searchFor, tests) {
         await waitForEnd('analysisEnded');
         // force last write of output data
         log('Force write of output with await');
+
+        // validate single url
+        const validator = new Validator(url, searchFor, tests, output.fields);
+        await validator.validate();
+
         await output.writeOutput();
     } catch (error) {
         console.error(error);
@@ -295,41 +303,13 @@ async function analysePage(browser, url, searchFor, tests) {
 Apify.main(async () => {
     log('Loading data from input');
     try {
+
         // Fetch the input and check it has a valid format
         // You don't need to check the input, but it's a good practice.
-        let input = await Apify.getValue('INPUT');
-
-        const isSinglePageInput = typeCheck(PAGE_INPUT_TYPE, input);
-        const isMultiPageInput = typeCheck(INPUT_TYPE, input);
-
-        if (!isMultiPageInput && !isSinglePageInput) {
-            log('Expected input:');
-            log(INPUT_TYPE);
-            log('or');
-            log(PAGE_INPUT_TYPE);
-            log('Received input:');
-            console.dir(input);
-            throw new Error('Received invalid input');
-        }
-        if (isMultiPageInput) {
-            input.pages.forEach(page => {
-                if (!typeCheck(PAGE_INPUT_TYPE, page) && !isSinglePageInput) {
-                    log('Expected input:');
-                    log(INPUT_TYPE);
-                    log('Received input:');
-                    console.dir(input);
-                    throw new Error('Received invalid input');
-                }
-            });
-        } else if (isSinglePageInput) {
-            input = {
-                pages: [
-                    input,
-                ],
-            };
-        }
-
-        const tests = input.tests || ['SCHEMA.ORG', 'JSON-LD', 'WINDOW', 'XHR', 'META', 'HTML'];
+        const inputFileName = 'INPUT';
+        let input = await readInputAsync(inputFileName);
+        // TODO: Per page tests
+        const tests = input.tests || ['SCHEMA.ORG', 'JSON-LD', 'WINDOW', 'XHR', 'META', 'HTML', 'VALIDATE'];
         output = new OutputGenerator(tests);
 
         const launchPuppeteerContext = {
