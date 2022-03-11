@@ -1,11 +1,12 @@
 const fs = require('fs');
+const Apify = require('apify');
 
 class htmlGenerator {
 
   constructor(analyzerOutput) {
     // general OUTPUT.json file object
     this.analyzerOutput = analyzerOutput;
-    
+
     this.htmlOutput = [];
   }
   // readAnalyzerOutput() {
@@ -19,25 +20,35 @@ class htmlGenerator {
 
   // }
 
-  generateHtmlFile() {
+  async generateHtmlFile(fileName) {
     this.generateHeaderAndCss();
     this.htmlOutput.push(`<body>`);
     this.tabs();
     this.htmlTab();
     
-    // this.jsonLDDataTab();
+    this.jsonLDDataTab();
     // this.xhrTab();
     this.appendScript();
 
 
 
-    console.log(this.htmlOutput.join(""));
-    fs.writeFileSync('page.html', this.htmlOutput.join(""), function (err) {
-      if (err) return console.log(err);
-    });
+    // console.log(this.htmlOutput.join(""));
+    // fs.writeFileSync('page.html', this.htmlOutput.join(""), function (err) {
+    //   if (err) return console.log(err);
+    // });
+
+    await this.saveValidatorOutput(fileName);
+
+    
 
   }
-
+  async saveValidatorOutput(fileName){
+    try {
+      await Apify.setValue(fileName,this.htmlOutput.join(""), { contentType: 'text/html' });
+    }    catch (errr) {
+      console.log(err);
+    }
+  }
   tabs() {
     const tabs = `<div class="tab">
     <button class="tablinks" onclick="openTab(event, 'HTML')">HTML</button>
@@ -68,14 +79,14 @@ class htmlGenerator {
 
   jsonLDDataTab() {
     this.htmlOutput.push(`<div id="JSONLD" class="tabcontent" >`);
-    this.analyzerOutput.jsonLDDValidated.forEach(jsonldValidated => {
-      const color = jsonldValidated.htmlExpected === jsonldValidated.htmlFound ? "green" : "red";
+    this.analyzerOutput.validation.jsonLDDValidated.forEach(jsonldDataUnit => {
+      const color = jsonldDataUnit.htmlExpected === jsonldDataUnit.htmlFound ? "green" : "red";
 
       this.htmlOutput.push(`
             <div class="${color} htmlRow">
-            <h3>Path: ${jsonldValidated.path}</h3>
-            <p><b>Jsonld data expected</b>: ${jsonldValidated.dataExpected}</p>
-            <p><b>Data found</b>: ${jsonldValidated.dataFound}</p>
+            <h3>Path: ${jsonldDataUnit.path}</h3>
+            <p><b>Jsonld data expected</b>: ${jsonldDataUnit.dataExpected}</p>
+            <p><b>Data found</b>: ${jsonldDataUnit.dataFound}</p>
             </div>          
             `);
     });

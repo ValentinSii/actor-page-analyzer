@@ -8,7 +8,6 @@ const parseJsonLD = require('../parse/json-ld');
 const { result } = require('lodash');
 const parseMetadata = require('../parse/metadata');
 const parseSchemaOrgData = require('../parse/schema-org');
-const htmlGenerator = require('../generate/HtmlOutput');
 
 class Validator {
 
@@ -45,8 +44,6 @@ class Validator {
         this.validateHtml();
         this.validateJsonLD();
         this.analyzerOutput.validation = this.vod;
-        this.htmlGenerator = new htmlGenerator(this.analyzerOutput);
-        this.htmlGenerator.generateHtmlFile();
         // this.validateJsonLD();
         // schema org 
         // metadata

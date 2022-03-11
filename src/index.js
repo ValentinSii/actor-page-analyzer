@@ -10,9 +10,11 @@ const parseJsonLD = require('./parse/json-ld');
 const DOMSearcher = require('./search/DOMSearcher');
 const TreeSearcher = require('./search/TreeSearcher');
 const OutputGenerator = require('./generate/Output');
-const { findCommonAncestors } = require('./utils');
+const { findCommonAncestors, getHostName } = require('./utils');
 const { readInputAsync } = require('./input/inputReader');
 const { Validator } = require('./validate/validator');
+const htmlGenerator = require('./generate/HtmlOutput');
+
 
 let lastLog = Date.now();
 
@@ -53,11 +55,20 @@ async function waitForEnd(field) {
     return done;
 }
 
-async function analysePage(browser, url, searchFor, tests) {
+async function analysePage(browser, url, searchFor, tests, inputIndex) {
     output.setNewUrl(url);
     console.log('================================');
     console.log(url);
     console.log('================================');
+    
+
+    //create filenames for initial html response and html validation output
+    const hostName = getHostName(url);
+    console.log(hostName);
+
+    const initialResposneFileName = hostName + inputIndex;
+    const validationFileName = hostName + 'Validation' + inputIndex;
+
     log('analysisStarted');
     output.set('analysisStarted', new Date());
 
@@ -92,7 +103,7 @@ async function analysePage(browser, url, searchFor, tests) {
         const html = response.responseBody;
         const treeSearcher = new TreeSearcher();
 
-        await Apify.setValue('html', html, { contentType: 'text/html' });
+        await Apify.setValue(initialResposneFileName, html, { contentType: 'text/html' });
 
         try {
             log(`start of html: ${html && html.substr && html.substr(0, 500)}`);
@@ -293,8 +304,15 @@ async function analysePage(browser, url, searchFor, tests) {
         // validate single url
         const validator = new Validator(url, searchFor, tests, output.fields);
         await validator.validate();
+
+        //generate validation html output 
+        this.htmlGenerator = new htmlGenerator(output.fields);
+
         
+        await this.htmlGenerator.generateHtmlFile(validationFileName);
+
         // force last write of output data
+        console.log(url.match(/^http(s)?:\/\//i));
         log('Force write of output with await');
 
         await output.writeOutput();
@@ -337,7 +355,7 @@ Apify.main(async () => {
         for (let i = 0; i < input.pages.length; i++) {
             pageToAnalyze = input.pages[i];
             // eslint-disable-next-line no-await-in-loop
-            await analysePage(browser, pageToAnalyze.url, pageToAnalyze.searchFor, pageToAnalyze.tests || tests);
+            await analysePage(browser, pageToAnalyze.url, pageToAnalyze.searchFor, pageToAnalyze.tests || tests, i);
         }
 
         log('Analyzer finished');
