@@ -284,15 +284,18 @@ async function analysePage(browser, url, searchFor, tests) {
 
     try {
         const fullUrl = url.match(/^http(s)?:\/\//i) ? url : `http://${url}`;
+        log(`Starting scraper for: ${fullUrl}`);
         await scrapper.start(fullUrl);
         // prevent act from closing before all data is asynchronously parsed and searched
         await waitForEnd('analysisEnded');
-        // force last write of output data
-        log('Force write of output with await');
+        
 
         // validate single url
         const validator = new Validator(url, searchFor, tests, output.fields);
         await validator.validate();
+        
+        // force last write of output data
+        log('Force write of output with await');
 
         await output.writeOutput();
     } catch (error) {

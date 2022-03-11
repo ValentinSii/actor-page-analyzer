@@ -6,10 +6,13 @@ const { JSONPath } = require('jsonpath-plus');
 const parseJsonLD = require('../parse/json-ld');
 // const html = require('../generate/HtmlOutput');
 const { result } = require('lodash');
+const parseMetadata = require('../parse/metadata');
+const parseSchemaOrgData = require('../parse/schema-org');
+const htmlGenerator = require('../generate/HtmlOutput');
 
 class Validator {
 
-    constructor(inputUrl, inputSearchFor, inputTests,  analyzerOutput) {
+    constructor(inputUrl, inputSearchFor, inputTests, analyzerOutput) {
         // data from user input
         this.inputPageUrl = inputUrl;
         this.inputSearchFor = inputSearchFor;
@@ -24,7 +27,11 @@ class Validator {
 
         // variable for cheeriocrawler object
         this.$ = null;
-        
+        this.initialjsonld = null;
+        this.initialMetadata = null;
+        this.initialSchema = null;
+        this.initialWindowPorperties = null;
+
         console.log('Validator instance created sucessfully. ')
     }
 
@@ -36,9 +43,16 @@ class Validator {
 
 
         this.validateHtml();
+        this.validateJsonLD();
         this.analyzerOutput.validation = this.vod;
+        this.htmlGenerator = new htmlGenerator(this.analyzerOutput);
+        this.htmlGenerator.generateHtmlFile();
         // this.validateJsonLD();
-        
+        // schema org 
+        // metadata
+        // windows properties
+        // 
+
 
 
 
@@ -76,7 +90,7 @@ class Validator {
         //             // console.log(`Response from ${requestMethod} received sucessfully: \n ${requestResponse}`);
         //     }                
 
-            
+
         // }
 
         // await this.dumpValidatorData();
@@ -96,7 +110,8 @@ class Validator {
             const htmlValidationResult = {
                 selector: htmlData.selector,
                 htmlExpected: htmlData.text,
-                htmlFound: htmlFound || null
+                htmlFound: htmlFound || null,
+                foundinLists: htmlData.foundinLists || null
 
             };
             htmlDataValidated.push(htmlValidationResult);
@@ -111,38 +126,69 @@ class Validator {
 
         const jsonld = { jsonLdArray: this.initialjsonld };
         let jsonLDDValidated = [];
-        this.analyzerOutputData[0].jsonLDDataFound.map((jsonLDDataUnit) => {
+        this.analyzerOutput.jsonLDDataFound.map((jsonLDDataUnit) => {
             const jsonldFound = JSONPath({ path: 'jsonLdArray' + jsonLDDataUnit.path, json: jsonld });
             console.log(jsonldFound);
 
             const jsonldValidationResult = {
                 path: jsonLDDataUnit.path,
                 dataExpected: jsonLDDataUnit.value,
-                dataFound: jsonldFound
+                dataFound: jsonldFound,
+                foundinLists: jsonLDDataUnit.foundinLists || null
             };
             jsonLDDValidated.push(jsonldValidationResult);
 
         });
 
-        this.currentlyValidatedData.jsonLDDValidated = jsonLDDValidated;
-        console.log('HTML validation end');
+        this.vod.jsonLDDValidated = jsonLDDValidated;
+        console.log('Json-ld validation end');
     }
+
+    // async validateXHR() {
+
+    //     if (this.analyzerOutputData.xhrRequests.length > 0) {
+
+    //         this.analyzerOutputData.xhrRequests.map(xhrRequest => {
+    //             const requestMethod = xhrRequest.method;
+    //             const requestUrl = xhrRequest.url;
+    //             const requestHeaders = xhrRequest.requestHeaders;
+
+    //             const response = null;
+
+    //             if (requestMethod === "POST") {
+
+    //                 // const options = new Options({
+    //                 //     headers: requestHeaders
+    //                 // });
     
+    //                 const requestResponse = await gotScraping.post(
+    //                     requestUrl, 
+    //                     { 
+    //                         headers: requestHeaders, 
+    //                         json: { commodityId: 6398627 } 
+    //                     });
+    //                 console.log(requestResponse);
+    //                 console.log(requestResponse.body);
+    
+    //                 this.currentlyValidatedData.xhr = {
+    //                     url: requestUrl,
+    //                     method: requestMethod,
+    //                     headers: requestHeaders,
+    //                     responseBody: requestResponse.body
+    //                 }
+    //                     // const data = JSON.stringify(await result, null, 2);
+    //                     // await Apify.setValue('responseeeee', data, { contentType: 'application/text' });
+    
+    //                     // console.log(`Response from ${requestMethod} received sucessfully: \n ${requestResponse}`);
+    //             }
 
 
-    async dumpValidatorData() {
-        try {
-            this.validatorOutputData.push(this.currentlyValidatedData);
-            const data = JSON.stringify(this.validatorOutputData, null, 2);
-            await Apify.setValue('VALIDATION', data, { contentType: 'application/json' });
-            log.debug('VALIDATION written into file');
 
-        } catch (error) {
-            log.debug('could not save validator output');
-            log.debug(error);
-            throw error;
-        }
-    }
+
+
+    //         });
+    //     }
+    // }
     async loadInitialHtml() {
         // Prepare a list of URLs to crawl
         const requestList = new Apify.RequestList({
@@ -156,8 +202,12 @@ class Validator {
 
             //this will retry 
             handlePageFunction: async ({ request, response, body, contentType, $ }) => {
-                
+
+                // parse all available data
                 this.initialjsonld = parseJsonLD({ $ });
+                this.initialMetadata = parseMetadata({ $ });
+                this.initialSchema = parseSchemaOrgData({ $ });
+
                 this.$ = $;
 
             },
