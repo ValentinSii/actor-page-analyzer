@@ -43,59 +43,40 @@ class Validator {
 
         this.validateHtml();
         this.validateJsonLD();
+        // this.validateMetaData();
         this.analyzerOutput.validation = this.vod;
-        // this.validateJsonLD();
+        // await this.validateXHR();
         // schema org 
         // metadata
-        // windows properties
-        // 
 
 
-
-
-        // if (this.analyzerOutputData[0].xhrRequests.length > 0) {
-        //     const xhrRequest = this.analyzerOutputData[0].xhrRequests[7];
-        //     const requestMethod = xhrRequest.method;
-        //     const requestUrl = xhrRequest.url;
-        //     const requestHeaders = xhrRequest.requestHeaders;
-
-        //     const requestResponse = null;
-        //     if (requestMethod === "POST") {
-
-        //         // const options = new Options({
-        //         //     headers: requestHeaders
-        //         // });
-
-        //         const requestResponse = await gotScraping.post(
-        //             requestUrl, 
-        //             { 
-        //                 headers: requestHeaders, 
-        //                 json: { commodityId: 6398627 } 
-        //             });
-        //         console.log(requestResponse);
-        //         console.log(requestResponse.body);
-
-        //         this.currentlyValidatedData.xhr = {
-        //             url: requestUrl,
-        //             method: requestMethod,
-        //             headers: requestHeaders,
-        //             responseBody: requestResponse.body
-        //         }
-        //             // const data = JSON.stringify(await result, null, 2);
-        //             // await Apify.setValue('responseeeee', data, { contentType: 'application/text' });
-
-        //             // console.log(`Response from ${requestMethod} received sucessfully: \n ${requestResponse}`);
-        //     }                
-
-
-        // }
-
-        // await this.dumpValidatorData();
-
-        // const htmlGen = new html(this.currentlyValidatedData);
-        // htmlGen.generateHtmlFile();  
     }
+    validateMetaData() {
+        let metadataValidated = [];
 
+        this.analyzerOutput.metaDataFound.forEach((metaUnit) => {
+            try {
+                console.log(metaUnit);
+
+                const metaDataFound = (this.$(metaUnit.path)).text();
+
+                const metaDataValidationResult = {
+                    selector: metaUnit.path,
+                    metaExpected: metaUnit.value,
+                    metaFound: metaDataFound || null
+
+                };
+                metadataValidated.push(metaDataValidationResult);
+            } catch (err) {
+                console.log(err);
+                return;
+            }
+
+        });
+
+        this.vod.metaDataValidated = metadataValidated;
+        console.log('Meta validation end');
+    }
     validateHtml() {
 
         let htmlDataValidated = [];
@@ -141,51 +122,56 @@ class Validator {
         console.log('Json-ld validation end');
     }
 
-    // async validateXHR() {
+    async validateXHR() {
 
-    //     if (this.analyzerOutputData.xhrRequests.length > 0) {
+        if (this.analyzerOutput.xhrRequestsFound.length > 0) {
 
-    //         this.analyzerOutputData.xhrRequests.map(xhrRequest => {
-    //             const requestMethod = xhrRequest.method;
-    //             const requestUrl = xhrRequest.url;
-    //             const requestHeaders = xhrRequest.requestHeaders;
+            this.analyzerOutput.xhrRequestsFound.forEach(async (xhrRequest) => {
+                const requestMethod = xhrRequest.method;
+                const requestUrl = xhrRequest.url;
+                const requestHeaders = xhrRequest.requestHeaders;
 
-    //             const response = null;
+                const response = null;
 
-    //             if (requestMethod === "POST") {
+                if (requestMethod === "POST") {
 
-    //                 // const options = new Options({
-    //                 //     headers: requestHeaders
-    //                 // });
-    
-    //                 const requestResponse = await gotScraping.post(
-    //                     requestUrl, 
-    //                     { 
-    //                         headers: requestHeaders, 
-    //                         json: { commodityId: 6398627 } 
-    //                     });
-    //                 console.log(requestResponse);
-    //                 console.log(requestResponse.body);
-    
-    //                 this.currentlyValidatedData.xhr = {
-    //                     url: requestUrl,
-    //                     method: requestMethod,
-    //                     headers: requestHeaders,
-    //                     responseBody: requestResponse.body
-    //                 }
-    //                     // const data = JSON.stringify(await result, null, 2);
-    //                     // await Apify.setValue('responseeeee', data, { contentType: 'application/text' });
-    
-    //                     // console.log(`Response from ${requestMethod} received sucessfully: \n ${requestResponse}`);
-    //             }
+                    // const options = new Options({
+                    //     headers: requestHeaders
+                    // });
+
+                    // const response = await gotScraping.post(
+                    //     requestUrl, 
+                    //     { 
+                    //         headers: requestHeaders
+                    //     });
+                    // console.log(response.body);
+
+                    // this.currentlyValidatedData.xhr = {
+                    //     url: requestUrl,
+                    //     method: requestMethod,
+                    //     headers: requestHeaders,
+                    //     responseBody: response.body
+                    // }
+                    // const data = JSON.stringify(await result, null, 2);
+                    // await Apify.setValue('responseeeee', data, { contentType: 'application/text' });
+
+                    // console.log(`Response from ${requestMethod} received sucessfully: \n ${requestResponse}`);
+                } else if (requestMethod === "GET") {
+
+                    const response = await gotScraping.get(
+                        requestUrl
+                    );
+                    // console.log(response);
+
+                }
 
 
 
 
 
-    //         });
-    //     }
-    // }
+            });
+        }
+    }
     async loadInitialHtml() {
         // Prepare a list of URLs to crawl
         const requestList = new Apify.RequestList({

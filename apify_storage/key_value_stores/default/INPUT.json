@@ -1,31 +1,7 @@
 {
-    "pages": [
-        {
-            "url": "https://www.yelp.com/biz/cuisine-of-nepal-san-francisco",
-            "searchFor": [
-                "Cuisine of Nepal",
-                "3486 Mission St",
-                "11:00 am - 2:30 pm"
-            ]
-        },
-        {
-            "url": "https://www.alza.cz/xerox-b235dni-d6804822.htm",
-            "searchFor": [
-                "Xerox B235DNI",
-                "6 490,-",
-                "Můžete mít ihned na 18 prodejnách"
-
-            ],
-            "tests": ["HTML"]
-        },
-        {
-            "url": "http://www.imdb.com/title/tt1856101/",
-            "searchFor": [
-                "Blade Runner 2049",
-                "8.5",
-                "Ryan Gosling"
-            ]
-        }
-    ],
-    "tests": ["SCHEMA.ORG", "JSON-LD", "WINDOW", "XHR", "META", "HTML"]
+    "url": "https://www.yelp.com/biz/cuisine-of-nepal-san-francisco",
+    "searchFor": [
+        "Cuisine of Nepal",
+        "3486 Mission St"
+    ]
 }

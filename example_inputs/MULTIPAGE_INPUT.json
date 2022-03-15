@@ -9,9 +9,12 @@
             ]
         },
         {
-            "url": "https://www.alza.cz/samsung-galaxy-a3-2017",
+            "url": "https://www.alza.cz/xerox-b235dni-d6804822.htm",
             "searchFor": [
-                "Samsung Galaxy A3"
+                "Xerox B235DNI",
+                "6 490,-",
+                "Můžete mít ihned na 18 prodejnách"
+
             ],
             "tests": ["HTML"]
         },

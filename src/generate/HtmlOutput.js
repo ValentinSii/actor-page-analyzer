@@ -1,4 +1,3 @@
-const fs = require('fs');
 const Apify = require('apify');
 
 class htmlGenerator {
@@ -24,9 +23,11 @@ class htmlGenerator {
     this.generateHeaderAndCss();
     this.htmlOutput.push(`<body>`);
     this.tabs();
+    this.generateConculsionTab();
     this.htmlTab();
-    
     this.jsonLDDataTab();
+    this.windowPropertiesTab();
+    this.generateSchemaTab();
     // this.xhrTab();
     this.appendScript();
 
@@ -39,18 +40,19 @@ class htmlGenerator {
 
     await this.saveValidatorOutput(fileName);
 
-    
+
 
   }
-  async saveValidatorOutput(fileName){
+  async saveValidatorOutput(fileName) {
     try {
-      await Apify.setValue(fileName,this.htmlOutput.join(""), { contentType: 'text/html' });
-    }    catch (errr) {
+      await Apify.setValue(fileName, this.htmlOutput.join(""), { contentType: 'text/html' });
+    } catch (errr) {
       console.log(err);
     }
   }
   tabs() {
     const tabs = `<div class="tab">
+    <button class="tablinks" onclick="openTab(event, 'CONCLUSION')">CONCLUSION</button>
     <button class="tablinks" onclick="openTab(event, 'HTML')">HTML</button>
     <button class="tablinks" onclick="openTab(event, 'JSONLD')">JSONLD</button>
     <button class="tablinks" onclick="openTab(event, 'SCHEMA')">SCHEMA.ORG</button>
@@ -93,6 +95,19 @@ class htmlGenerator {
     this.htmlOutput.push(`</div>`);
 
   }
+  windowPropertiesTab() {
+    this.htmlOutput.push(`<div id="WINDOW" class="tabcontent" >`);
+    this.analyzerOutput.windowPropertiesFound.forEach(windowProperty => {
+      const color = "green";
+
+      this.htmlOutput.push(`
+            <div class="${color} htmlRow">
+            <p><b>Path:</b> ${windowProperty.path} <b>Value:</b>${windowProperty.value}</p>
+            </div>          
+            `);
+    });
+    this.htmlOutput.push(`</div>`);
+  }
   xhrTab() {
     this.htmlOutput.push(`<div id="XHR" class="tabcontent" >`);
 
@@ -111,6 +126,96 @@ class htmlGenerator {
 
     this.htmlOutput.push(`</div>`);
   }
+
+  generateConculsionTab() {
+    this.htmlOutput.push(`<div id="CONCLUSION" class="tabcontent" >`);
+    this.htmlOutput.push(`
+            <div class="green htmlRow">
+            <h2><b>Url:</b> ${this.analyzerOutput.validation.url}</h2>
+            <h3><b>Searched for:</b> ${this.analyzerOutput.validation.searchFor}</h3>
+            </div>          
+            `);
+    const timeStampKeys = [
+      "analysisStarted",
+      "scrappingStarted",
+      "pageNavigated",
+      "windowPropertiesSearched",
+      "metadataSearched",
+      "schemaOrgSearched",
+      "jsonLDSearched",
+      "htmlSearched",
+      "xhrRequestsSearched",
+      "analysisEnded",
+      "outputFinished"
+    ];
+
+    timeStampKeys.forEach(timeStamp => {
+      const color = timeStamp == null ? 'red' : 'green';
+      this.htmlOutput.push(`
+      <div class="${color} htmlRow">
+      <h3><b>${timeStamp}:</b> ${this.analyzerOutput[timeStamp]}</h3>
+      </div>          
+      `);
+
+    });
+    const dataCountKeys = [
+      "metaData",
+      "metaDataFound",
+      "jsonLDData",
+      "jsonLDDataFound",
+      "allJsonLDData",
+      "htmlFound",
+      "xhrRequests",
+      "xhrRequestsFound"
+    ];
+
+    dataCountKeys.forEach(dataCountKey => {
+      const dataCountValue = this.analyzerOutput[dataCountKey]?.length;
+      const color = this.analyzerOutput[dataCountKey]?.length == null || dataCountValue == 0 ? 'red' : 'green';
+      this.htmlOutput.push(`
+      <div class="${color} htmlRow">
+      <h3><b>${dataCountKey}:</b> ${dataCountValue}</h3>
+      </div>          
+      `);
+
+    });
+
+    
+
+    // error
+    // pageError
+
+    this.htmlOutput.push(`</div>`);
+  }
+
+  generateSchemaTab() {
+    this.htmlOutput.push(`<div id="SCHEMA" class="tabcontent" >`);
+
+    const color = "green";
+
+    this.htmlOutput.push(`
+            <div class="${color} htmlRow">
+            <h3>TODO: Propagate schema.org data found in jsonld/application contex= "schema.org"</h3>            
+            </div>          
+            `);
+
+    this.htmlOutput.push(`</div>`);
+  }
+  // generateMetaTab(){
+  //   this.htmlOutput.push(`<div id="META" class="tabcontent" >`);
+  //   this.analyzerOutput.validation.jsonLDDValidated.forEach(jsonldDataUnit => {
+  //     const color = jsonldDataUnit.htmlExpected === jsonldDataUnit.htmlFound ? "green" : "red";
+
+  //     this.htmlOutput.push(`
+  //           <div class="${color} htmlRow">
+  //           <h3>Path: ${jsonldDataUnit.path}</h3>
+  //           <p><b>Jsonld data expected</b>: ${jsonldDataUnit.dataExpected}</p>
+  //           <p><b>Data found</b>: ${jsonldDataUnit.dataFound}</p>
+  //           </div>          
+  //           `);
+  //   });
+  //   this.htmlOutput.push(`</div>`);
+  // }
 
   generateHeaderAndCss() {
     const header = `<!DOCTYPE html>

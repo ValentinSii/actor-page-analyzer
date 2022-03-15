@@ -261,7 +261,9 @@ async function analysePage(browser, url, searchFor, tests, inputIndex) {
                 }
                 if (results.length > 0) {
                     xhrRequestResults.push({
-                        request: `${request.method} ${request.url}`,
+                        url: `${request.url}`,
+                        method: `${request.method}`,
+                        requestHeaders: request.requestHeaders,
                         response: request.responseBody,
                         searchResults: results,
                     });
@@ -312,7 +314,6 @@ async function analysePage(browser, url, searchFor, tests, inputIndex) {
         await this.htmlGenerator.generateHtmlFile(validationFileName);
 
         // force last write of output data
-        console.log(url.match(/^http(s)?:\/\//i));
         log('Force write of output with await');
 
         await output.writeOutput();
