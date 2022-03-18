@@ -15,6 +15,9 @@ const { readInputAsync } = require('./input/inputReader');
 const { Validator } = require('./validate/validator');
 const htmlGenerator = require('./generate/HtmlOutput');
 
+const fs = require('fs');
+
+
 
 let lastLog = Date.now();
 
@@ -60,7 +63,7 @@ async function analysePage(browser, url, searchFor, tests, inputIndex) {
     console.log('================================');
     console.log(url);
     console.log('================================');
-    
+
 
     //create filenames for initial html response and html validation output
     const hostName = getHostName(url);
@@ -301,7 +304,7 @@ async function analysePage(browser, url, searchFor, tests, inputIndex) {
         await scrapper.start(fullUrl);
         // prevent act from closing before all data is asynchronously parsed and searched
         await waitForEnd('analysisEnded');
-        
+
 
         // validate single url
         const validator = new Validator(url, searchFor, tests, output.fields);
@@ -310,7 +313,7 @@ async function analysePage(browser, url, searchFor, tests, inputIndex) {
         //generate validation html output 
         this.htmlGenerator = new htmlGenerator(output.fields);
 
-        
+
         await this.htmlGenerator.generateHtmlFile(validationFileName);
 
         // force last write of output data
@@ -364,4 +367,15 @@ Apify.main(async () => {
         log('Top level error');
         console.error(error);
     }
+
+    //generate validation html output 
+    // try {
+    //     const file = 'apify_storage/key_value_stores/default/OUTPUT.json';
+    //     const fileContents = fs.readFileSync(file, 'utf8');
+    //     const output = JSON.parse(fileContents);
+    //     const htmlGeneratorInstance = new htmlGenerator(output);
+    //     htmlGeneratorInstance.generateHtmlFile();
+    // } catch (err) {
+    //     console.log(err);
+    // }
 });

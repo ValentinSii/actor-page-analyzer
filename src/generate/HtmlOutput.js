@@ -1,4 +1,14 @@
 const Apify = require('apify');
+const fs = require('fs');
+
+
+// Apify.main(async () => {
+//   //generate validation html output 
+//   const file = 'apify_storage/key_value_stores/default/OUTPUT.json';
+//   const fileContents = fs.readFileSync(file, 'utf8');
+//   const htmlGeneratorInstance = new htmlGenerator(fileContents.fields);
+//   htmlGeneratorInstance.generateHtmlFile('dev');
+// });
 
 class htmlGenerator {
 
@@ -14,7 +24,7 @@ class htmlGenerator {
   //   const file = 'apify_storage/key_value_stores/default/OUTPUT.json';
   //   const fileContents = fs.readFileSync(file, 'utf8');
 
-  //   this.validatorOutputData = JSON.parse(fileContents);
+  //   this.analyzerOutput = JSON.parse(fileContents);
   //   this.htmlOutput = [];
 
   // }
@@ -33,10 +43,10 @@ class htmlGenerator {
 
 
 
-    // console.log(this.htmlOutput.join(""));
-    // fs.writeFileSync('page.html', this.htmlOutput.join(""), function (err) {
-    //   if (err) return console.log(err);
-    // });
+    console.log(this.htmlOutput.join(""));
+    fs.writeFileSync('page.html', this.htmlOutput.join(""), function (err) {
+      if (err) return console.log(err);
+    });
 
     await this.saveValidatorOutput(fileName);
 
@@ -46,7 +56,7 @@ class htmlGenerator {
   async saveValidatorOutput(fileName) {
     try {
       await Apify.setValue(fileName, this.htmlOutput.join(""), { contentType: 'text/html' });
-    } catch (errr) {
+    } catch (err) {
       console.log(err);
     }
   }
@@ -128,13 +138,25 @@ class htmlGenerator {
   }
 
   generateConculsionTab() {
-    this.htmlOutput.push(`<div id="CONCLUSION" class="tabcontent" >`);
+    this.htmlOutput.push(`<div id="CONCLUSION" class="tabcontent active" style="display: block;" >`);
+
     this.htmlOutput.push(`
             <div class="green htmlRow">
             <h2><b>Url:</b> ${this.analyzerOutput.validation.url}</h2>
             <h3><b>Searched for:</b> ${this.analyzerOutput.validation.searchFor}</h3>
             </div>          
             `);
+    this.generateTimeStamps();
+
+
+    // error
+    // pageError
+
+    this.htmlOutput.push(`</div>`);
+  }
+
+
+  generateTimeStamps() {
     const timeStampKeys = [
       "analysisStarted",
       "scrappingStarted",
@@ -149,15 +171,39 @@ class htmlGenerator {
       "outputFinished"
     ];
 
-    timeStampKeys.forEach(timeStamp => {
-      const color = timeStamp == null ? 'red' : 'green';
-      this.htmlOutput.push(`
-      <div class="${color} htmlRow">
-      <h3><b>${timeStamp}:</b> ${this.analyzerOutput[timeStamp]}</h3>
-      </div>          
+    this.htmlOutput.push('<table class="pure-table pure-table-bordered">');
+
+    // table headers row
+    this.htmlOutput.push('<thead><tr>');
+    this.htmlOutput.push(`
+      <th>Event</th>
       `);
 
+    this.htmlOutput.push(`
+      <th>Time</th>
+      `);
+    this.htmlOutput.push('</tr></thead>');
+    // timestamp value rows
+    this.htmlOutput.push('<tbody>');
+
+    timeStampKeys.forEach(timeStamp => {
+
+      this.htmlOutput.push('<tr>');
+
+      this.htmlOutput.push(`
+      <td>${timeStamp}</td>
+      <td>${this.analyzerOutput[timeStamp]}</td>
+      `);
+
+      this.htmlOutput.push('</tr>');
     });
+    this.htmlOutput.push('</tbody>');
+
+    this.htmlOutput.push('</table>');
+  }
+
+  generateDataCountTable() {
+
     const dataCountKeys = [
       "metaData",
       "metaDataFound",
@@ -179,15 +225,7 @@ class htmlGenerator {
       `);
 
     });
-
-    
-
-    // error
-    // pageError
-
-    this.htmlOutput.push(`</div>`);
   }
-
   generateSchemaTab() {
     this.htmlOutput.push(`<div id="SCHEMA" class="tabcontent" >`);
 
@@ -218,6 +256,57 @@ class htmlGenerator {
   // }
 
   generateHeaderAndCss() {
+    const header = `<!DOCTYPE html>
+        <html>
+        <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://unpkg.com/purecss@2.1.0/build/pure-min.css" integrity="sha384-yHIFVG6ClnONEA5yB5DJXfW2/KC173DIQrYoZMEtBvGzmf0PKiGyNEqe9N6BNDBH" crossorigin="anonymous">
+        <style>
+        body {font-family: Arial;}
+        
+        /* Style the tab */
+        .tab {
+          overflow: hidden;
+          border: 1px solid #ccc;
+          background-color: #f1f1f1;
+        }
+        
+        /* Style the buttons inside the tab */
+        .tab button {
+          background-color: inherit;
+          float: left;
+          border: none;
+          outline: none;
+          cursor: pointer;
+          padding: 14px 16px;
+          transition: 0.3s;
+          font-size: 17px;
+        }
+        
+        /* Change background color of buttons on hover */
+        .tab button:hover {
+          background-color: #ddd;
+        }
+        
+        /* Create an active/current tablink class */
+        .tab button.active {
+          background-color: #ccc;
+        }
+        
+        /* Style the tab content */
+        .tabcontent {
+          display: none;
+          padding: 6px 12px;
+        }
+        
+
+        </style>
+        </head>`;
+
+    this.htmlOutput.push(header);
+  }
+
+  generateHeaderAndCssMin() {
     const header = `<!DOCTYPE html>
         <html>
         <head>
@@ -261,28 +350,6 @@ class htmlGenerator {
           border: 1px solid #ccc;
           border-top: none;
         }
-        .London {
-            background-color: aquamarine;
-        }
-
-        .htmlRow {
-          border: 1px solid #ccc;
-          margin-bottom: 14px;
-          margin-left: 0px;
-        }
-        .green {
-          background-color: #b5e3af;
-        }
-        .red {
-          background-color: #f88687;
-        }
-        p {
-          padding-left: 14px;
-        }
-        h3 {
-          padding: 6px 14px;
-        }
-
         </style>
         </head>`;
 
@@ -293,7 +360,7 @@ class htmlGenerator {
     const content = `
 
         <script>
-        function openTab(evt, cityName) {
+        function openTab(evt, tabName) {
           var i, tabcontent, tablinks;
           tabcontent = document.getElementsByClassName("tabcontent");
           for (i = 0; i < tabcontent.length; i++) {
@@ -303,7 +370,7 @@ class htmlGenerator {
           for (i = 0; i < tablinks.length; i++) {
               tablinks[i].className = tablinks[i].className.replace(" active", "");
           }
-          document.getElementById(cityName).style.display = "block";
+          document.getElementById(tabName).style.display = "block";
           evt.currentTarget.className += " active";
       }
         </script>           
