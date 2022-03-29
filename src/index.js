@@ -256,18 +256,30 @@ async function analysePage(browser, url, searchFor, tests, inputIndex) {
             const xhrRequestResults = [];
             requests.forEach(request => {
                 let results;
+
+                // if response body is html in string format
                 if (isString(request.responseBody)) {
                     const searcher = new DOMSearcher({ html: request.responseBody });
                     results = searcher.find(searchFor);
+
+                // if response body is json 
                 } else {
-                    results = treeSearcher.find(request.responseBody, searchFor);
+                    results = treeSearcher.find(request.responseBody, searchFor); 
+
+                    //look for html objects inside json 
+
+                    // const htmlTreeSearcher = new TreeSearcher();
+                    // const htmlSearchResults = htmlTreeSearcher.findHtmlStrings(request.responseBody);
+                    // console.log(request.url);
+                    // console.log(htmlSearchResults);
+
                 }
                 if (results.length > 0) {
                     xhrRequestResults.push({
                         url: `${request.url}`,
                         method: `${request.method}`,
                         requestHeaders: request.requestHeaders,
-                        response: request.responseBody,
+                        request: request,
                         searchResults: results,
                     });
                 }

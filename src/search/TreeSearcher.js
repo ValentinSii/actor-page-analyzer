@@ -4,6 +4,7 @@ const {
     sortBy,
     isNumber,
     isString,
+    isBuffer,
 } = require('lodash');
 const { normalize } = require('../utils');
 
@@ -107,21 +108,50 @@ class TreeSearcher {
             }
             const normalizedText = normalize(item);
             const pathScore = depth;
-            const score = normalizedSearch.reduce((lastScore, searchString) => {
-                if (normalizedText.indexOf(searchString) === -1) return lastScore;
-                const remainingTextLength = normalizedText.replace(searchString, '').length;
-                if (remainingTextLength > 40) return lastScore;
-                const searchScore = pathScore * (1 + (remainingTextLength * LETTER_DEDUCTION));
-                return Math.max(lastScore, searchScore);
-            }, 0);
+            // const score = normalizedSearch.reduce((lastScore, searchString) => {
+            //     console.log('++++++++++++++++++++++' + searchString);
+            //     if (normalizedText.indexOf(searchString) === -1) return lastScore;
+            //     const remainingTextLength = normalizedText.replace(searchString, '').length;
+            //     if (remainingTextLength > 40) return lastScore;
+            //     const searchScore = pathScore * (1 + (remainingTextLength * LETTER_DEDUCTION));
+            //     return Math.max(lastScore, searchScore);
+            // }, 0);
 
-            if (score > 0) {
-                this.foundPaths.push({
-                    path: `${path}`,
-                    value: data,
-                    score,
-                });
-            }
+            const scorePerString = normalizedSearch.map((searchString => {
+                // if current element does not contain searched text
+                if (normalizedText.indexOf(searchString.normalizedSearchString) === -1) {
+                    return null;
+                // current element contains searched string
+                } else {
+                    const remainingTextLength = normalizedText.replace(searchString.normalizedSearchString, '').length;
+                    const searchScore = pathScore * (1 + (remainingTextLength * LETTER_DEDUCTION));
+                    return {
+                        originalSearchString: searchString.originalSearchString,
+                        score: searchScore,
+                    };
+                }
+
+
+            }));
+
+            scorePerString.forEach((searchResult) => {
+                if(searchResult != null ) {
+                    this.foundPaths.push({
+                        path: `${path}`,
+                        value: data,
+                        originalSearchString: searchResult.originalSearchString,
+                        score: searchResult.searchScore,
+                    });
+                }
+            });
+
+            // if (score > 0) {
+            //     this.foundPaths.push({
+            //         path: `${path}`,
+            //         value: data,
+            //         score,
+            //     });
+            // }
         } else if (isArray(data)) {
             data.forEach((value, index) => {
                 findInTree(value, `${path}[${index}]`, depth + 1);
@@ -137,15 +167,77 @@ class TreeSearcher {
     find(data, searchFor, path = '') {
         this.foundPaths = [];
         this.searchFor = searchFor;
-        this.normalizedSearch = searchFor.map(searchString => normalize(searchString));
+        this.normalizedSearch = searchFor.map(searchString => {
+            return {
+                normalizedSearchString: normalize(searchString),
+                originalSearchString: searchString,
+            }
+        });
         this.findInTree(data, path);
         const sortedPaths = sortBy(this.foundPaths, ['score']).map((foundPath) => ({
             path: foundPath.path,
             value: foundPath.value,
+            originalSearchString: foundPath.originalSearchString,
         }));
         const sortedPathsWithDetails = findSimilarPaths(data, sortedPaths);
         return sortedPathsWithDetails;
     }
+
+
+    // findHtmlStrings(data, path = '') {
+    //     this.foundPaths = [];
+    //     this.searchFor = [
+    //         '<div',
+    //         '</div>',
+    //         '</html>'
+    //     ];
+    //     this.normalizedSearch = this.searchFor;
+    //     this.findHtmlInTree(data, path);
+    //     const sortedPaths = sortBy(this.foundPaths, ['score']).map((foundPath) => ({
+    //         path: foundPath.path,
+    //         value: foundPath.value,
+    //     }));
+    //     return sortedPaths
+    // }
+
+    // findHtmlInTree(data, path = '', depth = 0) {
+    //     const { normalizedSearch, findHtmlInTree } = this;
+
+    //     if (!data) return;
+    //     if (!isArray(data) && !isObject(data)) {
+    //         let item = data;
+    //         if (item.toString) {
+    //             item = item.toString();
+    //         }
+    //         const normalizedTextNotReally = item;
+    //         const pathScore = depth;
+    //         const score = normalizedSearch.reduce((lastScore, 
+    //             ) => {
+    //             if (normalizedTextNotReally.indexOf(searchString) === -1) return lastScore;
+    //             const remainingTextLength = normalizedTextNotReally.replace(searchString, '').length;
+    //             if (remainingTextLength > 40) return lastScore;
+    //             const searchScore = pathScore * (1 + (remainingTextLength * LETTER_DEDUCTION));
+    //             return Math.max(lastScore, searchScore);
+    //         }, 0);
+
+    //         if (score > 0) {
+    //             this.foundPaths.push({
+    //                 path: `${path}`,
+    //                 value: data,
+    //                 score,
+    //             });
+    //         }
+    //     } else if (isArray(data)) {
+    //         data.forEach((value, index) => {
+    //             findHtmlInTree(value, `${path}[${index}]`, depth + 1);
+    //         });
+    //     } else if (isObject(data)) {
+    //         Object.keys(data).forEach(key => {
+    //             const value = data[key];
+    //             findHtmlInTree(value, `${path}.${key}`, depth + 1);
+    //         });
+    //     }
+    // }
 }
 
 module.exports = TreeSearcher;

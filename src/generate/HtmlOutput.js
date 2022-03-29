@@ -1,5 +1,6 @@
 const Apify = require('apify');
 const fs = require('fs');
+const time = require('moment');
 
 
 // Apify.main(async () => {
@@ -33,7 +34,7 @@ class htmlGenerator {
     this.generateHeaderAndCss();
     this.htmlOutput.push(`<body>`);
     this.tabs();
-    this.generateConculsionTab();
+    this.generateConclusionTab();
     this.htmlTab();
     this.jsonLDDataTab();
     this.windowPropertiesTab();
@@ -43,7 +44,7 @@ class htmlGenerator {
 
 
 
-    console.log(this.htmlOutput.join(""));
+    // console.log(this.htmlOutput.join(""));
     fs.writeFileSync('page.html', this.htmlOutput.join(""), function (err) {
       if (err) return console.log(err);
     });
@@ -137,7 +138,7 @@ class htmlGenerator {
     this.htmlOutput.push(`</div>`);
   }
 
-  generateConculsionTab() {
+  generateConclusionTab() {
     this.htmlOutput.push(`<div id="CONCLUSION" class="tabcontent active" style="display: block;" >`);
 
     this.htmlOutput.push(`

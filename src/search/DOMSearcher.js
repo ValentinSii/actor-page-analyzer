@@ -229,14 +229,37 @@ class DOMSearcher {
             tag: tagName,
             class: $element.attr('class'),
             id: $element.attr('id'),
+            foundSearchedStrings : null
         };
         const normalizedText = normalize(elementText); // to lower case to match most results
         const score = this.normalizedSearch.reduce((lastScore, searchString) => {
-            if (normalizedText.indexOf(searchString) === -1) return lastScore;
+            if (normalizedText.indexOf(searchString.normalizedSearchString) === -1) return lastScore;
+            elementData.foundSearchedStrings = searchString.originalSearchString;
+            // console.log(searchString.originalSearchString);
             const remainingTextLength = normalizedText.replace(searchString, '').length;
             const searchScore = (1 + (remainingTextLength * LETTER_DEDUCTION));
-            return Math.max(lastScore, searchScore);
+            return Math.max(lastScore, searchScore); 
         }, 0);
+
+        // const scorePerString = normalizedSearch.map((searchString => {
+        //     // if current element does not contain searched text
+        //     if (normalizedText.indexOf(searchString.normalizedSearchString) === -1) {
+        //         return null;
+        //         // current element contains searched string
+        //     } else {
+        //         const remainingTextLength = normalizedText.replace(searchString.normalizedSearchString, '').length;
+        //         const searchScore = (1 + (remainingTextLength * LETTER_DEDUCTION));
+        //         return {
+        //             originalSearchString: searchString.originalSearchString,
+        //             score: searchScore,
+        //         };
+        //     }
+
+
+        // }));
+
+        
+
 
         if (score === 0) return elementData;
 
@@ -272,6 +295,7 @@ class DOMSearcher {
                 selector,
                 text: item.text,
                 score: (1 + (selector.split('>').length * 0.2)) * item.textScore,
+                foundSearchedStrings: item.foundSearchedStrings
             });
             return;
         }
@@ -308,20 +332,28 @@ class DOMSearcher {
         }
 
         this.searchFor = searchFor;
-        this.normalizedSearch = searchFor.map(searchString => normalize(searchString));
+        // this.normalizedSearch = searchFor.map(searchString => normalize(searchString));
+
+        this.normalizedSearch = searchFor.map(searchString => {
+            return {
+                normalizedSearchString: normalize(searchString),
+                originalSearchString: searchString,
+            }
+        });
         this.foundPaths = [];
 
         let $body = $('body');
         if (!$body.length) $body = $.root();
         $body = $body.children();
-        $body
+        const cheerioElementos = $body
             .map(function () {
                 return searchElement(this.tagName, $(this));
-            }).get()
-            .filter(child => child.text || child.children)
+            });
+            const elementos = cheerioElementos.get();
+            elementos.filter(child => child.text || child.children)
             .forEach((child) => findPath([], child));
 
-        const sortedSelectors = sortBy(this.foundPaths, ['score']).map(({ selector, text }) => ({ selector, text }));
+        const sortedSelectors = sortBy(this.foundPaths, ['score']).map(({ selector, text, foundSearchedStrings }) => ({ selector, text, foundSearchedStrings }));
         const selectorsWithDetails = findSimilarSelectors($, sortedSelectors);
         return selectorsWithDetails;
     }
