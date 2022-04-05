@@ -130,8 +130,6 @@ class TreeSearcher {
                         score: searchScore,
                     };
                 }
-
-
             }));
 
             scorePerString.forEach((searchResult) => {

@@ -15,10 +15,6 @@ const { readInputAsync } = require('./input/inputReader');
 const { Validator } = require('./validate/validator');
 const htmlGenerator = require('./generate/HtmlOutput');
 
-const fs = require('fs');
-
-
-
 let lastLog = Date.now();
 
 const log = (message) => {
@@ -268,10 +264,6 @@ async function analysePage(browser, url, searchFor, tests, inputIndex) {
 
                     //look for html objects inside json 
 
-                    // const htmlTreeSearcher = new TreeSearcher();
-                    // const htmlSearchResults = htmlTreeSearcher.findHtmlStrings(request.responseBody);
-                    // console.log(request.url);
-                    // console.log(htmlSearchResults);
 
                 }
                 if (results.length > 0) {

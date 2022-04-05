@@ -33,21 +33,20 @@ class htmlGenerator {
   async generateHtmlFile(fileName) {
     this.generateHeaderAndCss();
     this.htmlOutput.push(`<body>`);
-    this.tabs();
+    // this.tabs();
+    this.tabsPerKeyword();
     this.generateConclusionTab();
-    this.htmlTab();
-    this.jsonLDDataTab();
-    this.windowPropertiesTab();
-    this.generateSchemaTab();
+    this.analyzerOutput.validation.searchFor.forEach(keyword => {
+      this.generateKeywordConclusion(keyword);
+    })
+    // this.htmlTab();
+    // this.jsonLDDataTab();
+    // this.windowPropertiesTab();
+    // this.generateSchemaTab();
     // this.xhrTab();
     this.appendScript();
 
 
-
-    // console.log(this.htmlOutput.join(""));
-    fs.writeFileSync('page.html', this.htmlOutput.join(""), function (err) {
-      if (err) return console.log(err);
-    });
 
     await this.saveValidatorOutput(fileName);
 
@@ -72,6 +71,17 @@ class htmlGenerator {
     <button class="tablinks" onclick="openTab(event, 'META')">META</button>
     </div>`;
     this.htmlOutput.push(tabs);
+  }
+  tabsPerKeyword() {
+    this.htmlOutput.push(`
+      <div class="tab">
+      <button class="tablinks" onclick="openTab(event, 'CONCLUSION')">CONCLUSION</button>`
+    );
+    // generate tabs per keyword
+    this.analyzerOutput.validation.searchFor.forEach(keyword => {
+      this.htmlOutput.push(`<button class="tablinks" onclick="openTab(event, '${keyword}')">${keyword}</button>`)
+    });
+    this.htmlOutput.push(`</div>`);
   }
   htmlTab() {
     this.htmlOutput.push(`<div id="HTML" class="tabcontent" >`);
@@ -144,9 +154,17 @@ class htmlGenerator {
     this.htmlOutput.push(`
             <div class="green htmlRow">
             <h2><b>Url:</b> ${this.analyzerOutput.validation.url}</h2>
-            <h3><b>Searched for:</b> ${this.analyzerOutput.validation.searchFor}</h3>
+            <h4><b>Searched for: ${this.analyzerOutput.validation.searchFor}</b></h4>
             </div>          
             `);
+    // this.analyzerOutput.validation.searchFor.forEach(searchFor => {
+    //   this.htmlOutput.push(`<h3>${searchFor}</h3>`);
+    // });
+
+    // this.analyzerOutput.validation.searchFor.forEach(keyword => {
+    //     this.generateKeywordConclusion(keyword);
+    // });
+    this.generateSummaryTable()
     this.generateTimeStamps();
 
 
@@ -155,7 +173,89 @@ class htmlGenerator {
 
     this.htmlOutput.push(`</div>`);
   }
+  generateSummaryTable() {
+    this.htmlOutput.push('<table class="pure-table pure-table-bordered" >');
 
+    const tableKeys = [
+      'html',
+      'json',
+      'meta',
+      'xhr',
+      'schema',
+      'window'
+    ];
+    // table headers row
+    this.htmlOutput.push('<thead><tr>');
+    this.htmlOutput.push(`<th>Keyword</th>`);
+    tableKeys.forEach(key => {
+      this.htmlOutput.push(`<th>${key}</th>`);
+    })
+    this.htmlOutput.push('</tr></thead>');
+
+    // table body start
+    this.htmlOutput.push('<tbody>');
+
+    this.analyzerOutput.validation.searchFor.forEach(keyword => {
+      this.htmlOutput.push('<tr>');
+      const keywordData = this.analyzerOutput.validation.validationConclusion[keyword];
+      this.htmlOutput.push(`<td>${keyword}</td>`);
+      tableKeys.forEach(key => {
+        this.htmlOutput.push(`<td>${keywordData[key].length}</td>`);
+      })
+      this.htmlOutput.push('<tr>');
+    })
+
+
+    //table end 
+    this.htmlOutput.push('</tbody>');
+    this.htmlOutput.push('</table>');
+    this.htmlOutput.push(`<p>* Table contains number of possible options to retrieve keywords from given source</p>`);
+  }
+  generateKeywordConclusion(keyword) {
+    // this.htmlOutput.push(`<div id="WINDOW" class="tabcontent" >`);
+
+
+    const conclusionData = this.analyzerOutput.validation.validationConclusion[keyword];
+    this.keywordConclusionHtmlTable(keyword, conclusionData);
+
+  }
+  keywordConclusionHtmlTable(keyword, conclusionData) {
+
+      this.htmlOutput.push(`<div id="${keyword}" class="tabcontent " >`);
+    //html found
+    if (conclusionData.html.length != 0) {
+      this.htmlOutput.push(`<h3><b>Html found for ${keyword}:</b></h3>`);
+
+      this.htmlOutput.push('<table class="pure-table pure-table-bordered" >');
+
+      // table headers row
+      this.htmlOutput.push('<thead><tr>');
+      this.htmlOutput.push(`<th>Selector</th>`);
+      this.htmlOutput.push(`<th>Text</th>`);
+      this.htmlOutput.push('</tr></thead>');
+
+      // table body start
+      this.htmlOutput.push('<tbody>');
+      //html table start
+      this.htmlOutput.push('<tr>');
+      this.htmlOutput.push('</tr>');
+      conclusionData.html.forEach(html => {
+        this.htmlOutput.push('<tr>');
+        this.htmlOutput.push(`<td>${html.selector}</td>`);
+        this.htmlOutput.push(`<td>${html.text}</td>`);
+
+        this.htmlOutput.push('</tr>');
+      });
+      this.htmlOutput.push('</tbody>');
+      this.htmlOutput.push('</table>');
+      this.htmlOutput.push(`<p>* Table contains data that can be obtained from initial html with given selectors</p>`);
+
+      
+    } else {
+      this.htmlOutput.push(`<h3><b>No html found for ${keyword}</b></h3>`);
+    }
+    this.htmlOutput.push(`</div>`);
+  }
 
   generateTimeStamps() {
     const timeStampKeys = [
