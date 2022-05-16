@@ -220,7 +220,7 @@ class PageScrapper {
 
             try {
                 await this.page.goto(url, { waitUntil: 'networkidle2' });
-                await this.page.waitForTimeout(15000);
+                await this.page.waitForTimeout(5000);
                 this.cookies = await this.page.cookies();
                 // await this.page.reload({ waitUntil: ["networkidle2", "domcontentloaded"] });
             } catch (error) {

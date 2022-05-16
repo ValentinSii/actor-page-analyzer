@@ -123,13 +123,28 @@ function findSimilarSelectors($, selectors) {
                 }
             }
 
-            if (options.length) {
-                return {
-                    ...foundSelector,
-                    foundInLists: options,
-                };
-            }
-            return foundSelector;
+            // this change is to unify output format of treesearcher and DOMsearcher and will be solved properly in typescipt version
+            return {
+                path: foundSelector.selector,
+                value: foundSelector.text,
+                originalSearchString: foundSelector.originalSearchString,
+                foundInLists: options.length ? options.map((option) => {
+                    return {
+                        arrayPath: option.arraySelector,
+                        childPath: option.childSelector,
+                        possibleIndexes: option.possibleIndexes
+
+                    }
+                }) : null,
+            };
+
+            // if (options.length) {
+            //     return {
+            //         // ...foundSelector,
+            //         // foundInLists: options,
+            //     };
+            // }
+            // return foundSelector;
         });
 }
 
@@ -229,16 +244,16 @@ class DOMSearcher {
             tag: tagName,
             class: $element.attr('class'),
             id: $element.attr('id'),
-            foundSearchedStrings : null
+            originalSearchString: null
         };
         const normalizedText = normalize(elementText); // to lower case to match most results
         const score = this.normalizedSearch.reduce((lastScore, searchString) => {
             if (normalizedText.indexOf(searchString.normalizedSearchString) === -1) return lastScore;
-            elementData.foundSearchedStrings = searchString.originalSearchString;
+            elementData.originalSearchString = searchString.originalSearchString;
             // console.log(searchString.originalSearchString);
             const remainingTextLength = normalizedText.replace(searchString, '').length;
             const searchScore = (1 + (remainingTextLength * LETTER_DEDUCTION));
-            return Math.max(lastScore, searchScore); 
+            return Math.max(lastScore, searchScore);
         }, 0);
 
         // const scorePerString = normalizedSearch.map((searchString => {
@@ -258,7 +273,7 @@ class DOMSearcher {
 
         // }));
 
-        
+
 
 
         if (score === 0) return elementData;
@@ -295,7 +310,7 @@ class DOMSearcher {
                 selector,
                 text: item.text,
                 score: (1 + (selector.split('>').length * 0.2)) * item.textScore,
-                foundSearchedStrings: item.foundSearchedStrings
+                originalSearchString: item.originalSearchString
             });
             return;
         }
@@ -349,11 +364,11 @@ class DOMSearcher {
             .map(function () {
                 return searchElement(this.tagName, $(this));
             });
-            const elementos = cheerioElementos.get();
-            elementos.filter(child => child.text || child.children)
+        const elementos = cheerioElementos.get();
+        elementos.filter(child => child.text || child.children)
             .forEach((child) => findPath([], child));
 
-        const sortedSelectors = sortBy(this.foundPaths, ['score']).map(({ selector, text, foundSearchedStrings }) => ({ selector, text, foundSearchedStrings }));
+        const sortedSelectors = sortBy(this.foundPaths, ['score']).map(({ selector, text, originalSearchString }) => ({ selector, text, originalSearchString }));
         const selectorsWithDetails = findSimilarSelectors($, sortedSelectors);
         return selectorsWithDetails;
     }

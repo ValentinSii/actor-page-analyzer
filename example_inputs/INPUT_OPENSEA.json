@@ -1,10 +1,13 @@
 {
     "url": "https://opensea.io/rankings",
     "searchFor": [
-        "VOLT",
-        "volt",
-        "5.2"
+        "Otherdeed for Otherside",
+        "Doodles",
+        "Bored Ape Yacht Club",
+        "https://opensea.io/rankings",
+        "ETH",
+        "SOL",
+        "463.29"
 
-    ],
-    "tests": ["SCHEMA.ORG", "JSON-LD", "WINDOW", "XHR", "META", "HTML"]
+    ]
 }

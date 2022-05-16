@@ -82,13 +82,17 @@ function findSimilarPaths(data, paths) {
                     };
                 })
                 .filter(item => item !== null && Object.keys(item.possibleIndexes).length > 1);
-            if (arrayOptions.length > 0) {
                 return {
                     ...foundPath,
-                    foundInLists: arrayOptions,
-                };
-            }
-            return foundPath;
+                    foundinLists: arrayOptions.length ? arrayOptions : null
+                }
+            // if (arrayOptions.length > 0) {
+            //     return {
+            //         ...foundPath,
+            //         foundInLists: arrayOptions,
+            //     };
+            // }
+            // return foundPath;
         });
 }
 
