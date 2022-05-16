@@ -311,7 +311,7 @@ async function analysePage(browser, url, searchFor, tests, inputIndex) {
 
 
         // validate single url
-        const validator = new Validator(url, searchFor, tests, output.fields);
+        const validator = new Validator(url, searchFor, tests, output.fields, scrapper.cookies);
         await validator.validate();
 
         //generate validation html output 

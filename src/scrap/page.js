@@ -71,6 +71,7 @@ class PageScrapper {
         this.onRequest = this.onRequest.bind(this);
         this.onResponse = this.onResponse.bind(this);
         this.onPageError = this.onPageError.bind(this);
+        this.cookies  = null;
     }
 
     on(action, handler) {
@@ -99,6 +100,7 @@ class PageScrapper {
         return rec;
     }
 
+    // 'requests'
     onRequest(request) {
         const ignore = IGNORED_EXTENSIONS.reduce((ignored, extension) => {
             if (ignored) return ignored;
@@ -112,7 +114,10 @@ class PageScrapper {
         request.continue();
 
         const rec = this.getOrCreateRequestRecord(request.url());
+       
         rec.url = request.url();
+        // console.log(rec.url);
+
         rec.method = request.method();
         rec.postData = request.postData();
         rec.headers = request.headers();
@@ -126,6 +131,10 @@ class PageScrapper {
 
     async onResponse(response) {
         const request = response.request();
+        // console.log("Request url from onResponse: "  + request.url());
+        const requestHeaders = response.request().headers();
+        // console.log("Headers after response: " + JSON.stringify(requestHeaders));
+
         const rec = this.requests[request.url()];
 
         if (!rec) return;
@@ -196,7 +205,7 @@ class PageScrapper {
             await this.page.setUserAgent(USER_AGENTS[agentID]);
 
             this.page.setRequestInterception(true);
-            this.page.setDefaultNavigationTimeout(30 * 1000); // navigation timeout of 30s
+            this.page.setDefaultNavigationTimeout(40 * 1000); // navigation timeout of 30s
 
             this.page.on('error', this.onPageError);
 
@@ -211,6 +220,9 @@ class PageScrapper {
 
             try {
                 await this.page.goto(url, { waitUntil: 'networkidle2' });
+                await this.page.waitForTimeout(15000);
+                this.cookies = await this.page.cookies();
+                // await this.page.reload({ waitUntil: ["networkidle2", "domcontentloaded"] });
             } catch (error) {
                 this.call('error', error);
                 console.error(error);

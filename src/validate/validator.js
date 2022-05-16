@@ -2,27 +2,43 @@ const fs = require('fs');
 const Apify = require('apify');
 const { log } = Apify.utils;
 const { gotScraping } = require('got-scraping');
+// const {got} =  require('got');
 const { JSONPath } = require('jsonpath-plus');
 const parseJsonLD = require('../parse/json-ld');
 // const html = require('../generate/HtmlOutput');
-const { result } = require('lodash');
+const { result, orderBy } = require('lodash');
 const parseMetadata = require('../parse/metadata');
 const parseSchemaOrgData = require('../parse/schema-org');
 
+const DOMSearcher = require('../search/DOMSearcher');
+const TreeSearcher = require('../search/TreeSearcher');
+cheerio = require('cheerio');
+
+
 class Validator {
 
-    constructor(inputUrl, inputSearchFor, inputTests, analyzerOutput) {
+    constructor(inputUrl, inputSearchFor, inputTests, analyzerOutput, allCookies) {
         // data from user input
         this.inputPageUrl = inputUrl;
         this.inputSearchFor = inputSearchFor;
         this.inputTests = inputTests;
         this.analyzerOutput = analyzerOutput;
 
+        //cookies from page.cookies()
+        this.allCookies = allCookies;
+
         // propagate data to validator output
         this.vod = {};
         this.vod.url = this.inputPageUrl;
         this.vod.searchFor = this.inputSearchFor;
         this.vod.tests = this.inputTests;
+
+        //
+        this.vod.cheerioInitialResponse = null;
+
+        this.vod.cheerioCrawlerError = null;
+
+        this.vod.xhrValidation = [];
 
         // variable for cheeriocrawler object
         this.$ = null;
@@ -41,19 +57,30 @@ class Validator {
 
         try {
             // load initial html with cheerioCrawler into variable $
+
             await this.loadInitialHtml();
-            const jsonResposnse = await this.validateXHR();
-            console.log(jsonResposnse.responseBody);
+
+            //request was sucessfully obtained by http request with cheerio crawler
+            if (this.vod.cheerioCrawlerError == null) {
+                this.validateHtml();
+                // this.validateJsonLD();
+                // this.validateMetaData();
+                this.analyzerOutput.validation = this.vod;
+
+                // console.log(gotResponse);
+                // schema org 
+                // metadata
+            }
+
+            await this.validateAllXHR();
+
+
+            // const jsonResposnse = await this.validateXHR();
+            // console.log(jsonResposnse.responseBody);
 
 
 
-            this.validateHtml();
-            this.validateJsonLD();
-            // this.validateMetaData();
-            this.analyzerOutput.validation = this.vod;
-            // await this.validateXHR();
-            // schema org 
-            // metadata
+
 
             this.vod.validationConclusion = this.validationConclusion;
         } catch (err) {
@@ -108,6 +135,13 @@ class Validator {
 
         let htmlDataValidated = [];
 
+        //if we faield to load or par initial html response using cheerioCrawler
+        if (this.$ == null) {
+            //we load empty html so analysis can continue 
+            //TODO: fix this terrible design
+            this.$ == cheerio.load('');
+        }
+
         this.analyzerOutput.htmlFound.map((htmlData) => {
 
             try {
@@ -123,13 +157,13 @@ class Validator {
                 };
                 htmlDataValidated.push(htmlValidationResult);
 
-                // html in browser for given selector is the same as in initial response
-                if (htmlFound == htmlExpected) {
-                    this.validationConclusion[htmlData.foundSearchedStrings].html.push({
-                        selector: htmlData.selector,
-                        text: htmlFound
-                    });
-                }
+
+                this.validationConclusion[htmlData.foundSearchedStrings].html.push({
+                    selector: htmlData.selector,
+                    text: htmlFound,
+                    textExpected: htmlExpected,
+                    match: htmlFound == htmlExpected ? true : false
+                });
             } catch (error) {
                 console.log("Error during html validation")
                 console.log(error.message);
@@ -138,6 +172,11 @@ class Validator {
 
         });
 
+
+        this.inputSearchFor.forEach(keyword => {
+
+            this.validationConclusion[keyword].html = orderBy(this.validationConclusion[keyword].html, ['match'], ['desc']);
+        })
 
         this.vod.htmlDataValidated = htmlDataValidated;
         console.log('HTML validation end');
@@ -180,149 +219,148 @@ class Validator {
         console.log('Json-ld validation end');
     }
 
-    async validateXHR() {
+    async validateAllXHR() {
+
+        if (this.analyzerOutput.xhrRequestsFound.length > 0) {
+
+            for (const xhrFound of this.analyzerOutput.xhrRequestsFound) {
+
+                try {
+
+                    let retryObject = {
+                        callsMinimalHeaders: null,
+                        callsWithoutCookie: null,
+                        callsWithCookie: null
+                    }
+
+                    //first try to call request with minimum necessary headers
+                    const minimalHeaders = {};
+                    minimalHeaders["referer"] = xhrFound.request.headers["referer"];
+                    minimalHeaders["user-agent"] = xhrFound.request.headers["user-agent"];
+                    
+                    let requestValidationObject = {
+                        url: xhrFound.request.url,
+                        method: xhrFound.request.method,
+                        headers: minimalHeaders
+                    };
+                    //copy 
+                    if (xhrFound.request.postData != null) {
+                        requestValidationObject.body = xhrFound.request.postData;
+                        requestValidationObject.headers["content-type"] = xhrFound.request.headers["content-type"];
+                    }                 
+                
+                    retryObject.callsMinimalHeaders = await this.callGotRequest(requestValidationObject);
+
+                    //use all headers from puppeteer session, these dont contain cookies
+                    requestValidationObject.headers = xhrFound.request.headers;
+                    retryObject.callsWithoutCookie = await this.callGotRequest(requestValidationObject);
+
+                    //use all headers from puppeteer session, also add all cookies retrieved from puppeteer calling page.cookies();
+                    const cookieString = this.allCookies.map((cookie) => {
+                        return `${cookie.name}=${cookie.value}`;
+                    }).join("; ");
 
 
-        const response = await gotScraping({
-            responseType: 'json',
-            url: 'https://api.apify.com/v2/browser-info',
-        });
-        return response;
-        // this.analyzerOutput.xhrRequestsFound.forEach(async (xhr) => {
-        //     const requestMethod = xhr.method;
-        //     const requestUrl = xhr.url;
-        //     const requestHeaders = xhr.request.headers;
+                    requestValidationObject.headers["cookie"] = cookieString;
+                    retryObject.callsWithCookie = await this.callGotRequest(requestValidationObject);
 
-        //     switch(requestMethod) {
-        //         case 'GET' : {
-        //             try {
-        //                 const jsonResponse = await gotScraping.get(requestUrl, {
-        //                     headers: requestHeaders 
-        //                 }).json();
+                    this.vod.xhrValidation.push(retryObject);
+                }
+                catch (err) {
 
-        //                 return jsonResponse;
-        //             } catch (err) {
-        //                 console.log(err);
-                        
-        //             }
-        //             break;
-        //         }
-        //         case 'POST' : {
+                    console.log(err.message);
+                }
+            }
 
-        //         break;
-        //         }
-        //         default: {
-        //             console.log(`${requestMethod} is not supported (yet).`)
-        //         }
-        //     }
+        }
+    }
+    async callGotRequest(requestObject) {
+        const retryCount = 3;
 
+        const requestCalls = [];
+        for (let i = 0; i < retryCount; i++) {
 
-        // });
+            const response = await gotScraping(requestObject);
+            const validationResult = this.validateGotResponse(requestObject, response);
+            requestCalls.push(validationResult);
 
-        // const { data } = await gotScraping.post('https://www.alza.sk/Services/EShopService.svc/GetCommodityAvailabilityControl', {
-        //     json: {
-        //         commodityId: 5669250
-        //     }
-        // }).json();
-        // console.log(data.responseBody);
-        // const requestMethod = xhrRequest.method;
-        // const requestUrl = xhrRequest.url;
-        // const requestHeaders = xhrRequest.requestHeaders;
+            //response success
+            //TODO: maybe compare with original responseStatus?
+            // if (validationResult.responseStatus >= 200 && validationResult.responseStatus < 300) {
+            //     break;
+            // }
 
-        // const response = null;
+        }
 
-        // if (requestMethod === "POST") {
+        return requestCalls;
 
-        //     const options = new Opti    ons({
-        //         headers: requestHeaders
-        //     });
+    }
+    validateGotResponse(requestObject, gotResponse) {
 
-        //     const response = await gotScraping.post(
-        //         requestUrl,
-        //         {
-        //             headers: requestHeaders
-        //         });
-        //     console.log(response.body);
+        let requestValidationEntry = {
+            request: requestObject,
+            response: {
+                status: gotResponse.statusCode,
+                body: gotResponse.body,
+                headers: gotResponse.headers
 
-        //     this.currentlyValidatedData.xhr = {
-        //         url: requestUrl,
-        //         method: requestMethod,
-        //         headers: requestHeaders,
-        //         responseBody: response.body
-        //     }
-        //     const data = JSON.stringify(await result, null, 2);
-        //     await Apify.setValue('responseeeee', data, { contentType: 'application/text' });
+            }
+        }
 
-        //     console.log(`Response from ${requestMethod} received sucessfully: \n ${requestResponse}`);
-    
-    // if (this.analyzerOutput.xhrRequestsFound.length > 0) {
-
-    //     this.analyzerOutput.xhrRequestsFound.forEach(async (xhrRequest) => {
-    //         const requestMethod = xhrRequest.method;
-    //         const requestUrl = xhrRequest.url;
-    //         const requestHeaders = xhrRequest.requestHeaders;
-
-    //         const response = null;
-
-    //         if (requestMethod === "POST") {
-
-    //             const options = new Options({
-    //                 headers: requestHeaders
-    //             });
-
-    //             const response = await gotScraping.post(
-    //                 requestUrl, 
-    //                 { 
-    //                     headers: requestHeaders
-    //                 });
-    //             console.log(response.body);
-
-    //             this.currentlyValidatedData.xhr = {
-    //                 url: requestUrl,
-    //                 method: requestMethod,
-    //                 headers: requestHeaders,
-    //                 responseBody: response.body
-    //             }
-    //             const data = JSON.stringify(await result, null, 2);
-    //             await Apify.setValue('responseeeee', data, { contentType: 'application/text' });
-
-    //             console.log(`Response from ${requestMethod} received sucessfully: \n ${requestResponse}`);
-    //         }
+        //TODO: how to deal with other content-types?        
+        if (gotResponse.headers['content-type'].indexOf('json') != -1) {
+            const responseBodyJson = JSON.parse(gotResponse.body);
+            const treeSearcher = new TreeSearcher();
+            requestValidationEntry.searchResults = treeSearcher.find(responseBodyJson, this.vod.searchFor);
 
 
+        } else if (gotResponse.headers['content-type'].indexOf('html') != -1) {
+            const domSearcher = new DOMSearcher({html: gotResponse.body});
+            requestValidationEntry.searchResults = domSearcher.find(this.vod.searchFor);
+        }
 
-
-
-    //     });
-            
-}
+        return requestValidationEntry;
+    }
     async loadInitialHtml() {
-    // Prepare a list of URLs to crawl
-    const requestList = new Apify.RequestList({
-        sources: [{ url: this.inputPageUrl }],
-    });
-    requestList.initialize();
+        // await Apify.utils.purgeLocalStorage();
+        // Prepare a list of URLs to crawl
 
-    // Crawl the URLs
-    const crawler = new Apify.CheerioCrawler({
-        requestList,
+        const requestList = new Apify.RequestList({
+            sources: [{ url: this.inputPageUrl }],
+        });
+        requestList.initialize();
 
-        //this will retry 
-        handlePageFunction: async ({ request, response, body, contentType, $ }) => {
+        // Crawl the URLs
+        const crawler = new Apify.CheerioCrawler({
+            requestList,
 
-            // parse all available data
-            this.initialjsonld = parseJsonLD({ $ });
-            this.initialMetadata = parseMetadata({ $ });
-            this.initialSchema = parseSchemaOrgData({ $ });
+            maxRequestRetries: 4,
 
-            this.$ = $;
+            // Increase the timeout for processing of each page.
+            handlePageTimeoutSecs: 30,
 
-        },
-    });
+            //this will retry 
+            handlePageFunction: async ({ request, response, body, contentType, $ }) => {
 
-    await crawler.run();
-    console.log('Initial html loaded sucessfully.');
-}
+                // // parse all available data
+                // this.initialjsonld = parseJsonLD({ $ });
+                // this.initialMetadata = parseMetadata({ $ });
+                // this.initialSchema = parseSchemaOrgData({ $ });
+
+                this.$ = $;
+                console.log("CheerioCrawler response status: " + request.url);
+                console.log(response);
+
+            },
+            handleFailedRequestFunction: async ({ request }) => {
+                log.debug(`Request ${request.url} failed 5 times.`);
+                this.cheerioCrawlerError = request.errorMessages;
+            },
+        });
+
+        await crawler.run();
+        console.log('Initial html loaded sucessfully.');
+    }
 
 }
 

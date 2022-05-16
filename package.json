@@ -37,8 +37,11 @@
     "dependencies": {
         "apify": "^2.1",
         "cheerio": "^1.0.0-rc.3",
+        "got": "^12.0.4",
         "html-entities": "^1.2.1",
         "i": "^0.3.7",
+        "json-formatter-js": "^2.3.4",
+        "json-view": "^0.4.0",
         "jsonpath-plus": "^6.0.1",
         "lodash": "^4.17.21",
         "moment": "^2.29.1",

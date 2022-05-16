@@ -1,0 +1,10 @@
+{
+    "url": "https://opensea.io/rankings",
+    "searchFor": [
+        "VOLT",
+        "volt",
+        "5.2"
+
+    ],
+    "tests": ["SCHEMA.ORG", "JSON-LD", "WINDOW", "XHR", "META", "HTML"]
+}

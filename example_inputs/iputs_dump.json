@@ -1,0 +1,128 @@
+{
+    "url": "https://www.alza.sk/asus-rog-zephyrus-g14-ga401qc-k2123t-eclipse-gray-d6720970.htm",
+    "searchFor": [
+        "1 229",
+        "4,41",
+        "1 265,72 €"
+    ]
+}
+{
+    "url": "https://www.mall.cz/televizory",
+    "searchFor": [
+        "Philips 58PUS8505/12",
+        "Samsung UE43AU9072U",
+        "17 982"
+    ]
+}
+
+{
+    "url": "https://www.imdb.com/",
+    "searchFor": [
+        "The Batman",
+        "8.1",
+        "The Northman",
+        "7.9"
+
+    ],
+    "tests": ["SCHEMA.ORG", "JSON-LD", "WINDOW", "XHR", "META", "HTML"]
+}
+
+{
+    "url": "https://www.electroworld.cz/televize",
+    "searchFor": [
+        "LG 55UP7500 (2021)",
+        "LG 43NANO77P (2021)",
+        "11 990 Kč",
+        "Akutars",
+        "CryptoPunks"
+    ],
+    "tests": ["SCHEMA.ORG", "JSON-LD", "WINDOW", "XHR", "META", "HTML"]
+}
+
+{
+    "url": "https://www.imdb.com/",
+    "searchFor": [
+        "The Batman",
+        "8.1",
+        "The Northman",
+        "7.9",
+        "Outer Range",
+        "Fantastic Beasts"
+    ],
+    "tests": ["SCHEMA.ORG", "JSON-LD", "WINDOW", "XHR", "META", "HTML"]
+}
+
+{
+    "url": "https://www.wayfair.com/outdoor/sb0/patio-conversation-sets-c35236.html",
+    "searchFor": [
+        "Patio Conversation Sets",
+        "23,177 Results",
+        "485.99",
+        "Auguste Wicker"
+    ]
+}
+
+
+{
+    "url": "https://www.glami.cz/panska-obuv/",
+    "searchFor": [
+        "3 240",
+        "Air Max 270",
+        "Barefoot",
+        "Semiš"
+    ]
+}
+
+{
+    "url": "https://www.eobuv.cz/panske.html",
+    "searchFor": [
+        "Sneakersy Sprandi",
+        "849,00",
+        "MP72-21782-1 Khaki",
+        "Superstar EG4960"
+    ]
+}
+
+{
+    "url": "https://www.bonprix.cz/kategorie/muz-obleceni-kalhoty/?page=2",
+    "searchFor": [
+        "Strečové chino kalhoty Slim Fit",
+        "Kč 749",
+        "Joggingové bermudy",
+        "Navlékací bermudy z materiálu"
+
+    ],
+    "tests": ["SCHEMA.ORG", "JSON-LD", "WINDOW", "XHR", "META", "HTML"]
+}
+
+{
+    "url": "https://answear.cz/p/dzinova-bunda-lee-panska-tmavomodra-barva-prechodna-686960",
+    "searchFor": [
+        "Džínová bunda Lee",
+        "2799",
+        "Posledni kus",
+        "Navlékací bermudy z materiálu"
+
+    ],
+    "tests": ["SCHEMA.ORG", "JSON-LD", "WINDOW", "XHR", "META", "HTML"]
+}
+
+{
+    "url": "https://www.marksandspencer.com/cz/l/mu%C5%BEi/letn%C3%AD-styl/",
+    "searchFor": [
+        "Piké polotriko z čisté bavlny",
+        "499,00",
+        "Žerzejová košile, z čisté bavlny"
+    ]
+}
+
+{
+    "url": "https://www.udemy.com/courses/development/",
+    "searchFor": [
+        "Become a Web Developer from Scratch",
+        "Victor Bastos",
+        "AJAX Development",
+        "49.99"
+    ]
+}
+
