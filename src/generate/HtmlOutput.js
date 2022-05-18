@@ -1,7 +1,4 @@
 const Apify = require('apify');
-
-
-
 // Apify.main(async () => {
 //   //generate validation html output 
 //   const file = 'apify_storage/key_value_stores/default/OUTPUT.json';
@@ -13,23 +10,12 @@ const Apify = require('apify');
 class htmlGenerator {
 
   constructor(analyzerOutput) {
-    // general OUTPUT.json file object
     this.analyzerOutput = analyzerOutput;
 
     //array used to store lines of html code
     this.htmlOutput = [];
   }
-  // readAnalyzerOutput() {
-
-  //   //deserialzie output from file /home/vladopisko/source/apify/actor-page-analyzer/apify_storage/key_value_stores/default/OUTPUT.json
-  //   const file = 'apify_storage/key_value_stores/default/OUTPUT.json';
-  //   const fileContents = fs.readFileSync(file, 'utf8');
-
-  //   this.analyzerOutput = JSON.parse(fileContents);
-  //   this.htmlOutput = [];
-
-  // }
-
+  
   async generateHtmlFile(fileName) {
     this.generateHeaderAndCss();
     this.htmlOutput.push(`<body>`);

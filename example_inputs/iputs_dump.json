@@ -120,9 +120,25 @@
     "url": "https://www.udemy.com/courses/development/",
     "searchFor": [
         "Become a Web Developer from Scratch",
-        "Victor Bastos",
+        "Become a Certified HTML, CSS, JavaScript Web Developer",
         "AJAX Development",
-        "49.99"
+        "12.99"
     ]
 }
 
+
+
+{
+    "pages": [
+        {
+            "url": "https://www.alza.sk/asus-zenbook-duo-14-ux482ea-hy035t-celestial-blue-celokovovy-d7095701.htm",
+            "searchFor": [
+                "999",
+                "Môžete mať dnes od 17:30",
+                "512 GB (0,51 TB)",
+                "hmotnosť 1.57kg",
+                "Showroom Bratislava - centrála"
+            ]
+        }
+    ]
+}

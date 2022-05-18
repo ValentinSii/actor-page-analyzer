@@ -261,7 +261,7 @@ async function analysePage(browser, url, searchFor, tests, inputIndex) {
 
                 // if response body is json 
                 } else {
-                    results = treeSearcher.find(request.responseBody, searchFor); 
+                    results = treeSearcher.find(request.responseBody.data, searchFor); 
 
                     //look for html objects inside json 
 
@@ -313,8 +313,8 @@ async function analysePage(browser, url, searchFor, tests, inputIndex) {
 
         // validate single url
         // const validator = new Validator(url, searchFor, tests, output.fields, scrapper.cookies);
-        // const validator = new ValidatorReloaded(url, searchFor, tests, output.fields, scrapper.cookies);
-        // await validator.validate();
+        const validator = new ValidatorReloaded(url, searchFor, tests, output.fields, scrapper.cookies);
+        await validator.validate();
 
         // //generate validation html output 
         // this.htmlGenerator = new htmlGenerator(output.fields);
