@@ -313,14 +313,17 @@ async function analysePage(browser, url, searchFor, tests, inputIndex) {
 
         // validate single url
         // const validator = new Validator(url, searchFor, tests, output.fields, scrapper.cookies);
+
         const validator = new ValidatorReloaded(url, searchFor, tests, output.fields, scrapper.cookies);
+        output.set('validationStarted', new Date());
         await validator.validate();
+        output.set('validationFinished', new Date());
 
-        // //generate validation html output 
-        // this.htmlGenerator = new htmlGenerator(output.fields);
+        //generate validation html output 
+        this.htmlGenerator = new htmlGenerator(output.fields);
 
 
-        // await this.htmlGenerator.generateHtmlFile(validationFileName);
+        await this.htmlGenerator.generateHtmlFile(validationFileName);
 
         // force last write of output data
         log('Force write of output with await');

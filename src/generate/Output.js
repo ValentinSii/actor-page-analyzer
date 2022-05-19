@@ -48,7 +48,9 @@ class OutputGenerator {
             outputFinished: null,
             error: null,
             pageError: null,
-            validation: null
+            validationStarted: null,
+            validationFinished: null
+
         };
         this.writeTimeout = null;
         this.writeOutput = this.writeOutput.bind(this);
@@ -81,6 +83,8 @@ class OutputGenerator {
                 'jsonLDSearched',
                 'htmlSearched',
                 'xhrRequestsSearched',
+                'validationStarted',
+                'validationFinished'
             ].reduce((finished, property) => {
                 return this.fields[property] !== null && finished;
             }, true);

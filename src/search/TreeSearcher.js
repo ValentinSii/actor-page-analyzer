@@ -84,7 +84,7 @@ function findSimilarPaths(data, paths) {
                 .filter(item => item !== null && Object.keys(item.possibleIndexes).length > 1);
                 return {
                     ...foundPath,
-                    foundinLists: arrayOptions.length ? arrayOptions : null
+                    foundInLists: arrayOptions.length ? arrayOptions : null
                 }
             // if (arrayOptions.length > 0) {
             //     return {

@@ -9,311 +9,289 @@ const Apify = require('apify');
 
 class htmlGenerator {
 
-  constructor(analyzerOutput) {
-    this.analyzerOutput = analyzerOutput;
-
-    //array used to store lines of html code
-    this.htmlOutput = [];
-  }
-  
-  async generateHtmlFile(fileName) {
-    this.generateHeaderAndCss();
-    this.htmlOutput.push(`<body>`);
-    //generate top bar tab for each searched keyword from input file
-    this.tabsPerKeyword();
-    //tab for CONCLUSION
-    this.generateConclusionTab();
-    this.analyzerOutput.validation.searchFor.forEach(keyword => {
-      this.generateKeywordConclusion(keyword);
-    })
-
-    // this.htmlTab();
-    // this.jsonLDDataTab();
-    // this.windowPropertiesTab();
-    // this.generateSchemaTab();
-    this.xhrTab();
-    this.appendScript();
-
-
-
-    await this.saveValidatorOutput(fileName);
-
-
-
-  }
-  async saveValidatorOutput(fileName) {
-    try {
-      await Apify.setValue(fileName, this.htmlOutput.join(""), { contentType: 'text/html' });
-    } catch (err) {
-      console.log(err);
+    constructor(analyzerOutput) {
+        this.analyzerOutput = analyzerOutput;
+        //vod stands for validator output data
+        this.vod = analyzerOutput.vod;
+        //array used to store lines of html code
+        this.htmlOutput = [];
     }
-  }
 
-  tabsPerKeyword() {
-    this.htmlOutput.push(`
-      <div class="tab">
-      <button class="tablinks" onclick="openTab(event, 'CONCLUSION')">CONCLUSION</button>`
-    );
-    // generate tabs per keyword
-    this.analyzerOutput.validation.searchFor.forEach(keyword => {
-      this.htmlOutput.push(`<button class="tablinks" onclick="openTab(event, '${keyword}')">${keyword}</button>`)
-    });
+    async generateHtmlFile(fileName) {
+        this.generateHeaderAndCss();
+        this.htmlOutput.push(`<body>`);
+        //generate top bar tab for each searched keyword from input file
+        this.generateTabs();
+        //tab for CONCLUSION
+        this.generateConclusionTab();
+        this.vod.searchFor.forEach(keyword => {
+            this.generateKeyWordTab(keyword);
+        })
 
-    // Generate tab for XHR found requests
-    this.htmlOutput.push(`<button class="tablinks" onclick="openTab(event, 'XHR')">XHR Found</button>`);
-    // open OUTPUT.json in new tab
-    this.htmlOutput.push(`<button class="tablinks" onclick=" window.open('./OUTPUT.json','_blank')">OUTPUT.JSON</button>`);
-    this.htmlOutput.push(`</div>`);
-  }
+        // this.htmlTab();
+        // this.jsonLDDataTab();
+        // this.windowPropertiesTab();
+        // this.generateSchemaTab();
+        // this.xhrTab();
+        this.appendScript();
 
-  xhrTab() {
-    this.htmlOutput.push(`<div id="XHR" class="tabcontent" >`);
-    for (const xhrFound of this.analyzerOutput.xhrRequestsFound) {
-      this.htmlOutput.push(
-      `<div class="htmlRow">
+
+
+        await this.saveValidatorOutput(fileName);
+
+
+
+    }
+    async saveValidatorOutput(fileName) {
+        try {
+            await Apify.setValue(fileName, this.htmlOutput.join(""), { contentType: 'text/html' });
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    generateTabs() {
+        // start of top bar
+        this.htmlOutput.push(`<div class="tab">`);
+        this.htmlOutput.push(`<button class="tablinks" onclick="openTab(event, 'CONCLUSION')">CONCLUSION</button>`
+        );
+        // generate tabs per keyword
+        this.vod.searchFor.forEach(keyword => {
+            this.htmlOutput.push(`<button class="tablinks" onclick="openTab(event, '${keyword}')">${keyword}</button>`)
+        });
+
+        // Generate tab for XHR found requests
+        this.htmlOutput.push(`<button class="tablinks" onclick="openTab(event, 'XHR')">XHR Found</button>`);
+        // open OUTPUT.json in new tab
+        this.htmlOutput.push(`<button class="tablinks" onclick=" window.open('./OUTPUT.json','_blank')">OUTPUT.JSON</button>`);
+        //end of top bar 
+        this.htmlOutput.push(`</div>`);
+    }
+
+    xhrTab() {
+        this.htmlOutput.push(`<div id="XHR" class="tabcontent" >`);
+        for (const xhrFound of this.analyzerOutput.xhrRequestsFound) {
+            this.htmlOutput.push(
+                `<div class="htmlRow">
       <h3>Request: ${xhrFound.method} : ${xhrFound.url}</h3>
       <pre>
       ${JSON.stringify(xhrFound.searchResults, null, 4)}
       </pre>
       </div>`);
+        }
+        this.htmlOutput.push(`</div>`);
+
+        // this.htmlOutput.push(`
+        //         <div class="${color} htmlRow">
+        //         <h3>Request: ${xhr.url}</h3>
+        //         <p><b>Method</b>: ${xhr.method}</p>
+        //         <p><b>Headers</b>: ${JSON.stringify(xhr.headers, null, 2)}</p>
+        //         <p><b>Response body</b>: ${JSON.stringify(xhr.responseBody, null, 2)}</p>
+        //         </div>          
+        //         `);
+        this.htmlOutput.push(`</div>`);
     }
-    this.htmlOutput.push(`</div>`);
 
-    // this.htmlOutput.push(`
-    //         <div class="${color} htmlRow">
-    //         <h3>Request: ${xhr.url}</h3>
-    //         <p><b>Method</b>: ${xhr.method}</p>
-    //         <p><b>Headers</b>: ${JSON.stringify(xhr.headers, null, 2)}</p>
-    //         <p><b>Response body</b>: ${JSON.stringify(xhr.responseBody, null, 2)}</p>
-    //         </div>          
-    //         `);
-    this.htmlOutput.push(`</div>`);
-  }
+    generateConclusionTab() {
+        this.htmlOutput.push(`<div id="CONCLUSION" class="tabcontent active" style="display: block;" >`);
 
-  generateConclusionTab() {
-    this.htmlOutput.push(`<div id="CONCLUSION" class="tabcontent active" style="display: block;" >`);
-
-    this.htmlOutput.push(`
+        this.htmlOutput.push(`
             <div class="green htmlRow">
-            <h2><b>Url:</b> ${this.analyzerOutput.validation.url}</h2>
-            <h4><b>Searched for: ${this.analyzerOutput.validation.searchFor}</b></h4>
+            <h2><b>Url:</b> ${this.vod.url}</h2>
+            <h4><b>Searched for:</b> ${this.vod.searchFor}</h4>
+            <h4><b>Tests:</b> ${this.vod.tests}</h4>
             </div>          
             `);
-    // this.analyzerOutput.validation.searchFor.forEach(searchFor => {
-    //   this.htmlOutput.push(`<h3>${searchFor}</h3>`);
-    // });
 
-    // this.analyzerOutput.validation.searchFor.forEach(keyword => {
-    //     this.generateKeywordConclusion(keyword);
-    // });
-    this.generateSummaryTable()
-    this.generateTimeStamps();
-    this.htmlOutput.push(`<div id="jsonContainer">`);
-    this.htmlOutput.push(`</div>`);
+        // this.analyzerOutput.validation.searchFor.forEach(keyword => {
+        //     this.generateKeywordConclusion(keyword);
+
+        // });
+        this.generateSummaryTable();
+        this.generateTimeStamps();
+        this.htmlOutput.push(`</div>`);
 
 
-    // error
-    // pageError
+        // error
+        // pageError
 
-    this.htmlOutput.push(`</div>`);
-  }
-  generateSummaryTable() {
-    this.htmlOutput.push('<table class="pure-table pure-table-bordered" >');
-
-    const tableKeys = [
-      'html',
-      'json',
-      'meta',
-      'xhr',
-      'schema',
-      'window'
-    ];
-    // table headers row
-    this.htmlOutput.push('<thead><tr>');
-    this.htmlOutput.push(`<th>Keyword</th>`);
-    tableKeys.forEach(key => {
-      this.htmlOutput.push(`<th>${key}</th>`);
-    })
-    this.htmlOutput.push('</tr></thead>');
-
-    // table body start
-    this.htmlOutput.push('<tbody>');
-
-    this.analyzerOutput.validation.searchFor.forEach(keyword => {
-      this.htmlOutput.push('<tr>');
-      const keywordData = this.analyzerOutput.validation.validationConclusion[keyword];
-      this.htmlOutput.push(`<td>${keyword}</td>`);
-      tableKeys.forEach(key => {
-        this.htmlOutput.push(`<td>${keywordData[key].length}</td>`);
-      })
-      this.htmlOutput.push('<tr>');
-    })
-
-
-    //table end 
-    this.htmlOutput.push('</tbody>');
-    this.htmlOutput.push('</table>');
-    this.htmlOutput.push(`<p>* Table contains number of possible options to retrieve keywords from given source</p>`);
-  }
-
-  generateKeywordConclusion(keyword) {
-    // this.htmlOutput.push(`<div id="WINDOW" class="tabcontent" >`);
-
-
-    const conclusionData = this.analyzerOutput.validation.validationConclusion[keyword];
-    this.keywordTabHtmlTable(keyword, conclusionData);
-
-  }
-  keywordTabHtmlTable(keyword, conclusionData) {
-
-    this.htmlOutput.push(`<div id="${keyword}" class="tabcontent " >`);
-    //html found
-    if (conclusionData.html.length != 0) {
-      this.htmlOutput.push(`<h3><b>Html found for ${keyword}:</b></h3>`);
-
-      this.htmlOutput.push('<table class="pure-table pure-table-bordered" >');
-
-      // table headers row
-      this.htmlOutput.push('<thead><tr>');
-      this.htmlOutput.push(`<th>Selector</th>`);
-      this.htmlOutput.push(`<th>Text found</th>`);
-      this.htmlOutput.push(`<th>Text expected</th>`);
-      this.htmlOutput.push('</tr></thead>');
-
-      // table body start
-      this.htmlOutput.push('<tbody>');
-      //html table start
-      this.htmlOutput.push('<tr>');
-      this.htmlOutput.push('</tr>');
-      conclusionData.html.forEach(html => {
-        //if html was found in initial response and is the same as the one ine browser 
-        if (html.match) {
-          this.htmlOutput.push('<tr style="background-color: #D0F0C0;">');
-        } else {
-          this.htmlOutput.push('<tr style="background-color: #F78DA7;">');
-        }
-        this.htmlOutput.push(`<td>${html.selector}</td>`);
-        this.htmlOutput.push(`<td>${html.text}</td>`);
-        this.htmlOutput.push(`<td>${html.textExpected}</td>`);
-
-
-        this.htmlOutput.push('</tr>');
-      });
-      this.htmlOutput.push('</tbody>');
-      this.htmlOutput.push('</table>');
-      this.htmlOutput.push(`<p>* Table contains data that can be obtained from initial html with given selectors</p>`);
-
-
-    } else {
-      this.htmlOutput.push(`<h3><b>No html found for ${keyword}</b></h3>`);
+        this.htmlOutput.push(`</div>`);
     }
-    this.htmlOutput.push(`</div>`);
+    generateSummaryTable() {
+        this.htmlOutput.push('<table class="pure-table pure-table-bordered" >');
 
-    this.htmlOutput.push(`<div class="json">`);
-    this.htmlOutput.push(`</div>`);
-  }
+        const tableKeys = [
+            'html',
+            'json',
+            'meta',
+            'xhr',
+            'schema',
+            'window'
+        ];
+        // table headers row
+        this.htmlOutput.push('<thead><tr>');
+        this.htmlOutput.push(`<th>Keyword</th>`);
+        tableKeys.forEach(key => {
+            this.htmlOutput.push(`<th>${key}</th>`);
+        })
 
-  generateTimeStamps() {
-    const timeStampKeys = [
-      "analysisStarted",
-      "scrappingStarted",
-      "pageNavigated",
-      "windowPropertiesSearched",
-      "metadataSearched",
-      "schemaOrgSearched",
-      "jsonLDSearched",
-      "htmlSearched",
-      "xhrRequestsSearched",
-      "analysisEnded",
-      "outputFinished"
-    ];
+        //column for signalizing if keyword was found sucessfully found in initial html
+        this.htmlOutput.push(`<th>Found in initial HTML</th>`);
 
-    this.htmlOutput.push('<table class="pure-table pure-table-bordered">');
+        this.htmlOutput.push('</tr></thead>');
 
-    // table headers row
-    this.htmlOutput.push('<thead><tr>');
-    this.htmlOutput.push(`
+        // table body start
+        this.htmlOutput.push('<tbody>');
+
+        this.vod.searchFor.forEach(keyword => {
+            this.htmlOutput.push('<tr>');
+            const keywordData = this.vod.validationConclusion[keyword];
+            this.htmlOutput.push(`<td>${keyword}</td>`);
+            tableKeys.forEach(key => {
+                this.htmlOutput.push(`<td>${keywordData[key].length}</td>`);
+            })
+            this.htmlOutput.push(`<td>${keywordData["foundInInitial"]}</td>`)
+            this.htmlOutput.push('</tr>');
+        })
+
+
+        //table end 
+        this.htmlOutput.push('</tbody>');
+        this.htmlOutput.push('</table>');
+        this.htmlOutput.push(`<p>* Table contains number of possible options to retrieve keywords from given source</p>`);
+    }
+
+    //generates data for TAB with validated data found for each keyword
+    generateKeyWordTab(keyword) {
+        //start of tab 
+        this.htmlOutput.push(`<div id="${keyword}" class="tabcontent " >`);
+
+        const initialSuccess = this.vod.initialResponseRetrieved;
+        if (!initialSuccess) {
+            this.htmlOutput.push(`<h4><b>Cheeriocrawler request for initial html failed, data displayed was obtained during analysis and it's not validated!</b></h4>`);
+        }
+
+        // all tests =  ['SCHEMA.ORG', 'JSON-LD', 'WINDOW', 'XHR', 'META', 'HTML']
+        this.generateDataSourceTable('HTML', keyword, initialSuccess, this.vod.validationConclusion[keyword].html);
+        this.generateDataSourceTable('XHR', keyword, initialSuccess, this.vod.validationConclusion[keyword].xhr);
+        this.generateDataSourceTable('JSON-LD', keyword, initialSuccess, this.vod.validationConclusion[keyword].json);
+        this.generateDataSourceTable('SCHEMA.ORG', keyword, initialSuccess, this.vod.validationConclusion[keyword].schema);
+        this.generateDataSourceTable('META', keyword, initialSuccess, this.vod.validationConclusion[keyword].meta);
+
+
+        // end of tab
+        this.htmlOutput.push(`</div>`);
+
+    }
+
+    generateDataSourceTable(test, keyword, analyzed, dataSource) {
+
+        if (!this.vod.tests.includes(test)) {
+            this.htmlOutput.push(`<h3><b>${test}</b> analysis was not performed.</h3>`);
+        } else if (!dataSource.length) {
+            this.htmlOutput.push(`<h3><b>${test}</b> No ${test} data was found for this keyword.</h3>`);
+        } else {
+            this.htmlOutput.push(`<h3><b>${test} found for ${keyword}:</b></h3>`);
+
+            this.htmlOutput.push('<table class="pure-table pure-table-bordered" style="width:100%";table-layout: fixed>');
+
+            // table headers row
+            this.htmlOutput.push('<thead><tr>');
+            this.htmlOutput.push(`<th>Path</th>`);
+            this.htmlOutput.push(`<th>Value</th>`);
+            if (analyzed) {
+                this.htmlOutput.push(`<th><b>Initial html value</b></th>`);
+            }
+            this.htmlOutput.push('</tr></thead>');
+
+            // table body start
+            this.htmlOutput.push('<tbody>');
+            //html table start
+            this.htmlOutput.push('<tr>');
+            this.htmlOutput.push('</tr>');
+            dataSource.forEach(data => {
+                //if html was found in initial response and is the same as the one ine browser 
+                if (data.value == data.valueFound) {
+                    this.htmlOutput.push('<tr style="background-color: #D0F0C0;">');
+                } else {
+                    this.htmlOutput.push('<tr style="background-color: #F78DA7;">');
+                }
+                this.htmlOutput.push(`<td>${data.path}</td>`);
+                this.htmlOutput.push(`<td>${data.value}</td>`);
+                if (analyzed) {
+                    this.htmlOutput.push(`<td>${data.valueFound}</td>`);
+                }
+
+                this.htmlOutput.push('</tr>');
+                if (data.foundInLists) {
+                    this.htmlOutput.push('<tr>');
+                    this.htmlOutput.push('<td colspan=100%>');
+                    this.htmlOutput.push(`<div class ="collapsible">Element above was also found in some lists. Click here to reveal</div>`);
+                    this.htmlOutput.push(`<pre style="white-space: pre-wrap; display:none">`);
+                    this.htmlOutput.push(`${JSON.stringify(data.foundInLists, null, 4)}`)  
+                    this.htmlOutput.push(`</pre>`);
+                    this.htmlOutput.push('</td>');
+                    this.htmlOutput.push('</tr>');
+
+                    
+                }
+
+                
+            });
+            this.htmlOutput.push('</tbody>');
+            this.htmlOutput.push('</table>');
+
+        }
+
+    }
+
+    generateTimeStamps() {
+        const timeStampKeys = [
+            "analysisStarted",
+            "scrappingStarted",
+            "pageNavigated",
+            "windowPropertiesSearched",
+            "metadataSearched",
+            "schemaOrgSearched",
+            "jsonLDSearched",
+            "htmlSearched",
+            "xhrRequestsSearched",
+            "analysisEnded"
+        ];
+
+        this.htmlOutput.push('<table class="pure-table pure-table-bordered">');
+
+        // table headers row
+        this.htmlOutput.push('<thead><tr>');
+        this.htmlOutput.push(`
       <th>Event</th>
       `);
 
-    this.htmlOutput.push(`
+        this.htmlOutput.push(`
       <th>Time</th>
       `);
-    this.htmlOutput.push('</tr></thead>');
-    // timestamp value rows
-    this.htmlOutput.push('<tbody>');
+        this.htmlOutput.push('</tr></thead>');
+        // timestamp value rows
+        this.htmlOutput.push('<tbody>');
 
-    timeStampKeys.forEach(timeStamp => {
+        timeStampKeys.forEach(timeStamp => {
 
-      this.htmlOutput.push('<tr>');
+            this.htmlOutput.push('<tr>');
 
-      this.htmlOutput.push(`
+            this.htmlOutput.push(`
       <td>${timeStamp}</td>
       <td>${this.analyzerOutput[timeStamp]}</td>
       `);
 
-      this.htmlOutput.push('</tr>');
-    });
-    this.htmlOutput.push('</tbody>');
+            this.htmlOutput.push('</tr>');
+        });
+        this.htmlOutput.push('</tbody>');
 
-    this.htmlOutput.push('</table>');
-  }
+        this.htmlOutput.push('</table>');
+    }
 
-  generateDataCountTable() {
-
-    const dataCountKeys = [
-      "metaData",
-      "metaDataFound",
-      "jsonLDData",
-      "jsonLDDataFound",
-      "allJsonLDData",
-      "htmlFound",
-      "xhrRequests",
-      "xhrRequestsFound"
-    ];
-
-    dataCountKeys.forEach(dataCountKey => {
-      const dataCountValue = this.analyzerOutput[dataCountKey]?.length;
-      const color = this.analyzerOutput[dataCountKey]?.length == null || dataCountValue == 0 ? 'red' : 'green';
-      this.htmlOutput.push(`
-      <div class="${color} htmlRow">
-      <h3><b>${dataCountKey}:</b> ${dataCountValue}</h3>
-      </div>          
-      `);
-
-    });
-  }
-  generateSchemaTab() {
-    this.htmlOutput.push(`<div id="SCHEMA" class="tabcontent" >`);
-
-    const color = "green";
-
-    this.htmlOutput.push(`
-            <div class="${color} htmlRow">
-            <h3>TODO: Propagate schema.org data found in jsonld/application contex= "schema.org"</h3>            
-            </div>          
-            `);
-
-    this.htmlOutput.push(`</div>`);
-  }
-  // generateMetaTab(){
-  //   this.htmlOutput.push(`<div id="META" class="tabcontent" >`);
-  //   this.analyzerOutput.validation.jsonLDDValidated.forEach(jsonldDataUnit => {
-  //     const color = jsonldDataUnit.htmlExpected === jsonldDataUnit.htmlFound ? "green" : "red";
-
-  //     this.htmlOutput.push(`
-  //           <div class="${color} htmlRow">
-  //           <h3>Path: ${jsonldDataUnit.path}</h3>
-  //           <p><b>Jsonld data expected</b>: ${jsonldDataUnit.dataExpected}</p>
-  //           <p><b>Data found</b>: ${jsonldDataUnit.dataFound}</p>
-  //           </div>          
-  //           `);
-  //   });
-  //   this.htmlOutput.push(`</div>`);
-  // }
-
-  generateHeaderAndCss() {
-    const header = `<!DOCTYPE html>
+    generateHeaderAndCss() {
+        const header = `<!DOCTYPE html>
         <html>
         <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -364,13 +342,13 @@ class htmlGenerator {
         </style>
         </head>`;
 
-    this.htmlOutput.push(header);
-  }
+        this.htmlOutput.push(header);
+    }
 
 
 
-  appendScript() {
-    const content = `
+    appendScript() {
+        const content = `
         
         <script>
         function openTab(evt, tabName) {
@@ -399,17 +377,24 @@ class htmlGenerator {
         </script>
 
         <script type="module">
-         import JSONFormatter from 'json-formatter-js';
-         const myJSON = {ans: 42};
-
-        const formatter = new JSONFormatter(myJSON);
-
-        document.body.appendChild(formatter.render());
-
+        var coll = document.getElementsByClassName("collapsible");
+        var i;
+        
+        for (i = 0; i < coll.length; i++) {
+          coll[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var content = this.nextElementSibling;
+            if (content.style.display === "block") {
+              content.style.display = "none";
+            } else {
+              content.style.display = "block";
+            }
+          });
+        } 
         </script>
         </body>
         </html> `;
-    this.htmlOutput.push(content);
-  }
+        this.htmlOutput.push(content);
+    }
 }
 module.exports = htmlGenerator;
