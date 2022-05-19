@@ -82,9 +82,7 @@ class OutputGenerator {
                 'schemaOrgSearched',
                 'jsonLDSearched',
                 'htmlSearched',
-                'xhrRequestsSearched',
-                'validationStarted',
-                'validationFinished'
+                'xhrRequestsSearched'
             ].reduce((finished, property) => {
                 return this.fields[property] !== null && finished;
             }, true);
