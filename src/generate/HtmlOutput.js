@@ -1,4 +1,5 @@
 const Apify = require('apify');
+const { getKeyByValue } = require('../utils');
 // Apify.main(async () => {
 //   //generate validation html output 
 //   const file = 'apify_storage/key_value_stores/default/OUTPUT.json';
@@ -57,7 +58,8 @@ class htmlGenerator {
         );
         // generate tabs per keyword
         this.vod.searchFor.forEach(keyword => {
-            this.htmlOutput.push(`<button class="tablinks" onclick="openTab(event, '${keyword}')">${keyword}</button>`)
+            const searchForKey = getKeyByValue(this.vod.keywordMap, keyword)
+            this.htmlOutput.push(`<button class="tablinks" onclick="openTab(event, '${searchForKey}')">${searchForKey}</button>`)
         });
 
         // Generate tab for XHR found requests
@@ -145,7 +147,8 @@ class htmlGenerator {
 
         this.vod.searchFor.forEach(keyword => {
             this.htmlOutput.push('<tr>');
-            const keywordData = this.vod.validationConclusion[keyword];
+            const searchForKey = getKeyByValue(this.vod.keywordMap, keyword);
+            const keywordData = this.vod.validationConclusion[searchForKey];
             this.htmlOutput.push(`<td>${keyword}</td>`);
             tableKeys.forEach(key => {
                 this.htmlOutput.push(`<td>${keywordData[key].length}</td>`);
@@ -164,19 +167,22 @@ class htmlGenerator {
     //generates data for TAB with validated data found for each keyword
     generateKeyWordTab(keyword) {
         //start of tab 
-        this.htmlOutput.push(`<div id="${keyword}" class="tabcontent " >`);
+        const searchForKey = getKeyByValue(this.vod.keywordMap, keyword);
+        this.htmlOutput.push(`<div id="${searchForKey}" class="tabcontent " >`);
 
         const initialSuccess = this.vod.initialResponseRetrieved;
         if (!initialSuccess) {
             this.htmlOutput.push(`<h4><b>Cheeriocrawler request for initial html failed, data displayed was obtained during analysis and it's not validated!</b></h4>`);
         }
 
+        
         // all tests =  ['SCHEMA.ORG', 'JSON-LD', 'WINDOW', 'XHR', 'META', 'HTML']
-        this.generateDataSourceTable('HTML', keyword, initialSuccess, this.vod.validationConclusion[keyword].html);
-        this.generateDataSourceTable('XHR', keyword, initialSuccess, this.vod.validationConclusion[keyword].xhr);
-        this.generateDataSourceTable('JSON-LD', keyword, initialSuccess, this.vod.validationConclusion[keyword].json);
-        this.generateDataSourceTable('SCHEMA.ORG', keyword, initialSuccess, this.vod.validationConclusion[keyword].schema);
-        this.generateDataSourceTable('META', keyword, initialSuccess, this.vod.validationConclusion[keyword].meta);
+        this.generateDataSourceTable('HTML', keyword, initialSuccess, this.vod.validationConclusion[searchForKey].html);
+        this.generateDataSourceTable('XHR', keyword, initialSuccess, this.vod.validationConclusion[searchForKey].xhr);
+        this.generateDataSourceTable('JSON-LD', keyword, initialSuccess, this.vod.validationConclusion[searchForKey].json);
+        this.generateDataSourceTable('SCHEMA.ORG', keyword, initialSuccess, this.vod.validationConclusion[searchForKey].schema);
+        this.generateDataSourceTable('META', keyword, initialSuccess, this.vod.validationConclusion[searchForKey].meta);
+        this.generateDataSourceTable('WINDOW', keyword, initialSuccess, this.vod.validationConclusion[searchForKey].window);
 
 
         // end of tab

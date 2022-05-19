@@ -6,6 +6,7 @@ const parseMetadata = require('../parse/metadata');
 const parseSchemaOrgData = require('../parse/schema-org');
 const validateAllXHR = require('./XHRValidation');
 cheerio = require('cheerio');
+const { getKeyByValue, getKeywordMap } = require('../utils');
 
 
 class ValidatorReloaded {
@@ -29,7 +30,7 @@ class ValidatorReloaded {
         this.vod.metaDataValidated = [];
         this.vod.schemaValidated = [];
         this.vod.windowValidated = [];
-        this.vod.keywordMap = this.getKeywordMap(inputSearchFor);
+        this.vod.keywordMap = getKeywordMap(inputSearchFor);
         // copy input data to validator output object
         this.vod.url = this.url;
         this.vod.searchFor = this.searchFor;
@@ -50,27 +51,10 @@ class ValidatorReloaded {
         console.log('Validator instance created.');
 
         inputSearchFor.forEach(keyword => {
-            console.log(this.getKeyByValue(this.vod.keywordMap, keyword));
+            console.log(getKeyByValue(this.vod.keywordMap, keyword));
         })
 
     }
-
-    // TODO: Move to utils.
-    getKeywordMap(keywordsArray){
-        let keywordMap = {};
-        for (let index = 0; index < keywordsArray.length; index++) {
-            const keyword = keywordsArray[index];
-            
-            const keywordName = `keyword${index}`;
-            keywordMap[keywordName] = keyword;
-        }
-        return keywordMap;
-    }
-
-    getKeyByValue(object, value) {
-        return Object.keys(object).find(key => object[key] === value);
-    };
-
 
     // ['SCHEMA.ORG', 'JSON-LD', 'WINDOW', 'XHR', 'META', 'HTML', 'VALIDATE'];
     async validate() {
@@ -100,11 +84,12 @@ class ValidatorReloaded {
                     this.validateSchema(initialSchema);
                 }
 
-                // if (this.tests.includes('WINDOW')) {
-
-                // } else {
-
-                // }
+                if (this.tests.includes('WINDOW')) {
+                    this.analyzerOutput.windowPropertiesFound.map(searchResult => {
+                        const searchForKey = getKeyByValue(this.vod.keywordMap, searchResult.originalSearchString);
+                        this.vod.validationConclusion[searchForKey].window.push(searchResult);
+                    });
+                }
 
 
             } else {
@@ -178,10 +163,12 @@ class ValidatorReloaded {
                 valueFound: valueFound ? valueFound : null
             };
 
+            const searchForKey = getKeyByValue(this.vod.keywordMap, htmlFound.originalSearchString);
+
             //push data into validation conclusion
-            this.vod.validationConclusion[htmlFound.originalSearchString].html.push(htmlFoundValidated);
+            this.vod.validationConclusion[searchForKey].html.push(htmlFoundValidated);
             if (htmlFoundValidated.valueFound == htmlFound.value) {
-                this.vod.validationConclusion[htmlFound.originalSearchString].foundInInitial = true;
+                this.vod.validationConclusion[searchForKey].foundInInitial = true;
             }
             // if (htmlFound.foundinLists) {
             //     this.vod.validationConclusion[htmlFound.originalSearchString].html.lists.push(htmlFoundValidated.foundInLists);
@@ -204,10 +191,11 @@ class ValidatorReloaded {
                 valueFound: searchResultArray.length ? searchResultArray[0] : null
             }
 
+            const searchForKey = getKeyByValue(this.vod.keywordMap, jsonFound.originalSearchString);
             //push data into validation conclusion
-            this.vod.validationConclusion[jsonFound.originalSearchString].json.push(jsonFoundValidated);
+            this.vod.validationConclusion[searchForKey].json.push(jsonFoundValidated);
             if (jsonFoundValidated.valueFound == jsonFound.value) {
-                this.vod.validationConclusion[jsonFound.originalSearchString].foundInInitial = true;
+                this.vod.validationConclusion[searchForKey].foundInInitial = true;
             }
             // if (htmlFound.foundinLists) {
             //     this.vod.validationConclusion[jsonFound.originalSearchString].json.lists.push(jsonFoundValidated.foundInLists);
@@ -228,11 +216,11 @@ class ValidatorReloaded {
                 ...metaFound,
                 valueFound: valueFound ? valueFound : null
             }
-
+            const searchForKey = getKeyByValue(this.vod.keywordMap, metaFound.originalSearchString);
             //push data into validation conclusion
-            this.vod.validationConclusion[metaFound.originalSearchString].meta.push(metaFoundValidated);
+            this.vod.validationConclusion[searchForKey].meta.push(metaFoundValidated);
             if (metaFoundValidated.valueFound == metaFound.value) {
-                this.vod.validationConclusion[metaFound.originalSearchString].foundInInitial = true;
+                this.vod.validationConclusion[searchForKey].foundInInitial = true;
             }
             // if (metaFound.foundinLists) {
             //     this.vod.validationConclusion[metaFound.originalSearchString].meta.lists.push(metaFoundValidated.foundInLists);
@@ -255,10 +243,11 @@ class ValidatorReloaded {
                 valueFound: searchResultArray.length ? searchResultArray[0] : null
             }
 
+            const searchForKey = getKeyByValue(this.vod.keywordMap, schemaFound.originalSearchString);
             //push data into validation conclusion
-            this.vod.validationConclusion[schemaFound.originalSearchString].schema.push(schemaFoundValidated);
+            this.vod.validationConclusion[searchForKey].schema.push(schemaFoundValidated);
             if (schemaFoundValidated.valueFound == schemaFound.value) {
-                this.vod.validationConclusion[schemaFound.originalSearchString].foundInInitial = true;
+                this.vod.validationConclusion[searchForKey].foundInInitial = true;
             }
             // if (valueFoundValidated.foundinLists) {
             //     this.vod.validationConclusion[schemaFound.originalSearchString].schema.lists.push(valueFoundValidated.foundInLists);
@@ -274,7 +263,8 @@ class ValidatorReloaded {
         this.vod.validationConclusion = {};
 
         this.vod.searchFor.forEach(searchedString =>{
-            this.vod.validationConclusion[searchedString] = {
+            const searchForKey = getKeyByValue(this.vod.keywordMap, searchedString);
+            this.vod.validationConclusion[searchForKey] = {
                 html: [],
                 json: [],
                 meta: [],
@@ -296,18 +286,20 @@ class ValidatorReloaded {
         //     { key: 'META', output: 'metaDataFound'},
         //     { key: 'HTML', output: 'htmlFound'}
         // ];
+        
+        const searchForKey = getKeyByValue(this.vod.keywordMap, searchResult.originalSearchString);
 
         this.analyzerOutput.htmlFound.map(searchResult => {
-            this.vod.validationConclusion[searchResult.originalSearchString].html.push(searchResult);
+            this.vod.validationConclusion[searchForKey].html.push(searchResult);
         });
         this.analyzerOutput.jsonLDDataFound.map(searchResult => {
-            this.vod.validationConclusion[searchResult.originalSearchString].json.push(searchResult);
+            this.vod.validationConclusion[searchForKey].json.push(searchResult);
         });
         this.analyzerOutput.windowPropertiesFound.map(searchResult => {
-            this.vod.validationConclusion[searchResult.originalSearchString].window.push(searchResult);
+            this.vod.validationConclusion[searchForKey].window.push(searchResult);
         });
         this.analyzerOutput.metaDataFound.map(searchResult => {
-            this.vod.validationConclusion[searchResult.originalSearchString].meta.push(searchResult);
+            this.vod.validationConclusion[searchForKey].meta.push(searchResult);
         });
 
 

@@ -70,6 +70,21 @@ function findCommonAncestors(data, items, removeFirstCharacter = false) {
     return cleanedUpProperties;
 }
 
+// TODO: Move to utils.
+function getKeywordMap(keywordsArray){
+    let keywordMap = {};
+    for (let index = 0; index < keywordsArray.length; index++) {
+        const keyword = keywordsArray[index];
+        
+        const keywordName = `keyword${index}`;
+        keywordMap[keywordName] = keyword;
+    }
+    return keywordMap;
+}
+function getKeyByValue(object, value) {
+    return Object.keys(object).find(key => object[key] === value);
+};
+
 module.exports = {
     removeHTMLTags,
     replaceHTMLEntities,
@@ -78,5 +93,7 @@ module.exports = {
     normalize,
     cleanData,
     findCommonAncestors,
-    getHostName
+    getHostName,
+    getKeywordMap,
+    getKeyByValue
 };
