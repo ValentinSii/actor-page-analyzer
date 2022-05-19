@@ -1,97 +1,228 @@
 <!DOCTYPE html>
-        <html>
-        <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="https://unpkg.com/purecss@2.1.0/build/pure-min.css" integrity="sha384-yHIFVG6ClnONEA5yB5DJXfW2/KC173DIQrYoZMEtBvGzmf0PKiGyNEqe9N6BNDBH" crossorigin="anonymous">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-jsonview/1.2.3/jquery.jsonview.css" integrity="sha512-6dqKyKlSER24gVyNQkP3cUfIaA5OfAEHxDBRiElKxSmlZTTdY6Z7uiUW5pADcTzqjEmli6Dv+IuTPsMLuFPeBg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-        <script type="module" src="https://cdn.jsdelivr.net/npm/json-formatter-js@2.3.4/dist/json-formatter.umd.min.js" defer></script>
+<html>
 
-        <style>
-        
-        body {font-family: Arial;}
-        
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://unpkg.com/purecss@2.1.0/build/pure-min.css"
+        integrity="sha384-yHIFVG6ClnONEA5yB5DJXfW2/KC173DIQrYoZMEtBvGzmf0PKiGyNEqe9N6BNDBH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-jsonview/1.2.3/jquery.jsonview.css"
+        integrity="sha512-6dqKyKlSER24gVyNQkP3cUfIaA5OfAEHxDBRiElKxSmlZTTdY6Z7uiUW5pADcTzqjEmli6Dv+IuTPsMLuFPeBg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/json-formatter-js@2.3.4/dist/json-formatter.umd.min.js"
+        defer></script>
+
+    <style>
+        body {
+            font-family: Arial;
+        }
+
         /* Style the tab */
         .tab {
-          overflow: hidden;
-          border: 1px solid #ccc;
-          background-color: #f1f1f1;
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
         }
-        
+
         /* Style the buttons inside the tab */
         .tab button {
-          background-color: inherit;
-          float: left;
-          border: none;
-          outline: none;
-          cursor: pointer;
-          padding: 14px 16px;
-          transition: 0.3s;
-          font-size: 17px;
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            font-size: 17px;
         }
-        
+
         /* Change background color of buttons on hover */
         .tab button:hover {
-          background-color: #ddd;
+            background-color: #ddd;
         }
-        
+
         /* Create an active/current tablink class */
         .tab button.active {
-          background-color: #ccc;
+            background-color: #ccc;
         }
-        
+
         /* Style the tab content */
         .tabcontent {
-          display: none;
-          padding: 6px 12px;
+            display: none;
+            padding: 6px 12px;
         }
-        
+    </style>
+</head>
 
-        </style>
-        </head><body><div class="tab"><button class="tablinks" onclick="openTab(event, 'CONCLUSION')">CONCLUSION</button><button class="tablinks" onclick="openTab(event, 'HP EliteBook 845 G8, stříbrná')">HP EliteBook 845 G8, stříbrná</button><button class="tablinks" onclick="openTab(event, '37 990 Kč')">37 990 Kč</button><button class="tablinks" onclick="openTab(event, '48R68EA')">48R68EA</button><button class="tablinks" onclick="openTab(event, 'Výkon procesoru AMD Ryzen řady 5000')">Výkon procesoru AMD Ryzen řady 5000</button><button class="tablinks" onclick="openTab(event, 'XHR')">XHR Found</button><button class="tablinks" onclick=" window.open('./OUTPUT.json','_blank')">OUTPUT.JSON</button></div><div id="CONCLUSION" class="tabcontent active" style="display: block;" >
-            <div class="green htmlRow">
+<body>
+    <div class="tab"><button class="tablinks" onclick="openTab(event, 'CONCLUSION')">CONCLUSION</button><button
+            class="tablinks" onclick="openTab(event, 'HP EliteBook 845 G8, stříbrná')">HP EliteBook 845 G8,
+            stříbrná</button><button class="tablinks" onclick="openTab(event, '37 990 Kč')">37 990 Kč</button><button
+            class="tablinks" onclick="openTab(event, '48R68EA')">48R68EA</button><button class="tablinks"
+            onclick="openTab(event, 'Výkon procesoru AMD Ryzen řady 5000')">Výkon procesoru AMD Ryzen řady
+            5000</button><button class="tablinks" onclick="openTab(event, 'XHR')">XHR Found</button><button
+            class="tablinks" onclick=" window.open('./OUTPUT.json','_blank')">OUTPUT.JSON</button></div>
+    <div id="CONCLUSION" class="tabcontent active" style="display: block;">
+        <div class="green htmlRow">
             <h2><b>Url:</b> https://www.czc.cz/hp-elitebook-845-g8-stribrna_4/322077/produkt</h2>
-            <h4><b>Searched for:</b> HP EliteBook 845 G8, stříbrná,37 990 Kč,48R68EA,Výkon procesoru AMD Ryzen řady 5000</h4>
+            <h4><b>Searched for:</b> HP EliteBook 845 G8, stříbrná,37 990 Kč,48R68EA,Výkon procesoru AMD Ryzen řady 5000
+            </h4>
             <h4><b>Tests:</b> SCHEMA.ORG,JSON-LD,WINDOW,XHR,META,HTML,VALIDATE</h4>
-            </div>          
-            <table class="pure-table pure-table-bordered" ><thead><tr><th>Keyword</th><th>html</th><th>json</th><th>meta</th><th>xhr</th><th>schema</th><th>window</th><th>Found in initial HTML</th></tr></thead><tbody><tr><td>HP EliteBook 845 G8, stříbrná</td><td>8</td><td>0</td><td>5</td><td>0</td><td>3</td><td>0</td><td>true</td></tr><tr><td>37 990 Kč</td><td>4</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>true</td></tr><tr><td>48R68EA</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>true</td></tr><tr><td>Výkon procesoru AMD Ryzen řady 5000</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>false</td></tr></tbody></table><p>* Table contains number of possible options to retrieve keywords from given source</p><table class="pure-table pure-table-bordered"><thead><tr>
-      <th>Event</th>
-      
-      <th>Time</th>
-      </tr></thead><tbody><tr>
-      <td>analysisStarted</td>
-      <td>Thu May 19 2022 14:19:58 GMT+0200 (Central European Summer Time)</td>
-      </tr><tr>
-      <td>scrappingStarted</td>
-      <td>Thu May 19 2022 14:19:58 GMT+0200 (Central European Summer Time)</td>
-      </tr><tr>
-      <td>pageNavigated</td>
-      <td>Thu May 19 2022 14:20:06 GMT+0200 (Central European Summer Time)</td>
-      </tr><tr>
-      <td>windowPropertiesSearched</td>
-      <td>Thu May 19 2022 14:20:17 GMT+0200 (Central European Summer Time)</td>
-      </tr><tr>
-      <td>metadataSearched</td>
-      <td>Thu May 19 2022 14:19:59 GMT+0200 (Central European Summer Time)</td>
-      </tr><tr>
-      <td>schemaOrgSearched</td>
-      <td>Thu May 19 2022 14:19:59 GMT+0200 (Central European Summer Time)</td>
-      </tr><tr>
-      <td>jsonLDSearched</td>
-      <td>Thu May 19 2022 14:19:59 GMT+0200 (Central European Summer Time)</td>
-      </tr><tr>
-      <td>htmlSearched</td>
-      <td>Thu May 19 2022 14:20:17 GMT+0200 (Central European Summer Time)</td>
-      </tr><tr>
-      <td>xhrRequestsSearched</td>
-      <td>Thu May 19 2022 14:20:06 GMT+0200 (Central European Summer Time)</td>
-      </tr><tr>
-      <td>analysisEnded</td>
-      <td>Thu May 19 2022 14:20:17 GMT+0200 (Central European Summer Time)</td>
-      </tr></tbody></table></div></div><div id="HP EliteBook 845 G8, stříbrná" class="tabcontent " ><h3><b>HTML found for HP EliteBook 845 G8, stříbrná:</b></h3><table class="pure-table pure-table-bordered" style="width:100%";table-layout: fixed><thead><tr><th>Path</th><th>Value</th><th><b>Initial html value</b></th></tr></thead><tbody><tr></tr><tr style="background-color: #D0F0C0;"><td>.pd-wrap > h1</td><td>
-                HP EliteBook 845 G8, stříbrná
-            </td><td>
-                HP EliteBook 845 G8, stříbrná
-            </td></tr><tr style="background-color: #D0F0C0;"><td>td.title.title-variant > a > span.product-title</td><td>HP EliteBook 845 G8, stříbrná</td><td>HP EliteBook 845 G8, stříbrná</td></tr><tr style="background-color: #D0F0C0;"><td>td.title.title-variant > div > span.product-title</td><td>HP EliteBook 845 G8, stříbrná</td><td>HP EliteBook 845 G8, stříbrná</td></tr><tr style="background-color: #F78DA7;"><td>.breadcrumbs > span:nth-child(7) > a > span:nth-child(1)</td><td>HP EliteBook 845 G8, stříbrná</td><td>null</td></tr><tr style="background-color: #D0F0C0;"><td>.pd-discussion-comments > div:nth-child(2) > div.text > p.in-discuss > a:nth-child(1)</td><td>HP EliteBook 845 G8, stříbrná</td><td>HP EliteBook 845 G8, stříbrná</td></tr><tr><td colspan=100%><div class ="collapsible">Element above was also found in some lists. Click here to reveal</div><pre style="white-space: pre-wrap; display:none">[
+        </div>
+        <table class="pure-table pure-table-bordered">
+            <thead>
+                <tr>
+                    <th>Keyword</th>
+                    <th>html</th>
+                    <th>json</th>
+                    <th>meta</th>
+                    <th>xhr</th>
+                    <th>schema</th>
+                    <th>window</th>
+                    <th>Found in initial HTML</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>HP EliteBook 845 G8, stříbrná</td>
+                    <td>8</td>
+                    <td>0</td>
+                    <td>5</td>
+                    <td>0</td>
+                    <td>3</td>
+                    <td>0</td>
+                    <td>true</td>
+                </tr>
+                <tr>
+                    <td>37 990 Kč</td>
+                    <td>4</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>true</td>
+                </tr>
+                <tr>
+                    <td>48R68EA</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>true</td>
+                </tr>
+                <tr>
+                    <td>Výkon procesoru AMD Ryzen řady 5000</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>false</td>
+                </tr>
+            </tbody>
+        </table>
+        <p>* Table contains number of possible options to retrieve keywords from given source</p>
+        <table class="pure-table pure-table-bordered">
+            <thead>
+                <tr>
+                    <th>Event</th>
+
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>analysisStarted</td>
+                    <td>Thu May 19 2022 14:19:58 GMT+0200 (Central European Summer Time)</td>
+                </tr>
+                <tr>
+                    <td>scrappingStarted</td>
+                    <td>Thu May 19 2022 14:19:58 GMT+0200 (Central European Summer Time)</td>
+                </tr>
+                <tr>
+                    <td>pageNavigated</td>
+                    <td>Thu May 19 2022 14:20:06 GMT+0200 (Central European Summer Time)</td>
+                </tr>
+                <tr>
+                    <td>windowPropertiesSearched</td>
+                    <td>Thu May 19 2022 14:20:17 GMT+0200 (Central European Summer Time)</td>
+                </tr>
+                <tr>
+                    <td>metadataSearched</td>
+                    <td>Thu May 19 2022 14:19:59 GMT+0200 (Central European Summer Time)</td>
+                </tr>
+                <tr>
+                    <td>schemaOrgSearched</td>
+                    <td>Thu May 19 2022 14:19:59 GMT+0200 (Central European Summer Time)</td>
+                </tr>
+                <tr>
+                    <td>jsonLDSearched</td>
+                    <td>Thu May 19 2022 14:19:59 GMT+0200 (Central European Summer Time)</td>
+                </tr>
+                <tr>
+                    <td>htmlSearched</td>
+                    <td>Thu May 19 2022 14:20:17 GMT+0200 (Central European Summer Time)</td>
+                </tr>
+                <tr>
+                    <td>xhrRequestsSearched</td>
+                    <td>Thu May 19 2022 14:20:06 GMT+0200 (Central European Summer Time)</td>
+                </tr>
+                <tr>
+                    <td>analysisEnded</td>
+                    <td>Thu May 19 2022 14:20:17 GMT+0200 (Central European Summer Time)</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    </div>
+    <div id="HP EliteBook 845 G8, stříbrná" class="tabcontent ">
+        <h3><b>HTML found for HP EliteBook 845 G8, stříbrná:</b></h3>
+        <table class="pure-table pure-table-bordered" style="width:100%" ;table-layout: fixed>
+            <thead>
+                <tr>
+                    <th>Path</th>
+                    <th>Value</th>
+                    <th><b>Initial html value</b></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr></tr>
+                <tr style="background-color: #D0F0C0;">
+                    <td>.pd-wrap > h1</td>
+                    <td>
+                        HP EliteBook 845 G8, stříbrná
+                    </td>
+                    <td>
+                        HP EliteBook 845 G8, stříbrná
+                    </td>
+                </tr>
+                <tr style="background-color: #D0F0C0;">
+                    <td>td.title.title-variant > a > span.product-title</td>
+                    <td>HP EliteBook 845 G8, stříbrná</td>
+                    <td>HP EliteBook 845 G8, stříbrná</td>
+                </tr>
+                <tr style="background-color: #D0F0C0;">
+                    <td>td.title.title-variant > div > span.product-title</td>
+                    <td>HP EliteBook 845 G8, stříbrná</td>
+                    <td>HP EliteBook 845 G8, stříbrná</td>
+                </tr>
+                <tr style="background-color: #F78DA7;">
+                    <td>.breadcrumbs > span:nth-child(7) > a > span:nth-child(1)</td>
+                    <td>HP EliteBook 845 G8, stříbrná</td>
+                    <td>null</td>
+                </tr>
+                <tr style="background-color: #D0F0C0;">
+                    <td>.pd-discussion-comments > div:nth-child(2) > div.text > p.in-discuss > a:nth-child(1)</td>
+                    <td>HP EliteBook 845 G8, stříbrná</td>
+                    <td>HP EliteBook 845 G8, stříbrná</td>
+                </tr>
+                <tr>
+                    <td colspan=100%>
+                        <div class="collapsible">Element above was also found in some lists. Click here to reveal</div>
+                        <pre style="white-space: pre-wrap; display:none">[
     {
         "arrayPath": ".pd-discussion-comments > div",
         "childPath": "div.text > p.in-discuss > a:nth-child(1)",
@@ -101,7 +232,18 @@
             "2": "HP EliteBook 845 G8, stříbrná"
         }
     }
-]</pre></td></tr><tr style="background-color: #D0F0C0;"><td>.pd-discussion-comments > div:nth-child(3) > div.text > p.in-discuss > a:nth-child(1)</td><td>HP EliteBook 845 G8, stříbrná</td><td>HP EliteBook 845 G8, stříbrná</td></tr><tr><td colspan=100%><div class ="collapsible">Element above was also found in some lists. Click here to reveal</div><pre style="white-space: pre-wrap; display:none">[
+]</pre>
+                    </td>
+                </tr>
+                <tr style="background-color: #D0F0C0;">
+                    <td>.pd-discussion-comments > div:nth-child(3) > div.text > p.in-discuss > a:nth-child(1)</td>
+                    <td>HP EliteBook 845 G8, stříbrná</td>
+                    <td>HP EliteBook 845 G8, stříbrná</td>
+                </tr>
+                <tr>
+                    <td colspan=100%>
+                        <div class="collapsible">Element above was also found in some lists. Click here to reveal</div>
+                        <pre style="white-space: pre-wrap; display:none">[
     {
         "arrayPath": ".pd-discussion-comments > div",
         "childPath": "div.text > p.in-discuss > a:nth-child(1)",
@@ -111,7 +253,20 @@
             "2": "HP EliteBook 845 G8, stříbrná"
         }
     }
-]</pre></td></tr><tr style="background-color: #D0F0C0;"><td>div[id='microdata-container'] > span:nth-child(1)</td><td>HP EliteBook 845 G8, stříbrná Servisní pohotovost – vylepšený servis PC a NTB ZDARMA O2 TV HBO a Sport Pack na dva měsíce</td><td>HP EliteBook 845 G8, stříbrná Servisní pohotovost – vylepšený servis PC a NTB ZDARMA O2 TV HBO a Sport Pack na dva měsíce</td></tr><tr><td colspan=100%><div class ="collapsible">Element above was also found in some lists. Click here to reveal</div><pre style="white-space: pre-wrap; display:none">[
+]</pre>
+                    </td>
+                </tr>
+                <tr style="background-color: #D0F0C0;">
+                    <td>div[id='microdata-container'] > span:nth-child(1)</td>
+                    <td>HP EliteBook 845 G8, stříbrná Servisní pohotovost – vylepšený servis PC a NTB ZDARMA O2 TV HBO a
+                        Sport Pack na dva měsíce</td>
+                    <td>HP EliteBook 845 G8, stříbrná Servisní pohotovost – vylepšený servis PC a NTB ZDARMA O2 TV HBO a
+                        Sport Pack na dva měsíce</td>
+                </tr>
+                <tr>
+                    <td colspan=100%>
+                        <div class="collapsible">Element above was also found in some lists. Click here to reveal</div>
+                        <pre style="white-space: pre-wrap; display:none">[
     {
         "arrayPath": "div[id='content'] > div[id='product-detail'] > div",
         "childPath": "span:nth-child(1)",
@@ -126,7 +281,19 @@
             "8": "Přidat vlastní recenzi\n                "
         }
     }
-]</pre></td></tr><tr style="background-color: #F78DA7;"><td>div[id='latestActiveDiscussionThreadsContainer'] > div.sp-wrap > div.sp-content > .pd-discussion-comments > div > div.text > p.in-discuss > a:nth-child(1)</td><td>HP EliteBook 845 G8, stříbrná</td><td>HP EliteBook 845 G8, stříbrnáHP EliteBook 845 G8, stříbrnáHP EliteBook 845 G8, stříbrná</td></tr><tr><td colspan=100%><div class ="collapsible">Element above was also found in some lists. Click here to reveal</div><pre style="white-space: pre-wrap; display:none">[
+]</pre>
+                    </td>
+                </tr>
+                <tr style="background-color: #F78DA7;">
+                    <td>div[id='latestActiveDiscussionThreadsContainer'] > div.sp-wrap > div.sp-content >
+                        .pd-discussion-comments > div > div.text > p.in-discuss > a:nth-child(1)</td>
+                    <td>HP EliteBook 845 G8, stříbrná</td>
+                    <td>HP EliteBook 845 G8, stříbrnáHP EliteBook 845 G8, stříbrnáHP EliteBook 845 G8, stříbrná</td>
+                </tr>
+                <tr>
+                    <td colspan=100%>
+                        <div class="collapsible">Element above was also found in some lists. Click here to reveal</div>
+                        <pre style="white-space: pre-wrap; display:none">[
     {
         "arrayPath": "div[id='latestActiveDiscussionThreadsContainer'] > div.sp-wrap > div.sp-content > .pd-discussion-comments > div > div.text > p.in-discuss",
         "childPath": "a:nth-child(1)",
@@ -154,7 +321,33 @@
             "2": "HP EliteBook 845 G8, stříbrná"
         }
     }
-]</pre></td></tr></tbody></table><h3><b>XHR</b> No XHR data was found for this keyword.</h3><h3><b>JSON-LD</b> No JSON-LD data was found for this keyword.</h3><h3><b>SCHEMA.ORG found for HP EliteBook 845 G8, stříbrná:</b></h3><table class="pure-table pure-table-bordered" style="width:100%";table-layout: fixed><thead><tr><th>Path</th><th>Value</th><th><b>Initial html value</b></th></tr></thead><tbody><tr></tr><tr style="background-color: #D0F0C0;"><td>[0].itemListElement[6].item</td><td>HP EliteBook 845 G8, stříbrná</td><td>HP EliteBook 845 G8, stříbrná</td></tr><tr><td colspan=100%><div class ="collapsible">Element above was also found in some lists. Click here to reveal</div><pre style="white-space: pre-wrap; display:none">[
+]</pre>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <h3><b>XHR</b> No XHR data was found for this keyword.</h3>
+        <h3><b>JSON-LD</b> No JSON-LD data was found for this keyword.</h3>
+        <h3><b>SCHEMA.ORG found for HP EliteBook 845 G8, stříbrná:</b></h3>
+        <table class="pure-table pure-table-bordered" style="width:100%" ;table-layout: fixed>
+            <thead>
+                <tr>
+                    <th>Path</th>
+                    <th>Value</th>
+                    <th><b>Initial html value</b></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr></tr>
+                <tr style="background-color: #D0F0C0;">
+                    <td>[0].itemListElement[6].item</td>
+                    <td>HP EliteBook 845 G8, stříbrná</td>
+                    <td>HP EliteBook 845 G8, stříbrná</td>
+                </tr>
+                <tr>
+                    <td colspan=100%>
+                        <div class="collapsible">Element above was also found in some lists. Click here to reveal</div>
+                        <pre style="white-space: pre-wrap; display:none">[
     {
         "arrayPath": "[0].itemListElement",
         "childPath": "item",
@@ -168,7 +361,18 @@
             "6": "HP EliteBook 845 G8, stříbrná"
         }
     }
-]</pre></td></tr><tr style="background-color: #D0F0C0;"><td>[0].itemListElement[6].name</td><td>HP EliteBook 845 G8, stříbrná</td><td>HP EliteBook 845 G8, stříbrná</td></tr><tr><td colspan=100%><div class ="collapsible">Element above was also found in some lists. Click here to reveal</div><pre style="white-space: pre-wrap; display:none">[
+]</pre>
+                    </td>
+                </tr>
+                <tr style="background-color: #D0F0C0;">
+                    <td>[0].itemListElement[6].name</td>
+                    <td>HP EliteBook 845 G8, stříbrná</td>
+                    <td>HP EliteBook 845 G8, stříbrná</td>
+                </tr>
+                <tr>
+                    <td colspan=100%>
+                        <div class="collapsible">Element above was also found in some lists. Click here to reveal</div>
+                        <pre style="white-space: pre-wrap; display:none">[
     {
         "arrayPath": "[0].itemListElement",
         "childPath": "name",
@@ -182,11 +386,120 @@
             "6": "HP EliteBook 845 G8, stříbrná"
         }
     }
-]</pre></td></tr><tr style="background-color: #D0F0C0;"><td>[1].name</td><td>HP EliteBook 845 G8, stříbrná Servisní pohotovost – vylepšený servis PC a NTB ZDARMA O2 TV HBO a Sport Pack na dva měsíce</td><td>HP EliteBook 845 G8, stříbrná Servisní pohotovost – vylepšený servis PC a NTB ZDARMA O2 TV HBO a Sport Pack na dva měsíce</td></tr></tbody></table><h3><b>META found for HP EliteBook 845 G8, stříbrná:</b></h3><table class="pure-table pure-table-bordered" style="width:100%";table-layout: fixed><thead><tr><th>Path</th><th>Value</th><th><b>Initial html value</b></th></tr></thead><tbody><tr></tr><tr style="background-color: #D0F0C0;"><td>.description</td><td>HP EliteBook 845 G8, stříbrná 48R67EA Servisní pohotovost – vylepšený servis PC a NTB ZDARMA + O2 TV HBO a Sport Pack na dva měsíce - Profesionální, produktivní a vysoce odolný notebook na cesty i do firemního prostředí se schopností dlouhé výdrže při práci na baterie a pokročilými možnosti správy a zabezpečení. 8jádrový procesor AMD Ryzen 7 Pro 5850U (1.9GHz, TB 4.4GHz, 16 vláken), 16GB RAM DDR4, 14" IPS Full HD displej (400nits, 72% NTSC, Ambient Light Sensor), grafika AMD Radeon Graphics, 512GB SSD M.2 PCIe NVMe, bez mechaniky, Wi-Fi ax, Bluetooth 5.0, 2x USB Type-C 3.1/3.2 Gen 2, 2x USB 3.0/3.1/3.2 Gen 1, HDMI, čtečka otisků prstů, čtečka čipových karet, IR/HD kamera, podsvícená klávesnice, operační systém Windows 10 Pro.</td><td>HP EliteBook 845 G8, stříbrná 48R67EA Servisní pohotovost – vylepšený servis PC a NTB ZDARMA + O2 TV HBO a Sport Pack na dva měsíce - Profesionální, produktivní a vysoce odolný notebook na cesty i do firemního prostředí se schopností dlouhé výdrže při práci na baterie a pokročilými možnosti správy a zabezpečení. 8jádrový procesor AMD Ryzen 7 Pro 5850U (1.9GHz, TB 4.4GHz, 16 vláken), 16GB RAM DDR4, 14" IPS Full HD displej (400nits, 72% NTSC, Ambient Light Sensor), grafika AMD Radeon Graphics, 512GB SSD M.2 PCIe NVMe, bez mechaniky, Wi-Fi ax, Bluetooth 5.0, 2x USB Type-C 3.1/3.2 Gen 2, 2x USB 3.0/3.1/3.2 Gen 1, HDMI, čtečka otisků prstů, čtečka čipových karet, IR/HD kamera, podsvícená klávesnice, operační systém Windows 10 Pro.</td></tr><tr style="background-color: #D0F0C0;"><td>.keywords</td><td>Počítače a notebooky, Notebooky, Pracovní, kancelářské, Základní, HP, HP EliteBook 845 G8, stříbrná 48R67EA Servisní pohotovost – vylepšený servis PC a NTB ZDARMA + O2 TV HBO a Sport Pack na dva měsíce, EliteBook, 845, G8, stříbrná, 48R67EA, Servisní, pohotovost, –, vylepšený, servis, PC, a, NTB, ZDARMA, O2, TV, HBO, Sport, Pack, na, dva, měsíce, Webkamera, TPM, 2.0, Bez, numerické, části, Podsvícená, klávesnice, Voděodolná, Čtečka, otisků, prstů, HDMI, Podpora, DisplayPort, Power, Delivery</td><td>Počítače a notebooky, Notebooky, Pracovní, kancelářské, Základní, HP, HP EliteBook 845 G8, stříbrná 48R67EA Servisní pohotovost – vylepšený servis PC a NTB ZDARMA + O2 TV HBO a Sport Pack na dva měsíce, EliteBook, 845, G8, stříbrná, 48R67EA, Servisní, pohotovost, –, vylepšený, servis, PC, a, NTB, ZDARMA, O2, TV, HBO, Sport, Pack, na, dva, měsíce, Webkamera, TPM, 2.0, Bez, numerické, části, Podsvícená, klávesnice, Voděodolná, Čtečka, otisků, prstů, HDMI, Podpora, DisplayPort, Power, Delivery</td></tr><tr style="background-color: #D0F0C0;"><td>.twitter:title</td><td>HP EliteBook 845 G8, stříbrná Servisní pohotovost – vylepšený servis PC a NTB ZDARMA + O2 TV HBO a Sport Pack na dva měsíce</td><td>HP EliteBook 845 G8, stříbrná Servisní pohotovost – vylepšený servis PC a NTB ZDARMA + O2 TV HBO a Sport Pack na dva měsíce</td></tr><tr style="background-color: #D0F0C0;"><td>.og:title</td><td>HP EliteBook 845 G8, stříbrná Servisní pohotovost – vylepšený servis PC a NTB ZDARMA + O2 TV HBO a Sport Pack na dva měsíce</td><td>HP EliteBook 845 G8, stříbrná Servisní pohotovost – vylepšený servis PC a NTB ZDARMA + O2 TV HBO a Sport Pack na dva měsíce</td></tr><tr style="background-color: #D0F0C0;"><td>.title</td><td>HP EliteBook 845 G8, stříbrná 48R67EA Servisní | CZC.cz</td><td>HP EliteBook 845 G8, stříbrná 48R67EA Servisní | CZC.cz</td></tr></tbody></table></div><div id="37 990 Kč" class="tabcontent " ><h3><b>HTML found for 37 990 Kč:</b></h3><table class="pure-table pure-table-bordered" style="width:100%";table-layout: fixed><thead><tr><th>Path</th><th>Value</th><th><b>Initial html value</b></th></tr></thead><tbody><tr></tr><tr style="background-color: #D0F0C0;"><td>.alone > span.price-vatin</td><td>37 990 Kč</td><td>37 990 Kč</td></tr><tr style="background-color: #D0F0C0;"><td>span.title > b > span.price-vatin</td><td>37 990 Kč</td><td>37 990 Kč</td></tr><tr style="background-color: #F78DA7;"><td>div[id='microdata-container'] > div:nth-child(1)</td><td>Cena: 37 990 Kč
-                    
-                    Dostupnost: Skladem
-                    
-                </td><td>null</td></tr><tr><td colspan=100%><div class ="collapsible">Element above was also found in some lists. Click here to reveal</div><pre style="white-space: pre-wrap; display:none">[
+]</pre>
+                    </td>
+                </tr>
+                <tr style="background-color: #D0F0C0;">
+                    <td>[1].name</td>
+                    <td>HP EliteBook 845 G8, stříbrná Servisní pohotovost – vylepšený servis PC a NTB ZDARMA O2 TV HBO a
+                        Sport Pack na dva měsíce</td>
+                    <td>HP EliteBook 845 G8, stříbrná Servisní pohotovost – vylepšený servis PC a NTB ZDARMA O2 TV HBO a
+                        Sport Pack na dva měsíce</td>
+                </tr>
+            </tbody>
+        </table>
+        <h3><b>META found for HP EliteBook 845 G8, stříbrná:</b></h3>
+        <table class="pure-table pure-table-bordered" style="width:100%" ;table-layout: fixed>
+            <thead>
+                <tr>
+                    <th>Path</th>
+                    <th>Value</th>
+                    <th><b>Initial html value</b></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr></tr>
+                <tr style="background-color: #D0F0C0;">
+                    <td>.description</td>
+                    <td>HP EliteBook 845 G8, stříbrná 48R67EA Servisní pohotovost – vylepšený servis PC a NTB ZDARMA +
+                        O2 TV HBO a Sport Pack na dva měsíce - Profesionální, produktivní a vysoce odolný notebook na
+                        cesty i do firemního prostředí se schopností dlouhé výdrže při práci na baterie a pokročilými
+                        možnosti správy a zabezpečení. 8jádrový procesor AMD Ryzen 7 Pro 5850U (1.9GHz, TB 4.4GHz, 16
+                        vláken), 16GB RAM DDR4, 14" IPS Full HD displej (400nits, 72% NTSC, Ambient Light Sensor),
+                        grafika AMD Radeon Graphics, 512GB SSD M.2 PCIe NVMe, bez mechaniky, Wi-Fi ax, Bluetooth 5.0, 2x
+                        USB Type-C 3.1/3.2 Gen 2, 2x USB 3.0/3.1/3.2 Gen 1, HDMI, čtečka otisků prstů, čtečka čipových
+                        karet, IR/HD kamera, podsvícená klávesnice, operační systém Windows 10 Pro.</td>
+                    <td>HP EliteBook 845 G8, stříbrná 48R67EA Servisní pohotovost – vylepšený servis PC a NTB ZDARMA +
+                        O2 TV HBO a Sport Pack na dva měsíce - Profesionální, produktivní a vysoce odolný notebook na
+                        cesty i do firemního prostředí se schopností dlouhé výdrže při práci na baterie a pokročilými
+                        možnosti správy a zabezpečení. 8jádrový procesor AMD Ryzen 7 Pro 5850U (1.9GHz, TB 4.4GHz, 16
+                        vláken), 16GB RAM DDR4, 14" IPS Full HD displej (400nits, 72% NTSC, Ambient Light Sensor),
+                        grafika AMD Radeon Graphics, 512GB SSD M.2 PCIe NVMe, bez mechaniky, Wi-Fi ax, Bluetooth 5.0, 2x
+                        USB Type-C 3.1/3.2 Gen 2, 2x USB 3.0/3.1/3.2 Gen 1, HDMI, čtečka otisků prstů, čtečka čipových
+                        karet, IR/HD kamera, podsvícená klávesnice, operační systém Windows 10 Pro.</td>
+                </tr>
+                <tr style="background-color: #D0F0C0;">
+                    <td>.keywords</td>
+                    <td>Počítače a notebooky, Notebooky, Pracovní, kancelářské, Základní, HP, HP EliteBook 845 G8,
+                        stříbrná 48R67EA Servisní pohotovost – vylepšený servis PC a NTB ZDARMA + O2 TV HBO a Sport Pack
+                        na dva měsíce, EliteBook, 845, G8, stříbrná, 48R67EA, Servisní, pohotovost, –, vylepšený,
+                        servis, PC, a, NTB, ZDARMA, O2, TV, HBO, Sport, Pack, na, dva, měsíce, Webkamera, TPM, 2.0, Bez,
+                        numerické, části, Podsvícená, klávesnice, Voděodolná, Čtečka, otisků, prstů, HDMI, Podpora,
+                        DisplayPort, Power, Delivery</td>
+                    <td>Počítače a notebooky, Notebooky, Pracovní, kancelářské, Základní, HP, HP EliteBook 845 G8,
+                        stříbrná 48R67EA Servisní pohotovost – vylepšený servis PC a NTB ZDARMA + O2 TV HBO a Sport Pack
+                        na dva měsíce, EliteBook, 845, G8, stříbrná, 48R67EA, Servisní, pohotovost, –, vylepšený,
+                        servis, PC, a, NTB, ZDARMA, O2, TV, HBO, Sport, Pack, na, dva, měsíce, Webkamera, TPM, 2.0, Bez,
+                        numerické, části, Podsvícená, klávesnice, Voděodolná, Čtečka, otisků, prstů, HDMI, Podpora,
+                        DisplayPort, Power, Delivery</td>
+                </tr>
+                <tr style="background-color: #D0F0C0;">
+                    <td>.twitter:title</td>
+                    <td>HP EliteBook 845 G8, stříbrná Servisní pohotovost – vylepšený servis PC a NTB ZDARMA + O2 TV HBO
+                        a Sport Pack na dva měsíce</td>
+                    <td>HP EliteBook 845 G8, stříbrná Servisní pohotovost – vylepšený servis PC a NTB ZDARMA + O2 TV HBO
+                        a Sport Pack na dva měsíce</td>
+                </tr>
+                <tr style="background-color: #D0F0C0;">
+                    <td>.og:title</td>
+                    <td>HP EliteBook 845 G8, stříbrná Servisní pohotovost – vylepšený servis PC a NTB ZDARMA + O2 TV HBO
+                        a Sport Pack na dva měsíce</td>
+                    <td>HP EliteBook 845 G8, stříbrná Servisní pohotovost – vylepšený servis PC a NTB ZDARMA + O2 TV HBO
+                        a Sport Pack na dva měsíce</td>
+                </tr>
+                <tr style="background-color: #D0F0C0;">
+                    <td>.title</td>
+                    <td>HP EliteBook 845 G8, stříbrná 48R67EA Servisní | CZC.cz</td>
+                    <td>HP EliteBook 845 G8, stříbrná 48R67EA Servisní | CZC.cz</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="37 990 Kč" class="tabcontent ">
+        <h3><b>HTML found for 37 990 Kč:</b></h3>
+        <table class="pure-table pure-table-bordered" style="width:100%" ;table-layout: fixed>
+            <thead>
+                <tr>
+                    <th>Path</th>
+                    <th>Value</th>
+                    <th><b>Initial html value</b></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr></tr>
+                <tr style="background-color: #D0F0C0;">
+                    <td>.alone > span.price-vatin</td>
+                    <td>37 990 Kč</td>
+                    <td>37 990 Kč</td>
+                </tr>
+                <tr style="background-color: #D0F0C0;">
+                    <td>span.title > b > span.price-vatin</td>
+                    <td>37 990 Kč</td>
+                    <td>37 990 Kč</td>
+                </tr>
+                <tr style="background-color: #F78DA7;">
+                    <td>div[id='microdata-container'] > div:nth-child(1)</td>
+                    <td>Cena: 37 990 Kč
+
+                        Dostupnost: Skladem
+
+                    </td>
+                    <td>null</td>
+                </tr>
+                <tr>
+                    <td colspan=100%>
+                        <div class="collapsible">Element above was also found in some lists. Click here to reveal</div>
+                        <pre style="white-space: pre-wrap; display:none">[
     {
         "arrayPath": "div[id='content'] > div[id='product-detail'] > div",
         "childPath": "div:nth-child(1)",
@@ -199,11 +512,22 @@
             "7": "\n                            \n        \n            \n        \n            \n        \n                \n                Skrýt  Zobrazit diskuzi\n                \n        \n            \n                                \n                                    \n                                            \n                                                \n\n        \n\n                \n                    \n                        zivan\n                    \n                    ZIV\n                \n        \n                                                \n                                                    \n                                                        \n        Upgrade SSD\n        \n                                                    \n                                                    \n                                                        k produktu: HP EliteBook 845 G8, stříbrná\n                                                    \n\n                                                    \n                                                        \n                                                            \n            zivan\n                                                                \n                                                                    5. 5. 2022 3:17\n                                                                \n                                                            \n                                                        \n\n                                                    \n                                                    \n                                                        \n            \n        \n                                                    \n\n                                                    \n                                                        Kdyby někdo chtěl upgradovat SSD, tak pozor na to, že se tam nevejde SSD s čipy z obou stran.\n                                                    \n                                                \n                                            \n                                            \n                                                \n\n        \n\n                \n                    \n                        SKLIMA\n                    \n                    SKL\n                \n        \n                                                \n                                                    \n                                                        \n        Rozšíření RAM\n        \n                                                    \n                                                    \n                                                        k produktu: HP EliteBook 845 G8, stříbrná\n                                                    \n\n                                                    \n                                                        \n                                                            \n            SKLIMA\n                                                                \n                                                                    15. 3. 2022 7:15\n                                                                \n                                                            \n                                                        \n\n                                                    \n                                                    \n                                                        \n            \n        \n                                                    \n\n                                                    \n                                                        Poradíte nějaký kompatibilní modul 16GB RAM? Aby to dalo alespoň 24GB\n                                                    \n                                                \n                                            \n                                            \n                                                \n\n        \n\n                \n                    \n                        peedek\n                    \n                    PEE\n                \n        \n                                                \n                                                    \n                                                        \n        Navýšení kapacity RAM bez ztráty záruky\n        \n                                                    \n                                                    \n                                                        k produktu: HP EliteBook 845 G8, stříbrná\n                                                    \n\n                                                    \n                                                        \n                                                            \n            peedek\n                                                                \n                                                                    2. 11. 2021 13:14\n                                                                \n                                                            \n                                                        \n\n                                                    \n                                                    \n                                                        \n            \n        \n                                                    \n\n                                                    \n                                                        Dobrý den,měl bych zájem o tento notebook, ale potřeboval bych 16GB RAM. Tento notebook mám 2 sloty na RAM a jeden je volný.Chtěl bych se zeptat, zda-…\n            \n                více\n            \n        \n            \n        \n                                                    \n                                                \n                                            \n                                            \n                                                \n\n        \n\n                \n                    \n                        tommikcz\n                    \n                    TOM\n                \n        \n                                                \n                                                    \n                                                        \n        Dostupnost 2021\n        \n                                                    \n                                                    \n\n                                                    \n                                                        \n                                                            \n            tommikcz\n                                                                \n                                                                    20. 8. 2021 19:18\n                                                                \n                                                            \n                                                        \n\n                                                    \n                                                    \n                                                        \n            \n        \n                                                    \n\n                                                    \n                                                        Dobrý den, jsou prosím již dostupné nějaké přibližné informace o dostupnosti pro modely Elitebook 845 G8? Děkuji\n                                                    \n                                                \n                                            \n                                \n                                \n                                    \n                                        všechna témata (4)\n                                    \n                                    \n                                        \n                                            všechny komentáře (11)\n                                        \n                                    \n        \n                Zeptat se v diskuzi\n                \n        \n                                \n                            \n            \n        \n                        \n            \n        \n            \n        \n                \n                Skrýt  Zobrazit diskuzi\n                \n        \n            \n                                \n                                    \n                                            \n                                                \n\n        \n\n                \n                    \n                        zivan\n                    \n                    ZIV\n                \n        \n                                                \n                                                    \n                                                        \n        Upgrade SSD\n        \n                                                    \n                                                    \n                                                        k produktu: HP EliteBook 845 G8, stříbrná\n                                                    \n\n                                                    \n                                                        \n                                                            \n            zivan\n                                                                \n                                                                    5. 5. 2022 3:17\n                                                                \n                                                            \n                                                        \n\n                                                    \n                                                    \n                                                        \n            \n        \n                                                    \n\n                                                    \n                                                        Kdyby někdo chtěl upgradovat SSD, tak pozor na to, že se tam nevejde SSD s čipy z obou stran.\n                                                    \n                                                \n                                            \n                                            \n                                                \n\n        \n\n                \n                    \n                        SKLIMA\n                    \n                    SKL\n                \n        \n                                                \n                                                    \n                                                        \n        Rozšíření RAM\n        \n                                                    \n                                                    \n                                                        k produktu: HP EliteBook 845 G8, stříbrná\n                                                    \n\n                                                    \n                                                        \n                                                            \n            SKLIMA\n                                                                \n                                                                    15. 3. 2022 7:15\n                                                                \n                                                            \n                                                        \n\n                                                    \n                                                    \n                                                        \n            \n        \n                                                    \n\n                                                    \n                                                        Poradíte nějaký kompatibilní modul 16GB RAM? Aby to dalo alespoň 24GB\n                                                    \n                                                \n                                            \n                                            \n                                                \n\n        \n\n                \n                    \n                        peedek\n                    \n                    PEE\n                \n        \n                                                \n                                                    \n                                                        \n        Navýšení kapacity RAM bez ztráty záruky\n        \n                                                    \n                                                    \n                                                        k produktu: HP EliteBook 845 G8, stříbrná\n                                                    \n\n                                                    \n                                                        \n                                                            \n            peedek\n                                                                \n                                                                    2. 11. 2021 13:14\n                                                                \n                                                            \n                                                        \n\n                                                    \n                                                    \n                                                        \n            \n        \n                                                    \n\n                                                    \n                                                        Dobrý den,měl bych zájem o tento notebook, ale potřeboval bych 16GB RAM. Tento notebook mám 2 sloty na RAM a jeden je volný.Chtěl bych se zeptat, zda-…\n            \n                více\n            \n        \n            \n        \n                                                    \n                                                \n                                            \n                                            \n                                                \n\n        \n\n                \n                    \n                        tommikcz\n                    \n                    TOM\n                \n        \n                                                \n                                                    \n                                                        \n        Dostupnost 2021\n        \n                                                    \n                                                    \n\n                                                    \n                                                        \n                                                            \n            tommikcz\n                                                                \n                                                                    20. 8. 2021 19:18\n                                                                \n                                                            \n                                                        \n\n                                                    \n                                                    \n                                                        \n            \n        \n                                                    \n\n                                                    \n                                                        Dobrý den, jsou prosím již dostupné nějaké přibližné informace o dostupnosti pro modely Elitebook 845 G8? Děkuji\n                                                    \n                                                \n                                            \n                                \n                                \n                                    \n                                        všechna témata (4)\n                                    \n                                    \n                                        \n                                            všechny komentáře (11)\n                                        \n                                    \n        \n                Zeptat se v diskuzi\n                \n        \n                                \n                            \n            \n        \n                                    \n                                            \n                                                \n\n        \n\n                \n                    \n                        zivan\n                    \n                    ZIV\n                \n        \n                                                \n                                                    \n                                                        \n        Upgrade SSD\n        \n                                                    \n                                                    \n                                                        k produktu: HP EliteBook 845 G8, stříbrná\n                                                    \n\n                                                    \n                                                        \n                                                            \n            zivan\n                                                                \n                                                                    5. 5. 2022 3:17\n                                                                \n                                                            \n                                                        \n\n                                                    \n                                                    \n                                                        \n            \n        \n                                                    \n\n                                                    \n                                                        Kdyby někdo chtěl upgradovat SSD, tak pozor na to, že se tam nevejde SSD s čipy z obou stran.\n                                                    \n                                                \n                                            \n                                            \n                                                \n\n        \n\n                \n                    \n                        SKLIMA\n                    \n                    SKL\n                \n        \n                                                \n                                                    \n                                                        \n        Rozšíření RAM\n        \n                                                    \n                                                    \n                                                        k produktu: HP EliteBook 845 G8, stříbrná\n                                                    \n\n                                                    \n                                                        \n                                                            \n            SKLIMA\n                                                                \n                                                                    15. 3. 2022 7:15\n                                                                \n                                                            \n                                                        \n\n                                                    \n                                                    \n                                                        \n            \n        \n                                                    \n\n                                                    \n                                                        Poradíte nějaký kompatibilní modul 16GB RAM? Aby to dalo alespoň 24GB\n                                                    \n                                                \n                                            \n                                            \n                                                \n\n        \n\n                \n                    \n                        peedek\n                    \n                    PEE\n                \n        \n                                                \n                                                    \n                                                        \n        Navýšení kapacity RAM bez ztráty záruky\n        \n                                                    \n                                                    \n                                                        k produktu: HP EliteBook 845 G8, stříbrná\n                                                    \n\n                                                    \n                                                        \n                                                            \n            peedek\n                                                                \n                                                                    2. 11. 2021 13:14\n                                                                \n                                                            \n                                                        \n\n                                                    \n                                                    \n                                                        \n            \n        \n                                                    \n\n                                                    \n                                                        Dobrý den,měl bych zájem o tento notebook, ale potřeboval bych 16GB RAM. Tento notebook mám 2 sloty na RAM a jeden je volný.Chtěl bych se zeptat, zda-…\n            \n                více\n            \n        \n            \n        \n                                                    \n                                                \n                                            \n                                            \n                                                \n\n        \n\n                \n                    \n                        tommikcz\n                    \n                    TOM\n                \n        \n                                                \n                                                    \n                                                        \n        Dostupnost 2021\n        \n                                                    \n                                                    \n\n                                                    \n                                                        \n                                                            \n            tommikcz\n                                                                \n                                                                    20. 8. 2021 19:18\n                                                                \n                                                            \n                                                        \n\n                                                    \n                                                    \n                                                        \n            \n        \n                                                    \n\n                                                    \n                                                        Dobrý den, jsou prosím již dostupné nějaké přibližné informace o dostupnosti pro modely Elitebook 845 G8? Děkuji\n                                                    \n                                                \n                                            \n                                \n                                                \n\n        \n\n                \n                    \n                        zivan\n                    \n                    ZIV\n                \n        \n                                                \n                                                    \n                                                        \n        Upgrade SSD\n        \n                                                    \n                                                    \n                                                        k produktu: HP EliteBook 845 G8, stříbrná\n                                                    \n\n                                                    \n                                                        \n                                                            \n            zivan\n                                                                \n                                                                    5. 5. 2022 3:17\n                                                                \n                                                            \n                                                        \n\n                                                    \n                                                    \n                                                        \n            \n        \n                                                    \n\n                                                    \n                                                        Kdyby někdo chtěl upgradovat SSD, tak pozor na to, že se tam nevejde SSD s čipy z obou stran.\n                                                    \n                                                \n                                            "
         }
     }
-]</pre></td></tr><tr style="background-color: #D0F0C0;"><td>.pd-rel-bazaar-items > tbody > tr:nth-child(2) > td.text-right > span.price-vatin</td><td>
-                                        37 990 Kč
-                                </td><td>
-                                        37 990 Kč
-                                </td></tr><tr><td colspan=100%><div class ="collapsible">Element above was also found in some lists. Click here to reveal</div><pre style="white-space: pre-wrap; display:none">[
+]</pre>
+                    </td>
+                </tr>
+                <tr style="background-color: #D0F0C0;">
+                    <td>.pd-rel-bazaar-items > tbody > tr:nth-child(2) > td.text-right > span.price-vatin</td>
+                    <td>
+                        37 990 Kč
+                    </td>
+                    <td>
+                        37 990 Kč
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan=100%>
+                        <div class="collapsible">Element above was also found in some lists. Click here to reveal</div>
+                        <pre style="white-space: pre-wrap; display:none">[
     {
         "arrayPath": ".pd-rel-bazaar-items > tbody > tr",
         "childPath": "td.text-right > span.price-vatin",
@@ -212,7 +536,62 @@
             "1": "\n                                        37 990 Kč\n                                "
         }
     }
-]</pre></td></tr></tbody></table><h3><b>XHR</b> No XHR data was found for this keyword.</h3><h3><b>JSON-LD</b> No JSON-LD data was found for this keyword.</h3><h3><b>SCHEMA.ORG</b> No SCHEMA.ORG data was found for this keyword.</h3><h3><b>META</b> No META data was found for this keyword.</h3></div><div id="48R68EA" class="tabcontent " ><h3><b>HTML found for 48R68EA:</b></h3><table class="pure-table pure-table-bordered" style="width:100%";table-layout: fixed><thead><tr><th>Path</th><th>Value</th><th><b>Initial html value</b></th></tr></thead><tbody><tr></tr><tr style="background-color: #D0F0C0;"><td>td.title.title-variant > a > span.product-code</td><td>48R68EA</td><td>48R68EA</td></tr></tbody></table><h3><b>XHR</b> No XHR data was found for this keyword.</h3><h3><b>JSON-LD</b> No JSON-LD data was found for this keyword.</h3><h3><b>SCHEMA.ORG</b> No SCHEMA.ORG data was found for this keyword.</h3><h3><b>META</b> No META data was found for this keyword.</h3></div><div id="Výkon procesoru AMD Ryzen řady 5000" class="tabcontent " ><h3><b>HTML found for Výkon procesoru AMD Ryzen řady 5000:</b></h3><table class="pure-table pure-table-bordered" style="width:100%";table-layout: fixed><thead><tr><th>Path</th><th>Value</th><th><b>Initial html value</b></th></tr></thead><tbody><tr></tr><tr style="background-color: #F78DA7;"><td>div.clear-styles.css-wrapper > ul > li:nth-child(1)</td><td>Výkon procesoru AMD Ryzen řady 5000.</td><td>Velmi kompaktní kovová konstrukce o síle přibližně 17.9 mm a hmotnosti cca. 1.37 kg (dotykové varianty cca 1.49 kg)</td></tr><tr><td colspan=100%><div class ="collapsible">Element above was also found in some lists. Click here to reveal</div><pre style="white-space: pre-wrap; display:none">[
+]</pre>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <h3><b>XHR</b> No XHR data was found for this keyword.</h3>
+        <h3><b>JSON-LD</b> No JSON-LD data was found for this keyword.</h3>
+        <h3><b>SCHEMA.ORG</b> No SCHEMA.ORG data was found for this keyword.</h3>
+        <h3><b>META</b> No META data was found for this keyword.</h3>
+    </div>
+    <div id="48R68EA" class="tabcontent ">
+        <h3><b>HTML found for 48R68EA:</b></h3>
+        <table class="pure-table pure-table-bordered" style="width:100%" ;table-layout: fixed>
+            <thead>
+                <tr>
+                    <th>Path</th>
+                    <th>Value</th>
+                    <th><b>Initial html value</b></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr></tr>
+                <tr style="background-color: #D0F0C0;">
+                    <td>td.title.title-variant > a > span.product-code</td>
+                    <td>48R68EA</td>
+                    <td>48R68EA</td>
+                </tr>
+            </tbody>
+        </table>
+        <h3><b>XHR</b> No XHR data was found for this keyword.</h3>
+        <h3><b>JSON-LD</b> No JSON-LD data was found for this keyword.</h3>
+        <h3><b>SCHEMA.ORG</b> No SCHEMA.ORG data was found for this keyword.</h3>
+        <h3><b>META</b> No META data was found for this keyword.</h3>
+    </div>
+    <div id="Výkon procesoru AMD Ryzen řady 5000" class="tabcontent ">
+        <h3><b>HTML found for Výkon procesoru AMD Ryzen řady 5000:</b></h3>
+        <table class="pure-table pure-table-bordered" style="width:100%" ;table-layout: fixed>
+            <thead>
+                <tr>
+                    <th>Path</th>
+                    <th>Value</th>
+                    <th><b>Initial html value</b></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr></tr>
+                <tr style="background-color: #F78DA7;">
+                    <td>div.clear-styles.css-wrapper > ul > li:nth-child(1)</td>
+                    <td>Výkon procesoru AMD Ryzen řady 5000.</td>
+                    <td>Velmi kompaktní kovová konstrukce o síle přibližně 17.9 mm a hmotnosti cca. 1.37 kg (dotykové
+                        varianty cca 1.49 kg)</td>
+                </tr>
+                <tr>
+                    <td colspan=100%>
+                        <div class="collapsible">Element above was also found in some lists. Click here to reveal</div>
+                        <pre style="white-space: pre-wrap; display:none">[
     {
         "arrayPath": "div.clear-styles.css-wrapper",
         "childPath": "ul > li:nth-child(1)",
@@ -224,49 +603,67 @@
             "9": "O násDoprava a platbaSlužbyFranšízing - podnikejte s CZC.cz"
         }
     }
-]</pre></td></tr></tbody></table><h3><b>XHR</b> No XHR data was found for this keyword.</h3><h3><b>JSON-LD</b> No JSON-LD data was found for this keyword.</h3><h3><b>SCHEMA.ORG</b> No SCHEMA.ORG data was found for this keyword.</h3><h3><b>META</b> No META data was found for this keyword.</h3></div>
-        
-        <script>
+]</pre>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <h3><b>XHR</b> No XHR data was found for this keyword.</h3>
+        <h3><b>JSON-LD</b> No JSON-LD data was found for this keyword.</h3>
+        <h3><b>SCHEMA.ORG</b> No SCHEMA.ORG data was found for this keyword.</h3>
+        <h3><b>META</b> No META data was found for this keyword.</h3>
+    </div>
+
+    <script>
         function openTab(evt, tabName) {
-          var i, tabcontent, tablinks;
-          tabcontent = document.getElementsByClassName("tabcontent");
-          for (i = 0; i < tabcontent.length; i++) {
-              tabcontent[i].style.display = "none";
-          }
-          tablinks = document.getElementsByClassName("tablinks");
-          for (i = 0; i < tablinks.length; i++) {
-              tablinks[i].className = tablinks[i].className.replace(" active", "");
-          }
-          document.getElementById(tabName).style.display = "block";
-          evt.currentTarget.className += " active";
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
         }
-        
 
-        
-        </script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js" integrity="sha512-TGClBy3S4qrWJtzel4qMtXsmM0Y9cap6QwRm3zo1MpVjvIURa90YYz5weeh6nvDGKZf/x3hrl1zzHW/uygftKg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>         
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js" integrity="sha512-TGClBy3S4qrWJtzel4qMtXsmM0Y9cap6QwRm3zo1MpVjvIURa90YYz5weeh6nvDGKZf/x3hrl1zzHW/uygftKg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-jsonview/1.2.3/jquery.jsonview.min.js" integrity="sha512-ff/E/8AEnLDXnTCyIa+l80evPRNH8q5XnPGY/NgBL645jzHL1ksmXonVMDt7e5D34Y4DTOv+P+9Rmo9jBSSyIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        <script src="https://cdn.jsdelivr.net/npm/json-formatter-js@2.3.4/dist/json-formatter.umd.min.js" defer>
-          
-        </script>
 
-        <script type="module">
+
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+        integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js"
+        integrity="sha512-TGClBy3S4qrWJtzel4qMtXsmM0Y9cap6QwRm3zo1MpVjvIURa90YYz5weeh6nvDGKZf/x3hrl1zzHW/uygftKg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js"
+        integrity="sha512-TGClBy3S4qrWJtzel4qMtXsmM0Y9cap6QwRm3zo1MpVjvIURa90YYz5weeh6nvDGKZf/x3hrl1zzHW/uygftKg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-jsonview/1.2.3/jquery.jsonview.min.js"
+        integrity="sha512-ff/E/8AEnLDXnTCyIa+l80evPRNH8q5XnPGY/NgBL645jzHL1ksmXonVMDt7e5D34Y4DTOv+P+9Rmo9jBSSyIg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/json-formatter-js@2.3.4/dist/json-formatter.umd.min.js" defer>
+
+    </script>
+
+    <script type="module">
         var coll = document.getElementsByClassName("collapsible");
         var i;
-        
+
         for (i = 0; i < coll.length; i++) {
-          coll[i].addEventListener("click", function() {
-            this.classList.toggle("active");
-            var content = this.nextElementSibling;
-            if (content.style.display === "block") {
-              content.style.display = "none";
-            } else {
-              content.style.display = "block";
-            }
-          });
+            coll[i].addEventListener("click", function () {
+                this.classList.toggle("active");
+                var content = this.nextElementSibling;
+                if (content.style.display === "block") {
+                    content.style.display = "none";
+                } else {
+                    content.style.display = "block";
+                }
+            });
         } 
-        </script>
-        </body>
-        </html> 
+    </script>
+</body>
+
+</html>

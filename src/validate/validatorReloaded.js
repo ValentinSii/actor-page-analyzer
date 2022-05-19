@@ -29,6 +29,7 @@ class ValidatorReloaded {
         this.vod.metaDataValidated = [];
         this.vod.schemaValidated = [];
         this.vod.windowValidated = [];
+        this.vod.keywordMap = this.getKeywordMap(inputSearchFor);
         // copy input data to validator output object
         this.vod.url = this.url;
         this.vod.searchFor = this.searchFor;
@@ -43,11 +44,32 @@ class ValidatorReloaded {
         this.vod.topLevelError = null;
         this.cheerioCrawlerError = null;
 
+
         this.initializeConclusionData();
 
         console.log('Validator instance created.');
 
+        inputSearchFor.forEach(keyword => {
+            console.log(this.getKeyByValue(this.vod.keywordMap, keyword));
+        })
+
     }
+
+    // TODO: Move to utils.
+    getKeywordMap(keywordsArray){
+        let keywordMap = {};
+        for (let index = 0; index < keywordsArray.length; index++) {
+            const keyword = keywordsArray[index];
+            
+            const keywordName = `keyword${index}`;
+            keywordMap[keywordName] = keyword;
+        }
+        return keywordMap;
+    }
+
+    getKeyByValue(object, value) {
+        return Object.keys(object).find(key => object[key] === value);
+    };
 
 
     // ['SCHEMA.ORG', 'JSON-LD', 'WINDOW', 'XHR', 'META', 'HTML', 'VALIDATE'];
