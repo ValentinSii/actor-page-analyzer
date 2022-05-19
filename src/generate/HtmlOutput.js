@@ -28,16 +28,8 @@ class htmlGenerator {
         this.vod.searchFor.forEach(keyword => {
             this.generateKeyWordTab(keyword);
         })
-
-        // this.htmlTab();
-        // this.jsonLDDataTab();
-        // this.windowPropertiesTab();
-        // this.generateSchemaTab();
-        // this.xhrTab();
+        
         this.appendScript();
-
-
-
         await this.saveValidatorOutput(fileName);
 
 
@@ -72,25 +64,8 @@ class htmlGenerator {
 
     xhrTab() {
         this.htmlOutput.push(`<div id="XHR" class="tabcontent" >`);
-        for (const xhrFound of this.analyzerOutput.xhrRequestsFound) {
-            this.htmlOutput.push(
-                `<div class="htmlRow">
-      <h3>Request: ${xhrFound.method} : ${xhrFound.url}</h3>
-      <pre>
-      ${JSON.stringify(xhrFound.searchResults, null, 4)}
-      </pre>
-      </div>`);
-        }
-        this.htmlOutput.push(`</div>`);
+        
 
-        // this.htmlOutput.push(`
-        //         <div class="${color} htmlRow">
-        //         <h3>Request: ${xhr.url}</h3>
-        //         <p><b>Method</b>: ${xhr.method}</p>
-        //         <p><b>Headers</b>: ${JSON.stringify(xhr.headers, null, 2)}</p>
-        //         <p><b>Response body</b>: ${JSON.stringify(xhr.responseBody, null, 2)}</p>
-        //         </div>          
-        //         `);
         this.htmlOutput.push(`</div>`);
     }
 
