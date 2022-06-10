@@ -28,7 +28,8 @@ class htmlGenerator {
         this.vod.searchFor.forEach(keyword => {
             this.generateKeyWordTab(keyword);
         })
-        
+        this.xhrTab();
+
         this.appendScript();
         await this.saveValidatorOutput(fileName);
 
@@ -64,7 +65,20 @@ class htmlGenerator {
 
     xhrTab() {
         this.htmlOutput.push(`<div id="XHR" class="tabcontent" >`);
-        
+
+       if(this.vod.validatedXhr) {
+
+        this.vod.validatedXhr.map(xhr => {
+            this.htmlOutput.push(`<h3><b>Request:</b> ${xhr.originalRequest.url}</h3>`);
+            this.htmlOutput.push(`<h3><b>Method:</b> ${xhr.originalRequest.method}</h3>`);
+            this.htmlOutput.push(`<div class ="collapsible"> Click to open original request: </div>`);
+            this.htmlOutput.push(`${JSON.stringify(xhr.originalRequest, null, 4)}`);
+            this.htmlOutput.push(`<pre style="white-space: pre-wrap; display:none">`);
+            this.htmlOutput.push(`</pre>`);
+
+
+        });
+       }
 
         this.htmlOutput.push(`</div>`);
     }
@@ -150,7 +164,7 @@ class htmlGenerator {
             this.htmlOutput.push(`<h4><b>Cheeriocrawler request for initial html failed, data displayed was obtained during analysis and it's not validated!</b></h4>`);
         }
 
-        
+
         // all tests =  ['SCHEMA.ORG', 'JSON-LD', 'WINDOW', 'XHR', 'META', 'HTML']
         this.generateDataSourceTable('HTML', keyword, initialSuccess, this.vod.validationConclusion[searchForKey].html);
         this.generateDataSourceTable('XHR', keyword, initialSuccess, this.vod.validationConclusion[searchForKey].xhr);
@@ -209,15 +223,15 @@ class htmlGenerator {
                     this.htmlOutput.push('<td colspan=100%>');
                     this.htmlOutput.push(`<div class ="collapsible">Element above was also found in some lists. Click here to reveal</div>`);
                     this.htmlOutput.push(`<pre style="white-space: pre-wrap; display:none">`);
-                    this.htmlOutput.push(`${JSON.stringify(data.foundInLists, null, 4)}`)  
+                    this.htmlOutput.push(`${JSON.stringify(data.foundInLists, null, 4)}`)
                     this.htmlOutput.push(`</pre>`);
                     this.htmlOutput.push('</td>');
                     this.htmlOutput.push('</tr>');
 
-                    
+
                 }
 
-                
+
             });
             this.htmlOutput.push('</tbody>');
             this.htmlOutput.push('</table>');

@@ -12,7 +12,7 @@ const USER_AGENTS = [
     'Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko',
 ];
 
-const PAGE_EVALUATE_TIMEOUT = 20 * 1000;
+const PAGE_EVALUATE_TIMEOUT = 40 * 1000;
 
 const promiseWithTimeout = (promise, timeout) => Promise.race([
     promise,

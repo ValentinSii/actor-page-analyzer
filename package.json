@@ -35,11 +35,13 @@
         "lint": "eslint src test"
     },
     "dependencies": {
+        "abstract-syntax-tree": "^2.20.6",
         "apify": "^2.1",
         "cheerio": "^1.0.0-rc.3",
         "got": "^12.0.4",
         "html-entities": "^1.2.1",
         "i": "^0.3.7",
+        "install": "^0.13.0",
         "json-formatter-js": "^2.3.4",
         "json-view": "^0.4.0",
         "jsonpath-plus": "^6.0.1",

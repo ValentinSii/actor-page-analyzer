@@ -7,6 +7,9 @@ const parseSchemaOrgData = require('../parse/schema-org');
 const validateAllXHR = require('./XHRValidation');
 cheerio = require('cheerio');
 const { getKeyByValue, getKeywordMap } = require('../utils');
+const ast = require('abstract-syntax-tree');
+const TreeSearcher = require('../search/TreeSearcher');
+var util = require('util');
 
 
 class ValidatorReloaded {
@@ -30,6 +33,8 @@ class ValidatorReloaded {
         this.vod.metaDataValidated = [];
         this.vod.schemaValidated = [];
         this.vod.windowValidated = [];
+        // this object contains object for each keyword with entries for every data source separately
+        this.vod.validationConclusion = {};
         this.vod.keywordMap = getKeywordMap(inputSearchFor);
         // copy input data to validator output object
         this.vod.url = this.url;
@@ -50,9 +55,6 @@ class ValidatorReloaded {
 
         console.log('Validator instance created.');
 
-        inputSearchFor.forEach(keyword => {
-            console.log(getKeyByValue(this.vod.keywordMap, keyword));
-        })
 
     }
 
@@ -85,16 +87,14 @@ class ValidatorReloaded {
                 }
 
                 if (this.tests.includes('WINDOW')) {
-                    this.analyzerOutput.windowPropertiesFound.map(searchResult => {
-                        const searchForKey = getKeyByValue(this.vod.keywordMap, searchResult.originalSearchString);
-                        this.vod.validationConclusion[searchForKey].window.push(searchResult);
-                    });
+                    this.validateWindowProperties();
+
                 }
 
 
             } else {
                 // cheeriocrawler failed, we sitll need to generate conclusion, so we will copy data found by analyzer to output html file
-                    this.populateConclusionFromAnalysis();
+                this.populateConclusionFromAnalysis();
             }
 
             // we can still validate XHR regardless of the cheeriocrawler response
@@ -126,7 +126,7 @@ class ValidatorReloaded {
         const crawler = new Apify.CheerioCrawler({
             requestList,
 
-            maxRequestRetries: 4,
+            maxRequestRetries: 20,
             // Increase the timeout for processing of each page.
             handlePageTimeoutSecs: 30,
 
@@ -154,7 +154,7 @@ class ValidatorReloaded {
 
         const htmlDataValidated = this.analyzerOutput.htmlFound.map((htmlFound) => {
 
-            console.log(htmlFound);
+            // console.log(htmlFound);
             const valueFound = (this.$(htmlFound.path)).text();
 
 
@@ -260,12 +260,13 @@ class ValidatorReloaded {
     }
 
     initializeConclusionData() {
-        this.vod.validationConclusion = {};
+        
 
-        this.vod.searchFor.forEach(searchedString =>{
+        this.vod.searchFor.forEach(searchedString => {
             const searchForKey = getKeyByValue(this.vod.keywordMap, searchedString);
             this.vod.validationConclusion[searchForKey] = {
                 html: [],
+
                 json: [],
                 meta: [],
                 xhr: [],
@@ -274,6 +275,202 @@ class ValidatorReloaded {
                 foundInInitial: false
             }
         });
+    }
+
+    findObjectInScriptByPropertyKey = (scriptText, propertyKeyToFind) => {
+        const parsed = ast.parse(scriptText);
+        const objects = ast.find(parsed, 'ObjectExpression');
+        const foundObjects = objects.filter((object) => object.properties.some((property) => {
+            return property.key.value === propertyKeyToFind;
+        }));
+
+        let foundOBjectsParsed = [];
+        if (foundObjects) {
+            for (const object of foundObjects) {
+                try {
+                    const myJson = ast.generate(object);
+                    foundOBjectsParsed.push(JSON.parse(myJson));
+                } catch (err) {
+                    console.log(err);
+
+                }
+            }
+        } 
+        return foundOBjectsParsed;
+    };
+
+
+    findObjectInHtml = ($, variableToFind, propertyToFind, ignoredScripts) => {
+        const scripts = $(`script:contains(${variableToFind})`);
+        if (scripts.length === 0) {
+            console.log(`Did not find any script with substring(win dow property name): ${variableToFind}`);
+            return [];
+
+        }
+
+        const scriptsArray = scripts.toArray();
+        let scriptText = '';
+
+        for (const script of scriptsArray) {
+            const scriptId = $(script).attr('id');
+            // filter scripts that have id and have previously been found and processed
+            if (ignoredScripts.indexOf(scriptId) == -1) {
+
+                const scriptHtml = $(script).html();
+
+                // sometimes text of script is just json so we encapsulate it to prevent AST.parse from failing
+                // replaces all the whitespace
+                if (scriptHtml.replace(/\s/g, "").indexOf('{') == 0) {
+                    if (scriptId) {
+                        scriptText = scriptText.concat(`${scriptId} = { ${scriptHtml} };`);
+                    } else {
+                        scriptText = scriptText.concat(`dummy = { ${scriptHtml} };`);
+                    }
+                } else {
+                    scriptText = scriptText.concat(scriptHtml);
+                }
+
+            }
+        }
+
+        let result = [];
+        try {
+            result = this.findObjectInScriptByPropertyKey(scriptText, propertyToFind);
+        } catch (e) {
+            //throw `Could not parse property: ${propertyToFind} from the script. Probably wrong HTML`;
+            console.log(e);            
+        }
+        return result;
+    };
+
+    findJsonScripts($, scriptNames) {
+        const result = [];
+        $(`script[type="application/json"]`).each(function () {
+            try {
+                const jsonId = $(this).attr('id');
+                // chceck if we are looking for this string
+                if (scriptNames.indexOf(jsonId) !== -1) {
+                    const jsonScript = JSON.parse($(this).html());
+                    result.push({ jsonId, jsonScript });
+                }
+
+            } catch (err) {
+                console.error(err);
+            }
+        });
+        return result;
+    }
+
+
+    validateWindowProperties() {
+
+        if (this.analyzerOutput.windowPropertiesFound) {
+
+            let windowObjectSelectors = [];
+            const windowObject = {};
+
+            //get list of selectors
+            for (const searchResult of this.analyzerOutput.windowPropertiesFound) {
+                let windowPropertyDescription = {
+                    // name of the object found in window properties, can be variable name or id of script tag 
+                    name: null,
+                    // selector is used to search AST to find object that conctains key with this selector
+                    property: null,
+                    fullPath: null
+                };
+                windowPropertyDescription.fullPath = searchResult.path;
+
+                // remove leading dot and get path 
+                const pathSplit = searchResult.path.substring(1).split('.');
+
+                if (pathSplit.length >= 2 && pathSplit[0].indexOf('[') == -1) {
+                    // first value is name of window variable
+                    // the second string is property by which the object will be searched for in AST
+
+                    // if we did not find this object yet, add it to objectSelectors array
+                    if (!windowObjectSelectors.some(obj => { return obj.name === pathSplit[0] })) {
+
+                        windowPropertyDescription.name = pathSplit[0];
+                        console.log("Searchign for window variable : " +windowPropertyDescription.name);
+
+                        // if property is array, extract name only
+                        const bracketIndexProperty = pathSplit[1].indexOf('[');
+                        if (bracketIndexProperty == -1) {
+                            windowPropertyDescription.property = pathSplit[1];
+                        } else {
+                            windowPropertyDescription.property = pathSplit[1].substring(0, bracketIndexProperty);
+                        }
+                        windowObjectSelectors.push(windowPropertyDescription);
+                    } else {
+                        // we already found a property by which we will search for object
+                        // TODO: allow for multiple property selectors
+                        continue;
+                    }
+
+                }
+                // TODO: Solver this for array and literals
+                // //get list of literals or arrays
+                // else if (propertyPathSplit.length == 1) {
+                // }
+            }
+
+            console.log("Object selectors: " + util.inspect(windowObjectSelectors, { depth: null }));
+            // some window properties are sent as json in script with id representing their name
+            const scriptIds = windowObjectSelectors.map(wp => { return wp.name });
+            // find all scripts of type application/json with given IDs and parse them to object 
+            const jsonScriptsFound = this.findJsonScripts(this.$, scriptIds);
+            // list of scripts already found
+            const ignoreScripts = [];
+
+            for (const scriptObject of jsonScriptsFound) {
+                windowObject[scriptObject.jsonId] = scriptObject.jsonScript;
+                windowObjectSelectors = windowObjectSelectors.filter(selector => {
+
+                    if (selector.name == scriptObject.jsonId) {
+                        ignoreScripts.push(scriptObject.jsonId);
+                        return false;
+                    }
+                    return true;
+                });
+            }
+            console.log("Object selectors left: " + util.inspect(windowObjectSelectors, { depth: null }));
+
+            // if we didnt find window properties sent as script, we will look for them as object with property 
+            for (const windowProperty of windowObjectSelectors) {
+                const scriptJsonFound = this.findObjectInHtml(this.$, windowProperty.name, windowProperty.property, ignoreScripts);
+
+                if (scriptJsonFound.length == 1) {
+                    windowObject[windowProperty.name] = scriptJsonFound[0];
+                    
+                } //multiple objects with same property found
+                else if( scriptJsonFound.length > 1) {
+                    windowObject[windowProperty.name] = scriptJsonFound[1];
+                }
+            }
+
+            // validate search results from browser with constructed window object
+            const windowValidated = this.analyzerOutput.windowPropertiesFound.map((windowFound) => {
+
+                const searchResultArray = JSONPath({ path: windowFound.path.substring(1), json: windowObject });
+
+                const windowFoundValidated  = {
+                    ...windowFound,
+                    valueFound: searchResultArray.length ? searchResultArray[0] : null
+                }
+
+                const searchForKey = getKeyByValue(this.vod.keywordMap, windowFound.originalSearchString);
+                //push data into validation conclusion
+                this.vod.validationConclusion[searchForKey].window.push(windowFoundValidated);
+                if (windowFoundValidated.valueFound == windowFound.value) {
+                    this.vod.validationConclusion[searchForKey].foundInInitial = true;
+                }
+
+                return windowFoundValidated;
+
+            });
+            this.vod.windowValidated = windowValidated;
+        }
+
     }
 
     populateConclusionFromAnalysis() {
@@ -286,8 +483,8 @@ class ValidatorReloaded {
         //     { key: 'META', output: 'metaDataFound'},
         //     { key: 'HTML', output: 'htmlFound'}
         // ];
-        
-        
+
+
 
         this.analyzerOutput.htmlFound.map(searchResult => {
             const searchForKey = getKeyByValue(this.vod.keywordMap, searchResult.originalSearchString);
@@ -304,6 +501,10 @@ class ValidatorReloaded {
         this.analyzerOutput.metaDataFound.map(searchResult => {
             const searchForKey = getKeyByValue(this.vod.keywordMap, searchResult.originalSearchString);
             this.vod.validationConclusion[searchForKey].meta.push(searchResult);
+        });
+        this.analyzerOutput.schemaOrgDataFound.map(searchResult => {
+            const searchForKey = getKeyByValue(this.vod.keywordMap, searchResult.originalSearchString);
+            this.vod.validationConclusion[searchForKey].schema.push(searchResult);
         });
 
 

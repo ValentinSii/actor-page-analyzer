@@ -12,6 +12,7 @@ async function validateAllXHR(analyzerOutput, searchFor, allCookies) {
         for (const xhrFound of analyzerOutput.xhrRequestsFound) {
 
             let retryObject = {
+                originalRequest: {...xhrFound},
                 callsMinimalHeaders: null,
                 callsWithoutCookie: null,
                 callsWithCookie: null
@@ -23,7 +24,8 @@ async function validateAllXHR(analyzerOutput, searchFor, allCookies) {
                 //first try to call request with minimum necessary headers
                 const minimalHeaders = {};
                 minimalHeaders["referer"] = xhrFound.request.headers["referer"];
-                minimalHeaders["user-agent"] = xhrFound.request.headers["user-agent"];
+                
+                // minimalHeaders["user-agent"] = xhrFound.request.headers["user-agent"];
                 
                 let requestObject = {
                     url: xhrFound.request.url,

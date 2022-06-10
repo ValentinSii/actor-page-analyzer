@@ -15,6 +15,7 @@ const { readInputAsync } = require('./input/inputReader');
 const { Validator } = require('./validate/validator');
 const htmlGenerator = require('./generate/HtmlOutput');
 const { ValidatorReloaded } = require('./validate/validatorReloaded');
+var util = require('util');
 
 let lastLog = Date.now();
 
@@ -259,9 +260,9 @@ async function analysePage(browser, url, searchFor, tests, inputIndex) {
                     const searcher = new DOMSearcher({ html: request.responseBody });
                     results = searcher.find(searchFor);
 
-                // if response body is json 
+                    // if response body is json 
                 } else {
-                    results = treeSearcher.find(request.responseBody.data, searchFor); 
+                    results = treeSearcher.find(request.responseBody.data, searchFor);
 
                     //look for html objects inside json 
 
@@ -357,11 +358,21 @@ Apify.main(async () => {
             }
         };
 
-        if (process.env.PROXY_GROUP && process.env.PROXY_PASSWORD) {
-            const { PROXY_PASSWORD, PROXY_GROUP, PROXY_ADDRESS } = process.env;
-            const proxyAddress = PROXY_ADDRESS || 'proxy.apify.com:8000';
-            launchPuppeteerContext.proxyUrl = `http://groups-${PROXY_GROUP}:${PROXY_PASSWORD}@${proxyAddress}`;
+        console.log("env objct: " + util.inspect(process.env, { depth: null }));
+
+        if (process.env.APIFY_PROXY_PASSWORD) {
+            const proxyConfiguration = await Apify.createProxyConfiguration(
+            );
+            launchPuppeteerContext.proxyUrl = proxyConfiguration.newUrl();
+
+            console.log("Proxy configuration" + util.inspect(proxyConfiguration, { depth: null }));
         }
+
+        // if (process.env.PROXY_GROUP && process.env.PROXY_PASSWORD) {
+        //     const { PROXY_PASSWORD, PROXY_GROUP, PROXY_ADDRESS } = process.env;
+        //     const proxyAddress = PROXY_ADDRESS || 'proxy.apify.com:8000';
+        //     launchPuppeteerContext.proxyUrl = `http://groups-${PROXY_GROUP}:${PROXY_PASSWORD}@${proxyAddress}`;
+        // }
         const browser = await Apify.launchPuppeteer(launchPuppeteerContext);
 
         let pageToAnalyze = null;
@@ -376,15 +387,5 @@ Apify.main(async () => {
         log('Top level error');
         console.error(error);
     }
-
-    //generate validation html output 
-    // try {
-    //     const file = 'apify_storage/key_value_stores/default/OUTPUT.json';
-    //     const fileContents = fs.readFileSync(file, 'utf8');
-    //     const output = JSON.parse(fileContents);
-    //     const htmlGeneratorInstance = new htmlGenerator(output);
-    //     htmlGeneratorInstance.generateHtmlFile();
-    // } catch (err) {
-    //     console.log(err);
-    // }
+    
 });
