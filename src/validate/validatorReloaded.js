@@ -485,7 +485,7 @@ class ValidatorReloaded {
                     
                 } //multiple objects with same property found
                 else if( scriptJsonFound.length > 1) {
-                    windowObject[windowProperty.name] = scriptJsonFound[1];
+                    windowObject[windowProperty.name] = scriptJsonFound[0];
                 }
             }
 

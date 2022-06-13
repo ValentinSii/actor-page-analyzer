@@ -104,7 +104,12 @@ async function analysePage(browser, url, searchFor, tests, inputIndex) {
         const html = response.responseBody;
         const treeSearcher = new TreeSearcher();
 
-        await Apify.setValue(initialResposneFileName, html, { contentType: 'text/html' });
+        try {
+            await Apify.setValue(initialResposneFileName, html, { contentType: 'text/html' });
+        } catch (err) {
+            log("Failed to save initial response!");
+            console.log(err.message);
+        }
 
         try {
             log(`start of html: ${html && html.substr && html.substr(0, 500)}`);

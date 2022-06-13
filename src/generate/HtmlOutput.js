@@ -7,7 +7,8 @@ const { getKeyByValue } = require('../utils');
 //   const htmlGeneratorInstance = new htmlGenerator(fileContents.fields);
 //   htmlGeneratorInstance.generateHtmlFile('dev');
 // });
-
+const SUCCESS_COLOR =  "#D0F0C0";
+const FAILURE_COLOR = "#F78DA7";
 class htmlGenerator {
 
     constructor(analyzerOutput) {
@@ -52,7 +53,13 @@ class htmlGenerator {
         // generate tabs per keyword
         this.vod.searchFor.forEach(keyword => {
             const searchForKey = getKeyByValue(this.vod.keywordMap, keyword)
-            this.htmlOutput.push(`<button class="tablinks" onclick="openTab(event, '${searchForKey}')">${searchForKey}</button>`)
+
+            let keyWordTabString = keyword;
+            if (keyword.length >= 10) {
+                keyWordTabString = keyword.substring(0, 9) + "..";
+            }
+
+            this.htmlOutput.push(`<button class="tablinks" onclick="openTab(event, '${searchForKey}')">${keyWordTabString}</button>`)
         });
 
         // Generate tab for XHR found requests
@@ -80,7 +87,7 @@ class htmlGenerator {
                 
                 const xhr = this.vod.validatedXhr[i];
 
-                const validationResultColor = xhr.validationSuccess ? "#D0F0C0" : "#F78DA7";
+                const validationResultColor = xhr.validationSuccess ? SUCCESS_COLOR : FAILURE_COLOR;
                 this.htmlOutput.push('<tr>');
                 this.htmlOutput.push(`<td colspan=100%>`);
                 this.htmlOutput.push(`<h4 class ="collapsible"><b> ${i}: </b> ${xhr.originalRequest.url} <b style="float: right; ">Click to expand.</b></h4>`);
@@ -147,13 +154,25 @@ class htmlGenerator {
     generateConclusionTab() {
         this.htmlOutput.push(`<div id="CONCLUSION" class="tabcontent active" style="display: block;" >`);
         this.htmlOutput.push(`
-            <div class="green htmlRow">
+            <div>
             <h2><b>URL: </b><a href="${this.vod.url}" target="_blank">${this.vod.url}</a></h2>
             <h4><b>Searched for:</b> ${this.vod.searchFor}</h4>
             <h4><b>Tests:</b> ${this.vod.tests}</h4>
-            </div>          
-            `);
+        `);
 
+        if(this.vod.initialResponseRetrieved) {
+            this.htmlOutput.push(`<div style="background-color: ${SUCCESS_COLOR};">`);
+            this.htmlOutput.push(`<h4>Cheerio crawler has sucessfully retrieved and parsed initial response. </h4>`);
+            this.htmlOutput.push(`</div>`);
+
+        } else {
+            this.htmlOutput.push(`<div style="background-color: ${FAILURE_COLOR};">`);
+            this.htmlOutput.push(`<h4>Cheerio crawler failed to retrieve or parse initial response 15 times.</h4>`);
+            this.htmlOutput.push(`<h5>Data shown comes from analysis during puppeteer session</h5>`);
+            this.htmlOutput.push(`</div>`);
+        }
+
+        this.htmlOutput.push(`</div>`);
         // this.analyzerOutput.validation.searchFor.forEach(keyword => {
         //     this.generateKeywordConclusion(keyword);
 
@@ -219,6 +238,8 @@ class htmlGenerator {
         const searchForKey = getKeyByValue(this.vod.keywordMap, keyword);
         this.htmlOutput.push(`<div id="${searchForKey}" class="tabcontent " >`);
 
+        this.htmlOutput.push(`<h3>Keyword:  "${keyword}" </h3>`);
+
         const initialSuccess = this.vod.initialResponseRetrieved;
         if (!initialSuccess) {
             this.htmlOutput.push(`<h4><b>Cheeriocrawler request for initial html failed, data displayed was obtained during analysis and it's not validated!</b></h4>`);
@@ -266,11 +287,8 @@ class htmlGenerator {
             this.htmlOutput.push('</tr>');
             dataSource.forEach(data => {
                 //if html was found in initial response and is the same as the one ine browser 
-                if (data.value == data.valueFound) {
-                    this.htmlOutput.push('<tr style="background-color: #D0F0C0;">');
-                } else {
-                    this.htmlOutput.push('<tr style="background-color: #F78DA7;">');
-                }
+                const validationResultColor = data.value == data.valueFound ? SUCCESS_COLOR : FAILURE_COLOR;
+                this.htmlOutput.push(`<tr style="background-color: ${validationResultColor};">`);
                 this.htmlOutput.push(`<td>${data.path}</td>`);
                 this.htmlOutput.push(`<td>${data.value}</td>`);
                 if (analyzed) {
@@ -303,7 +321,7 @@ class htmlGenerator {
         } else if (!this.vod.validationConclusion[searchForKey].xhr.length) {
             this.htmlOutput.push(`<h3>Keyword was not found in any XHR requests. </h3>`);
         } else {
-            this.htmlOutput.push(`<h3><b>XHR found for ${keyword}: (Click on table row to reveal request in XHR tab)</b></h3>`);
+            this.htmlOutput.push(`<h3><b>XHR found for ${keyword}:`);
 
             this.htmlOutput.push('<table class="pure-table pure-table-bordered" style="width:100%";table-layout: fixed>');
 
