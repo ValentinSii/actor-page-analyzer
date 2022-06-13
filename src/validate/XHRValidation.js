@@ -3,7 +3,7 @@ const DOMSearcher = require('../search/DOMSearcher');
 const TreeSearcher = require('../search/TreeSearcher');
 const _ = require('lodash');
 
-async function validateAllXHR(analyzerOutput, searchFor, allCookies) {
+async function validateAllXHR(analyzerOutput, searchFor, allCookies, proxyUrl = '') {
 
     let validatedXhr = [];
     if (analyzerOutput.xhrRequestsFound.length > 0) {
@@ -12,10 +12,11 @@ async function validateAllXHR(analyzerOutput, searchFor, allCookies) {
         for (const xhrFound of analyzerOutput.xhrRequestsFound) {
 
             let retryObject = {
-                originalRequest: {...xhrFound},
+                originalRequest: { ...xhrFound },
                 callsMinimalHeaders: null,
-                callsWithoutCookie: null,
-                callsWithCookie: null
+                callsPuppeteerHeaders: null,
+                callsPuppeteerHeadersCookie: null,
+                validationSuccess: false,
             }
 
             try {
@@ -24,36 +25,52 @@ async function validateAllXHR(analyzerOutput, searchFor, allCookies) {
                 //first try to call request with minimum necessary headers
                 const minimalHeaders = {};
                 minimalHeaders["referer"] = xhrFound.request.headers["referer"];
-                
+
                 // minimalHeaders["user-agent"] = xhrFound.request.headers["user-agent"];
-                
+
                 let requestObject = {
                     url: xhrFound.request.url,
                     method: xhrFound.request.method
                 };
+
+                if (proxyUrl.length) {
+                    requestObject.proxyUrl = proxyUrl;
+                    console.log(`Proxy url: ${proxyUrl}`)
+                }
                 //copy request body and content type
                 if (xhrFound.request.postData != null) {
                     requestObject.body = xhrFound.request.postData;
                     minimalHeaders["content-type"] = xhrFound.request.headers["content-type"];
-                }                 
-            
-                retryObject.callsMinimalHeaders = await callGotRequest({...requestObject, headers: minimalHeaders }, searchFor);
+                }
 
+                 let result = await validateGotRequest({ ...requestObject, headers: minimalHeaders }, searchFor, xhrFound);
+                 retryObject.callsMinimalHeaders = result.requestCalls;
+                 if(result.validationSuccess) {
+                     retryObject.validationSuccess = true;
+                 }
 
 
                 //use all headers from puppeteer session, these dont contain cookies
                 const puppeteerHeaders = xhrFound.request.headers;
-                retryObject.callsWithoutCookie = await callGotRequest({...requestObject, headers: puppeteerHeaders}, searchFor);
+                result = await validateGotRequest({ ...requestObject, headers: puppeteerHeaders }, searchFor, xhrFound);
+                retryObject.callsPuppeteerHeaders = result.requestCalls;
+                if(result.validationSuccess) {
+                    retryObject.validationSuccess = true;
+                }
 
                 //use all headers from puppeteer session, also add all cookies retrieved from puppeteer calling page.cookies();
                 const cookieString = allCookies.map((cookie) => {
                     return `${cookie.name}=${cookie.value}`;
                 }).join("; ");
 
-                retryObject.callsWithCookie = await callGotRequest({...requestObject, headers:{...puppeteerHeaders, cookie: cookieString}}, searchFor);
+                result = await validateGotRequest({ ...requestObject, headers: { ...puppeteerHeaders, cookie: cookieString } }, searchFor, xhrFound);
+                retryObject.callsPuppeteerHeadersCookie = result.requestCalls;
+                if(result.validationSuccess) {
+                    retryObject.validationSuccess = true;
+                }
 
                 console.log(retryObject);
-                
+
             }
             catch (err) {
                 console.log(err.message);
@@ -62,33 +79,33 @@ async function validateAllXHR(analyzerOutput, searchFor, allCookies) {
             }
             validatedXhr.push(retryObject);
         }
-        
+
     }
 
     return validatedXhr;
 }
-async function callGotRequest(requestObject, searchFor) {
+async function validateGotRequest(requestObject, searchFor, xhrFound) {
     const retryCount = 3;
-
+    let validationSuccess = false; 
     const requestCalls = [];
     for (let i = 0; i < retryCount; i++) {
 
         const response = await gotScraping(requestObject);
-        const validationResult = validateGotResponse(requestObject, response, searchFor);
+        const validationResult = validateGotResponse(requestObject, response, searchFor, xhrFound);
         requestCalls.push(validationResult);
 
-        //response success
-        //TODO: maybe compare with original responseStatus?
-        // if (validationResult.responseStatus >= 200 && validationResult.responseStatus < 300) {
-        //     break;
-        // }
+        if (validationResult.validationSuccess) {
+            // validation was sucessful, we dont need to call the request with the same headers again
+            validationSuccess = validationResult.validationSuccess;
+            break;
+        }
 
     }
 
-    return requestCalls;
+    return {requestCalls, validationSuccess};
 
 }
-function validateGotResponse(requestObject, gotResponse, searchFor) {
+function validateGotResponse(requestObject, gotResponse, searchFor, xhrFound) {
 
     let requestValidationEntry = {
         request: requestObject,
@@ -96,26 +113,37 @@ function validateGotResponse(requestObject, gotResponse, searchFor) {
             status: gotResponse.statusCode,
             body: gotResponse.body,
             headers: gotResponse.headers,
-            searchResults: null,
-            sucess: false
 
-        }
+        },
+        // headers merged from manualy filled headers and headers generated by gotscraping
+        gotHeaders: gotResponse.request.options.headers,
+        searchResults: null,
+        validationSuccess: false
     }
 
-    //TODO: how to deal with other content-types?  
-    let searchResults = null      
-    if (gotResponse.headers['content-type'].indexOf('json') != -1) {
-        const responseBodyJson = JSON.parse(gotResponse.body);
-        const treeSearcher = new TreeSearcher();
-        searchResults = treeSearcher.find(responseBodyJson, searchFor);
+    
+    if (xhrFound.request.responseStatus == gotResponse.statusCode) {
+        //TODO: how to deal with other content-types?  
+        let searchResults = [];
+        if (gotResponse.headers['content-type'].indexOf('json') != -1) {
+            const responseBodyJson = JSON.parse(gotResponse.body);
+            const treeSearcher = new TreeSearcher();
+            searchResults = treeSearcher.find(responseBodyJson, searchFor);
 
 
-    } else if (gotResponse.headers['content-type'].indexOf('html') != -1) {
-        const domSearcher = new DOMSearcher({html: gotResponse.body});
-        searchResults = domSearcher.find(searchFor);
-    } 
+        } else if (gotResponse.headers['content-type'].indexOf('html') != -1) {
+            const domSearcher = new DOMSearcher({ html: gotResponse.body });
+            searchResults = domSearcher.find(searchFor);
+        }
+        requestValidationEntry.searchResults = searchResults;
 
-    requestValidationEntry.searchResults = searchResults;
+        if (_.isEqual(searchResults, xhrFound.searchResults)) {
+            // if reponse status and search results are the same, we consider request as sucessfully validated
+            requestValidationEntry.validationSuccess = true;
+        }
+
+
+    }
 
 
     return requestValidationEntry;

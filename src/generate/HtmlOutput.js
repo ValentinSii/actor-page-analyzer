@@ -64,31 +64,91 @@ class htmlGenerator {
     }
 
     xhrTab() {
+        
         this.htmlOutput.push(`<div id="XHR" class="tabcontent" >`);
 
-       if(this.vod.validatedXhr) {
+        if (!this.vod.tests.includes('XHR')) {
+            this.htmlOutput.push(`<h3><b>XHR</b> analysis was not performed.</h3>`);
+        } else if (!this.vod.validatedXhr.length) {
+            this.htmlOutput.push(`<h3>There were no XHR requests found containing given keywords.</h3>`);
+        } else {
 
-        this.vod.validatedXhr.map(xhr => {
-            this.htmlOutput.push(`<h3><b>Request:</b> ${xhr.originalRequest.url}</h3>`);
-            this.htmlOutput.push(`<h3><b>Method:</b> ${xhr.originalRequest.method}</h3>`);
-            this.htmlOutput.push(`<div class ="collapsible"> Click to open original request: </div>`);
-            this.htmlOutput.push(`${JSON.stringify(xhr.originalRequest, null, 4)}`);
-            this.htmlOutput.push(`<pre style="white-space: pre-wrap; display:none">`);
-            this.htmlOutput.push(`</pre>`);
+            this.htmlOutput.push('<table class="pure-table pure-table-bordered" style="width:100%";table-layout: fixed>');
+
+            for (let i = 0; i < this.vod.validatedXhr.length; i++) {
+               
+                
+                const xhr = this.vod.validatedXhr[i];
+
+                const validationResultColor = xhr.validationSuccess ? "#D0F0C0" : "#F78DA7";
+                this.htmlOutput.push('<tr>');
+                this.htmlOutput.push(`<td colspan=100%>`);
+                this.htmlOutput.push(`<h4 class ="collapsible"><b> ${i}: </b> ${xhr.originalRequest.url} <b style="float: right; ">Click to expand.</b></h4>`);
+                
 
 
-        });
-       }
+                this.htmlOutput.push('<div style="white-space: pre-wrap; display:none;">');
+                this.htmlOutput.push(`<p style="background-color: ${validationResultColor};"><b>Validation result:</b> ${xhr.validationSuccess ? "SUCCESS" : "FAIL" }</p>`);
+                this.htmlOutput.push(`<p><b>Method:</b> ${xhr.originalRequest.method}</p>`);
+                this.htmlOutput.push(`<p><b>Response status:</b> ${xhr.originalRequest.request.responseStatus}</p>`);
+                this.htmlOutput.push(`<p><b>Keywords found:</b>${xhr.originalRequest.keywordsFound} </p>`);              
+
+                // this.htmlOutput.push(`<div class ="collapsible"> Click to open original request: </div>`);
+                // this.htmlOutput.push(`<pre style="white-space: pre-wrap; display:none; border-style: solid;border-width: thin;">`);
+                // this.htmlOutput.push(`${JSON.stringify(xhr.originalRequest, null, 4)}`);
+                // this.htmlOutput.push(`</pre>`);
+                
+                this.htmlOutput.push(`<p><b>Request headers: </b> </p>`);
+                this.htmlOutput.push(`<pre style="white-space: pre-wrap;">`);
+                this.htmlOutput.push(`${JSON.stringify(xhr.originalRequest.request.headers, null, 4)}`);
+                this.htmlOutput.push(`</pre>`);
+
+
+                this.htmlOutput.push(`<p><b>Response headers: </b> </p>`);
+                this.htmlOutput.push(`<pre style="white-space: pre-wrap;">`);
+                this.htmlOutput.push(`${JSON.stringify(xhr.originalRequest.request.responseHeaders, null, 4)}`);
+                this.htmlOutput.push(`</pre>`);
+
+                this.htmlOutput.push(`<p class ="collapsible"><b>Response body: </b> Click to expand. </p>`);
+                this.htmlOutput.push(`<pre style="white-space: pre-wrap;display:none;">`);
+                this.htmlOutput.push(`${JSON.stringify(xhr.originalRequest.request.responseBody, null, 4)}`);
+                this.htmlOutput.push(`</pre>`);
+
+
+                // this.htmlOutput.push(`<div><b>Method:</b> ${xhr.originalRequest.method}</div>`);
+                // this.htmlOutput.push(`<div><b>Response status:</b> ${xhr.originalRequest.request.responseStatus}</div>`);
+                // this.htmlOutput.push(`<div><b>Keywords found:</b> </div>`);
+                // request headers
+                //response headers 
+                // response body
+                // searchresults
+                
+                // take last call 
+                //calls minimal headers
+                    // headers
+                    // got headers
+                    // validation result
+                //calls original headers
+                //calls with cookie
+                this.htmlOutput.push('</div>');
+                this.htmlOutput.push('</td>');
+
+                this.htmlOutput.push('</tr>');
+
+            }
+            this.htmlOutput.push('</table>');
+
+
+        }
 
         this.htmlOutput.push(`</div>`);
     }
 
     generateConclusionTab() {
         this.htmlOutput.push(`<div id="CONCLUSION" class="tabcontent active" style="display: block;" >`);
-
         this.htmlOutput.push(`
             <div class="green htmlRow">
-            <h2><b>Url:</b> ${this.vod.url}</h2>
+            <h2><b>URL: </b><a href="${this.vod.url}" target="_blank">${this.vod.url}</a></h2>
             <h4><b>Searched for:</b> ${this.vod.searchFor}</h4>
             <h4><b>Tests:</b> ${this.vod.tests}</h4>
             </div>          
@@ -167,11 +227,11 @@ class htmlGenerator {
 
         // all tests =  ['SCHEMA.ORG', 'JSON-LD', 'WINDOW', 'XHR', 'META', 'HTML']
         this.generateDataSourceTable('HTML', keyword, initialSuccess, this.vod.validationConclusion[searchForKey].html);
-        this.generateDataSourceTable('XHR', keyword, initialSuccess, this.vod.validationConclusion[searchForKey].xhr);
         this.generateDataSourceTable('JSON-LD', keyword, initialSuccess, this.vod.validationConclusion[searchForKey].json);
         this.generateDataSourceTable('SCHEMA.ORG', keyword, initialSuccess, this.vod.validationConclusion[searchForKey].schema);
         this.generateDataSourceTable('META', keyword, initialSuccess, this.vod.validationConclusion[searchForKey].meta);
         this.generateDataSourceTable('WINDOW', keyword, initialSuccess, this.vod.validationConclusion[searchForKey].window);
+        this.generateXhrTable(keyword);
 
 
         // end of tab
@@ -221,20 +281,55 @@ class htmlGenerator {
                 if (data.foundInLists) {
                     this.htmlOutput.push('<tr>');
                     this.htmlOutput.push('<td colspan=100%>');
-                    this.htmlOutput.push(`<div class ="collapsible">Element above was also found in some lists. Click here to reveal</div>`);
+                    this.htmlOutput.push(`<div class ="collapsible">Element above was also found in some lists. Click here to expand</div>`);
                     this.htmlOutput.push(`<pre style="white-space: pre-wrap; display:none">`);
                     this.htmlOutput.push(`${JSON.stringify(data.foundInLists, null, 4)}`)
                     this.htmlOutput.push(`</pre>`);
                     this.htmlOutput.push('</td>');
                     this.htmlOutput.push('</tr>');
-
-
                 }
-
-
             });
             this.htmlOutput.push('</tbody>');
             this.htmlOutput.push('</table>');
+
+        }
+
+    }
+
+    generateXhrTable(keyword) {
+        const searchForKey = getKeyByValue(this.vod.keywordMap, keyword);
+        if (!this.vod.tests.includes('XHR')) {
+            this.htmlOutput.push(`<h3><b>XHR</b> analysis was not performed.</h3>`);
+        } else if (!this.vod.validationConclusion[searchForKey].xhr.length) {
+            this.htmlOutput.push(`<h3>Keyword was not found in any XHR requests. </h3>`);
+        } else {
+            this.htmlOutput.push(`<h3><b>XHR found for ${keyword}: (Click on table row to reveal request in XHR tab)</b></h3>`);
+
+            this.htmlOutput.push('<table class="pure-table pure-table-bordered" style="width:100%";table-layout: fixed>');
+
+            // table headers row
+            this.htmlOutput.push('<thead><tr>');
+            this.htmlOutput.push(`<th>XHR index</th>`);
+            this.htmlOutput.push(`<th>Url</th>`);
+            this.htmlOutput.push(`<th>Method</th>`);
+            this.htmlOutput.push(`<th>Validation</th>`);
+            this.htmlOutput.push('</tr></thead>');
+
+            // table body start
+            this.htmlOutput.push('<tbody>');
+            for (const xhrFound of this.vod.validationConclusion[searchForKey].xhr) {
+                this.htmlOutput.push('<tr>');
+                this.htmlOutput.push(`<td>${xhrFound.index}</td>`);
+                this.htmlOutput.push(`<td>${xhrFound.url}</td>`);
+                this.htmlOutput.push(`<td>${xhrFound.method}</td>`);
+                this.htmlOutput.push(`<td>${xhrFound.success}</td>`);
+                this.htmlOutput.push('</tr>');
+
+                
+            }
+            this.htmlOutput.push('</tbody>');
+            this.htmlOutput.push('</table>');
+            
 
         }
 
@@ -291,8 +386,7 @@ class htmlGenerator {
         <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="https://unpkg.com/purecss@2.1.0/build/pure-min.css" integrity="sha384-yHIFVG6ClnONEA5yB5DJXfW2/KC173DIQrYoZMEtBvGzmf0PKiGyNEqe9N6BNDBH" crossorigin="anonymous">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-jsonview/1.2.3/jquery.jsonview.css" integrity="sha512-6dqKyKlSER24gVyNQkP3cUfIaA5OfAEHxDBRiElKxSmlZTTdY6Z7uiUW5pADcTzqjEmli6Dv+IuTPsMLuFPeBg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-        <script type="module" src="https://cdn.jsdelivr.net/npm/json-formatter-js@2.3.4/dist/json-formatter.umd.min.js" defer></script>
+        
 
         <style>
         
@@ -364,13 +458,7 @@ class htmlGenerator {
         
         </script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js" integrity="sha512-TGClBy3S4qrWJtzel4qMtXsmM0Y9cap6QwRm3zo1MpVjvIURa90YYz5weeh6nvDGKZf/x3hrl1zzHW/uygftKg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>         
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js" integrity="sha512-TGClBy3S4qrWJtzel4qMtXsmM0Y9cap6QwRm3zo1MpVjvIURa90YYz5weeh6nvDGKZf/x3hrl1zzHW/uygftKg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-jsonview/1.2.3/jquery.jsonview.min.js" integrity="sha512-ff/E/8AEnLDXnTCyIa+l80evPRNH8q5XnPGY/NgBL645jzHL1ksmXonVMDt7e5D34Y4DTOv+P+9Rmo9jBSSyIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        <script src="https://cdn.jsdelivr.net/npm/json-formatter-js@2.3.4/dist/json-formatter.umd.min.js" defer>
-          
-        </script>
-
+        
         <script type="module">
         var coll = document.getElementsByClassName("collapsible");
         var i;

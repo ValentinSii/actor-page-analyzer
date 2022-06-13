@@ -10,6 +10,7 @@ const { getKeyByValue, getKeywordMap } = require('../utils');
 const ast = require('abstract-syntax-tree');
 const TreeSearcher = require('../search/TreeSearcher');
 var util = require('util');
+const { timeStamp } = require('console');
 
 
 class ValidatorReloaded {
@@ -19,6 +20,7 @@ class ValidatorReloaded {
 
         // data from user input
         this.url = inputUrl;
+        this.proxyUrl = '';
         this.searchFor = inputSearchFor;
         this.tests = inputTests;
         this.analyzerOutput = analyzerOutput;
@@ -98,8 +100,37 @@ class ValidatorReloaded {
             }
 
             // we can still validate XHR regardless of the cheeriocrawler response
-            if (this.tests.includes('XHR')) {
-                const validatedXhr = await validateAllXHR(this.analyzerOutput, this.searchFor, this.allCookies);
+            if (this.tests.includes('XHR')) {                
+                const validatedXhr = await validateAllXHR(this.analyzerOutput, this.searchFor, this.allCookies, this.proxyUrl);
+
+                
+                for (let i = 0; i < this.analyzerOutput.xhrRequestsFound.length; i++) {
+                    const xhr = this.analyzerOutput.xhrRequestsFound[i];
+                    let keywordsFound = [];
+                    // get list of keywords that have sucessfully been found in this xhr
+                    for (const searchResult of xhr.searchResults) {
+
+                        if(!keywordsFound.includes(searchResult.originalSearchString))
+                        {
+                            keywordsFound.push(searchResult.originalSearchString);
+                        }                    
+
+                    }
+
+
+                    for (const keyword of keywordsFound) {
+                        const xhrConclusionEntry = {
+                            index: i,
+                            url: xhr.url,
+                            method: xhr.method,
+                            success: validatedXhr[i].validationSuccess
+                        }
+                        const searchForKey = getKeyByValue(this.vod.keywordMap, keyword);
+                        this.vod.validationConclusion[searchForKey].xhr.push(xhrConclusionEntry); 
+                    }
+
+                    validatedXhr[i].originalRequest["keywordsFound"] = keywordsFound;
+                }
                 this.vod.validatedXhr = validatedXhr;
             }
 
@@ -123,10 +154,9 @@ class ValidatorReloaded {
         });
         requestList.initialize();
 
-        const crawler = new Apify.CheerioCrawler({
+        let cheerioCrawlerOptions = {
             requestList,
-
-            maxRequestRetries: 20,
+            maxRequestRetries: 14,
             // Increase the timeout for processing of each page.
             handlePageTimeoutSecs: 30,
 
@@ -139,11 +169,22 @@ class ValidatorReloaded {
 
             },
             handleFailedRequestFunction: async ({ request }) => {
-                log.debug(`Request ${request.url} failed 5 times.`);
+                log.debug(`Request ${request.url} failed 15 times.`);
                 this.cheerioCrawlerError = request.errorMessages;
             },
 
-        });
+        }
+        let proxyConfiguration = null;
+        if (process.env.APIFY_PROXY_PASSWORD) {
+            proxyConfiguration = await Apify.createProxyConfiguration(
+            );
+            console.log("Proxy configuration" + util.inspect(proxyConfiguration, { depth: null }));
+            cheerioCrawlerOptions.proxyConfiguration = proxyConfiguration;
+            this.proxyUrl = proxyConfiguration.newUrl();
+        }
+
+
+        const crawler = new Apify.CheerioCrawler(cheerioCrawlerOptions);
 
         await crawler.run();
         // console.log('Initial html loaded sucessfully.');
@@ -265,8 +306,8 @@ class ValidatorReloaded {
         this.vod.searchFor.forEach(searchedString => {
             const searchForKey = getKeyByValue(this.vod.keywordMap, searchedString);
             this.vod.validationConclusion[searchForKey] = {
+                keywordValue : searchedString,
                 html: [],
-
                 json: [],
                 meta: [],
                 xhr: [],
@@ -281,7 +322,7 @@ class ValidatorReloaded {
         const parsed = ast.parse(scriptText);
         const objects = ast.find(parsed, 'ObjectExpression');
         const foundObjects = objects.filter((object) => object.properties.some((property) => {
-            return property.key.value === propertyKeyToFind;
+            return property.key.value == propertyKeyToFind;
         }));
 
         let foundOBjectsParsed = [];
@@ -302,7 +343,7 @@ class ValidatorReloaded {
 
     findObjectInHtml = ($, variableToFind, propertyToFind, ignoredScripts) => {
         const scripts = $(`script:contains(${variableToFind})`);
-        if (scripts.length === 0) {
+        if (scripts.length == 0) {
             console.log(`Did not find any script with substring(win dow property name): ${variableToFind}`);
             return [];
 
@@ -382,13 +423,13 @@ class ValidatorReloaded {
 
                 // remove leading dot and get path 
                 const pathSplit = searchResult.path.substring(1).split('.');
-
+                // if window property is not an array
                 if (pathSplit.length >= 2 && pathSplit[0].indexOf('[') == -1) {
                     // first value is name of window variable
                     // the second string is property by which the object will be searched for in AST
 
                     // if we did not find this object yet, add it to objectSelectors array
-                    if (!windowObjectSelectors.some(obj => { return obj.name === pathSplit[0] })) {
+                    if (!windowObjectSelectors.some(obj => { return obj.name == pathSplit[0] })) {
 
                         windowPropertyDescription.name = pathSplit[0];
                         console.log("Searchign for window variable : " +windowPropertyDescription.name);
@@ -408,7 +449,7 @@ class ValidatorReloaded {
                     }
 
                 }
-                // TODO: Solver this for array and literals
+                // TODO: Solve this for array and literals
                 // //get list of literals or arrays
                 // else if (propertyPathSplit.length == 1) {
                 // }
@@ -472,6 +513,8 @@ class ValidatorReloaded {
         }
 
     }
+    // functions takes multiple potential objects that may represent window property  
+    validatePotentialWindowPropertyObject
 
     populateConclusionFromAnalysis() {
 

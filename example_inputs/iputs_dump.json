@@ -181,7 +181,7 @@
         "PlayStation 5 Media Remote",
         "19,90",
         "Xbox Wireless Controller Carbon Black",
-        "65,90"
+        "74,90"
     ]
 }
 
@@ -229,5 +229,25 @@
         "4,6 GHz (4 600 MHz)",
         "81 zákazníkov",
         "Michal, Petrov nad Desnou"
+    ]
+}
+
+{
+    "url": "https://opensea.io/rankings?sortBy=thirty_day_volume&chain=klaytn&category=collectibles",
+    "searchFor": [
+        "DanielPUNK",
+        "My bunny world",
+        "Kwang Boost",
+        "Crusera"
+    ]
+}
+
+{
+    "url": "https://www.alza.sk/gaming/playstation-5-media-remote-d5868926.htm",
+    "searchFor": [
+        "PlayStation 5 Media Remote",
+        "19,90",
+        "Môžete mať zajtra od 8:00",
+        "Diaľkový ovládač – pre PlayStation 5, ľahké ovládanie streamovacích služieb, biely"
     ]
 }

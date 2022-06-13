@@ -360,13 +360,13 @@ Apify.main(async () => {
 
         console.log("env objct: " + util.inspect(process.env, { depth: null }));
 
-        if (process.env.APIFY_PROXY_PASSWORD) {
-            const proxyConfiguration = await Apify.createProxyConfiguration(
-            );
-            launchPuppeteerContext.proxyUrl = proxyConfiguration.newUrl();
+        // if (process.env.APIFY_PROXY_PASSWORD) {
+        //     const proxyConfiguration = await Apify.createProxyConfiguration(
+        //     );
+        //     launchPuppeteerContext.proxyUrl = proxyConfiguration.newUrl();
 
-            console.log("Proxy configuration" + util.inspect(proxyConfiguration, { depth: null }));
-        }
+        //     console.log("Proxy configuration" + util.inspect(proxyConfiguration, { depth: null }));
+        // }
 
         // if (process.env.PROXY_GROUP && process.env.PROXY_PASSWORD) {
         //     const { PROXY_PASSWORD, PROXY_GROUP, PROXY_ADDRESS } = process.env;

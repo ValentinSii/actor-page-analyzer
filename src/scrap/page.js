@@ -119,7 +119,7 @@ class PageScrapper {
         // console.log(rec.url);
 
         rec.method = request.method();
-        rec.postData = request.postData();
+        rec.postData = request.postData() || null;
         rec.headers = request.headers();
 
         this.call('request', request);
