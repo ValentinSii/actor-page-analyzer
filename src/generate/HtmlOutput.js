@@ -1,6 +1,7 @@
 const Apify = require('apify');
 const { last } = require('lodash');
 const { getKeyByValue } = require('../utils');
+
 // Apify.main(async () => {
 //   //generate validation html output 
 //   const file = 'apify_storage/key_value_stores/default/OUTPUT.json';

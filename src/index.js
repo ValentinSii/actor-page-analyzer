@@ -1,8 +1,6 @@
 const cheerio = require('cheerio');
 const Apify = require('apify');
-const { typeCheck } = require('type-check');
 const { isString } = require('lodash');
-
 const PageScrapper = require('./scrap/page');
 const parseMetadata = require('./parse/metadata');
 const parseSchemaOrgData = require('./parse/schema-org');
@@ -12,7 +10,6 @@ const TreeSearcher = require('./search/TreeSearcher');
 const OutputGenerator = require('./generate/Output');
 const { findCommonAncestors, getHostName } = require('./utils');
 const { readInputAsync } = require('./input/inputReader');
-const { Validator } = require('./validate/validator');
 const htmlGenerator = require('./generate/HtmlOutput');
 const { ValidatorReloaded } = require('./validate/validatorReloaded');
 var util = require('util');
@@ -24,19 +21,6 @@ const log = (message) => {
     console.log(new Date(), `${Math.round((currentLog - lastLog) / 10) / 100}s`, message);
     lastLog = currentLog;
 };
-
-// Definition of the global input
-const INPUT_TYPE = `{
-    pages: Array,
-    tests: Maybe Array
-}`;
-
-// Definition of the page input
-const PAGE_INPUT_TYPE = `{
-    url: String,
-    searchFor: Array,
-    tests: Maybe Array
-}`;
 
 function wait(timeout) {
     return new Promise((resolve) => {

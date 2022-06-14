@@ -1,5 +1,4 @@
 const Apify = require('apify');
-const { log } = Apify.utils;
 const { JSONPath } = require('jsonpath-plus');
 const parseJsonLD = require('../parse/json-ld');
 const parseMetadata = require('../parse/metadata');
@@ -8,9 +7,7 @@ const validateAllXHR = require('./XHRValidation');
 cheerio = require('cheerio');
 const { getKeyByValue, getKeywordMap } = require('../utils');
 const ast = require('abstract-syntax-tree');
-const TreeSearcher = require('../search/TreeSearcher');
 var util = require('util');
-const { timeStamp } = require('console');
 
 
 class ValidatorReloaded {
@@ -28,13 +25,8 @@ class ValidatorReloaded {
         //cookies from page.cookies()
         this.allCookies = allCookies;
 
-        // create object for validator output
+        // create object for validator output data
         this.vod = {};
-        this.vod.htmlValidated = [];
-        this.vod.jsonValidated = [];
-        this.vod.metaDataValidated = [];
-        this.vod.schemaValidated = [];
-        this.vod.windowValidated = [];
         // this object contains object for each keyword with entries for every data source separately
         this.vod.validationConclusion = {};
         this.vod.keywordMap = getKeywordMap(inputSearchFor);
@@ -67,7 +59,7 @@ class ValidatorReloaded {
             await this.loadInitialHtml();
             this.vod.initialResponseRetrieved = this.$ == null ? false : true;
 
-            // we sucessfully retrieved initial response using cheerio crawler, data validation can be performer
+            // we sucessfully retrieved initial response using cheerio crawler, data validation can be performed
             if (this.vod.initialResponseRetrieved) {
                 if (this.tests.includes('HTML')) {
                     this.validateHtml();
@@ -90,16 +82,15 @@ class ValidatorReloaded {
 
                 if (this.tests.includes('WINDOW')) {
                     this.validateWindowProperties();
-
                 }
 
 
             } else {
-                // cheeriocrawler failed, we sitll need to generate conclusion, so we will copy data found by analyzer to output html file
+                // cheeriocrawler failed, we still want to , so we will copy data found by analyzer to output html file
                 this.populateConclusionFromAnalysis();
             }
 
-            // we can still validate XHR regardless of the cheeriocrawler response
+            // we can still validate XHR regardless of the cheeriocrawler call result
             if (this.tests.includes('XHR')) {                
                 const validatedXhr = await validateAllXHR(this.analyzerOutput, this.searchFor, this.allCookies, this.proxyUrl);
 
@@ -107,7 +98,7 @@ class ValidatorReloaded {
                 for (let i = 0; i < this.analyzerOutput.xhrRequestsFound.length; i++) {
                     const xhr = this.analyzerOutput.xhrRequestsFound[i];
                     let keywordsFound = [];
-                    // get list of keywords that have sucessfully been found in this xhr
+                    // get list of keywords that have been found in this xhr
                     for (const searchResult of xhr.searchResults) {
 
                         if(!keywordsFound.includes(searchResult.originalSearchString))
@@ -116,7 +107,6 @@ class ValidatorReloaded {
                         }                    
 
                     }
-
 
                     for (const keyword of keywordsFound) {
                         const xhrConclusionEntry = {
@@ -134,6 +124,7 @@ class ValidatorReloaded {
                 this.vod.validatedXhr = validatedXhr;
             }
             this.analyzerOutput.vod = this.vod;
+            
         } catch (topErr) {
             console.log('Top level error during validation.');
             console.log(topErr);
@@ -165,7 +156,7 @@ class ValidatorReloaded {
 
             },
             handleFailedRequestFunction: async ({ request }) => {
-                log.debug(`Request ${request.url} failed 15 times.`);
+                console.log(`Request ${request.url} failed 15 times.`);
                 this.cheerioCrawlerError = request.errorMessages;
             },
         }
@@ -188,11 +179,10 @@ class ValidatorReloaded {
 
     validateHtml() {
 
-        const htmlDataValidated = this.analyzerOutput.htmlFound.map((htmlFound) => {
+        this.analyzerOutput.htmlFound.map((htmlFound) => {
 
             // console.log(htmlFound);
             const valueFound = (this.$(htmlFound.path)).text();
-
 
             const htmlFoundValidated = {
                 ...htmlFound,
@@ -206,18 +196,14 @@ class ValidatorReloaded {
             if (htmlFoundValidated.valueFound == htmlFound.value) {
                 this.vod.validationConclusion[searchForKey].foundInInitial = true;
             }
-            // if (htmlFound.foundinLists) {
-            //     this.vod.validationConclusion[htmlFound.originalSearchString].html.lists.push(htmlFoundValidated.foundInLists);
-            // }
-
+           
             return htmlFoundValidated;
 
         });
-        this.vod.htmlValidated = htmlDataValidated;
     }
 
     validateJsonLDData(initialDataArray) {
-        const jsonDataValidated = this.analyzerOutput.jsonLDDataFound.map((jsonFound) => {
+        this.analyzerOutput.jsonLDDataFound.map((jsonFound) => {
 
             const initialDataObject = { data: initialDataArray }
             const searchResultArray = JSONPath({ path: 'data' + jsonFound.path, json: initialDataObject });
@@ -228,50 +214,42 @@ class ValidatorReloaded {
             }
 
             const searchForKey = getKeyByValue(this.vod.keywordMap, jsonFound.originalSearchString);
+
             //push data into validation conclusion
             this.vod.validationConclusion[searchForKey].json.push(jsonFoundValidated);
             if (jsonFoundValidated.valueFound == jsonFound.value) {
                 this.vod.validationConclusion[searchForKey].foundInInitial = true;
             }
-            // if (htmlFound.foundinLists) {
-            //     this.vod.validationConclusion[jsonFound.originalSearchString].json.lists.push(jsonFoundValidated.foundInLists);
-            // }
-
+            
             return jsonFoundValidated;
 
         });
-        this.vod.jsonValidated = jsonDataValidated;
     }
 
     validateMetaData(initialMetaData) {
-        const metaDataValidated = this.analyzerOutput.metaDataFound.map(metaFound => {
+        this.analyzerOutput.metaDataFound.map(metaFound => {
             const valueFound = initialMetaData[metaFound.path.substring(1)];
-
 
             const metaFoundValidated = {
                 ...metaFound,
                 valueFound: valueFound ? valueFound : null
             }
             const searchForKey = getKeyByValue(this.vod.keywordMap, metaFound.originalSearchString);
+
             //push data into validation conclusion
             this.vod.validationConclusion[searchForKey].meta.push(metaFoundValidated);
             if (metaFoundValidated.valueFound == metaFound.value) {
                 this.vod.validationConclusion[searchForKey].foundInInitial = true;
             }
-            // if (metaFound.foundinLists) {
-            //     this.vod.validationConclusion[metaFound.originalSearchString].meta.lists.push(metaFoundValidated.foundInLists);
-            // }
 
             return metaFoundValidated;
         })
-        this.vod.metaDataValidated = metaDataValidated;
     }
 
     validateSchema(initialSchema) {
-        const initialDataObject = { data: initialSchema }
-        const schemaValidated = this.analyzerOutput.schemaOrgDataFound.map(schemaFound => {
+        this.analyzerOutput.schemaOrgDataFound.map(schemaFound => {
 
-            const searchResultArray = JSONPath({ path: 'data' + schemaFound.path, json: initialDataObject });
+            const searchResultArray = JSONPath({ path: schemaFound.path.substring(1), json: initialSchema });
 
 
             const schemaFoundValidated = {
@@ -280,19 +258,16 @@ class ValidatorReloaded {
             }
 
             const searchForKey = getKeyByValue(this.vod.keywordMap, schemaFound.originalSearchString);
+
             //push data into validation conclusion
             this.vod.validationConclusion[searchForKey].schema.push(schemaFoundValidated);
             if (schemaFoundValidated.valueFound == schemaFound.value) {
                 this.vod.validationConclusion[searchForKey].foundInInitial = true;
             }
-            // if (valueFoundValidated.foundinLists) {
-            //     this.vod.validationConclusion[schemaFound.originalSearchString].schema.lists.push(valueFoundValidated.foundInLists);
-            // }
 
             return schemaFoundValidated;
 
         });
-        this.vod.schemaValidated = schemaValidated;
     }
 
     initializeConclusionData() {
@@ -485,7 +460,7 @@ class ValidatorReloaded {
             }
 
             // validate search results from browser with constructed window object
-            const windowValidated = this.analyzerOutput.windowPropertiesFound.map((windowFound) => {
+            this.analyzerOutput.windowPropertiesFound.map((windowFound) => {
 
                 const searchResultArray = JSONPath({ path: windowFound.path.substring(1), json: windowObject });
 
@@ -504,25 +479,17 @@ class ValidatorReloaded {
                 return windowFoundValidated;
 
             });
-            this.vod.windowValidated = windowValidated;
         }
 
     }
     // functions takes multiple potential objects that may represent window property  
-    validatePotentialWindowPropertyObject
+    validatePotentialWindowPropertyObject() {
 
+    }
+
+    // This function will copy data from analysis into validationConclusion
+    // if CheerioCrawler fails to load initial HTML and validation can not be performed. 
     populateConclusionFromAnalysis() {
-
-        // const testKeyOutput = [
-        //     { key: 'SCHEMA.ORG', output: 'schemaOrgDataFound' },
-        //     { key: 'JSON-LD', output: 'jsonLDDataFound' },
-        //     { key: 'WINDOW', output: 'windowPropertiesFound'},
-        //     { key: 'XHR', output: 'xhrRequestsFound' },
-        //     { key: 'META', output: 'metaDataFound'},
-        //     { key: 'HTML', output: 'htmlFound'}
-        // ];
-
-
 
         this.analyzerOutput.htmlFound.map(searchResult => {
             const searchForKey = getKeyByValue(this.vod.keywordMap, searchResult.originalSearchString);
@@ -544,7 +511,6 @@ class ValidatorReloaded {
             const searchForKey = getKeyByValue(this.vod.keywordMap, searchResult.originalSearchString);
             this.vod.validationConclusion[searchForKey].schema.push(searchResult);
         });
-
 
     }
 }
