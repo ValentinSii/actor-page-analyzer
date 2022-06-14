@@ -1,4 +1,5 @@
 const Apify = require('apify');
+const { last } = require('lodash');
 const { getKeyByValue } = require('../utils');
 // Apify.main(async () => {
 //   //generate validation html output 
@@ -7,7 +8,7 @@ const { getKeyByValue } = require('../utils');
 //   const htmlGeneratorInstance = new htmlGenerator(fileContents.fields);
 //   htmlGeneratorInstance.generateHtmlFile('dev');
 // });
-const SUCCESS_COLOR =  "#D0F0C0";
+const SUCCESS_COLOR = "#D0F0C0";
 const FAILURE_COLOR = "#F78DA7";
 class htmlGenerator {
 
@@ -71,7 +72,7 @@ class htmlGenerator {
     }
 
     xhrTab() {
-        
+
         this.htmlOutput.push(`<div id="XHR" class="tabcontent" >`);
 
         if (!this.vod.tests.includes('XHR')) {
@@ -80,69 +81,60 @@ class htmlGenerator {
             this.htmlOutput.push(`<h3>There were no XHR requests found containing given keywords.</h3>`);
         } else {
 
-            this.htmlOutput.push('<table class="pure-table pure-table-bordered" style="width:100%";table-layout: fixed>');
+            this.htmlOutput.push('<table class="pure-table pure-table-bordered" style="width:100%";table-layout: fixed">');
+            this.htmlOutput.push('<tbody>');
+
 
             for (let i = 0; i < this.vod.validatedXhr.length; i++) {
-               
-                
+
+
                 const xhr = this.vod.validatedXhr[i];
 
                 const validationResultColor = xhr.validationSuccess ? SUCCESS_COLOR : FAILURE_COLOR;
-                this.htmlOutput.push('<tr>');
+
+                this.htmlOutput.push(`<tr style="background-color: ${validationResultColor};">`);
                 this.htmlOutput.push(`<td colspan=100%>`);
-                this.htmlOutput.push(`<h4 class ="collapsible"><b> ${i}: </b> ${xhr.originalRequest.url} <b style="float: right; ">Click to expand.</b></h4>`);
-                
+                this.htmlOutput.push(`<h4 class ="collapsible"><b> ${i}: </b> ${xhr.originalRequest.url}</h4>`);
+                this.htmlOutput.push('</td>');
+                this.htmlOutput.push('</tr>');
+
+                this.htmlOutput.push('<tr>');
+                this.htmlOutput.push('<td>');
+                this.htmlOutput.push(`<div class ="collapsible">Clicke to reveal more info about request</div>`);
+
+                this.htmlOutput.push('<div style="white-space: pre-wrap; display: none">');
+                this.htmlOutput.push(`<p><b>Validation result:</b> ${xhr.validationSuccess ? "SUCCESS" : "FAIL"}</p>`);
 
 
-                this.htmlOutput.push('<div style="white-space: pre-wrap; display:none;">');
-                this.htmlOutput.push(`<p style="background-color: ${validationResultColor};"><b>Validation result:</b> ${xhr.validationSuccess ? "SUCCESS" : "FAIL" }</p>`);
+
+
+
+
+
                 this.htmlOutput.push(`<p><b>Method:</b> ${xhr.originalRequest.method}</p>`);
                 this.htmlOutput.push(`<p><b>Response status:</b> ${xhr.originalRequest.request.responseStatus}</p>`);
-                this.htmlOutput.push(`<p><b>Keywords found:</b>${xhr.originalRequest.keywordsFound} </p>`);              
+                this.htmlOutput.push(`<p><b>Keywords found:</b>${xhr.originalRequest.keywordsFound} </p>`);
 
-                // this.htmlOutput.push(`<div class ="collapsible"> Click to open original request: </div>`);
-                // this.htmlOutput.push(`<pre style="white-space: pre-wrap; display:none; border-style: solid;border-width: thin;">`);
-                // this.htmlOutput.push(`${JSON.stringify(xhr.originalRequest, null, 4)}`);
-                // this.htmlOutput.push(`</pre>`);
-                
-                this.htmlOutput.push(`<p><b>Request headers: </b> </p>`);
+                this.htmlOutput.push(`<p><b>Puppeteer request headers: </b> </p>`);
                 this.htmlOutput.push(`<pre style="white-space: pre-wrap;">`);
                 this.htmlOutput.push(`${JSON.stringify(xhr.originalRequest.request.headers, null, 4)}`);
                 this.htmlOutput.push(`</pre>`);
 
 
-                this.htmlOutput.push(`<p><b>Response headers: </b> </p>`);
+                this.htmlOutput.push(`<p><b>Puppeteer response headers: </b> </p>`);
                 this.htmlOutput.push(`<pre style="white-space: pre-wrap;">`);
                 this.htmlOutput.push(`${JSON.stringify(xhr.originalRequest.request.responseHeaders, null, 4)}`);
                 this.htmlOutput.push(`</pre>`);
 
-                this.htmlOutput.push(`<p class ="collapsible"><b>Response body: </b> Click to expand. </p>`);
-                this.htmlOutput.push(`<pre style="white-space: pre-wrap;display:none;">`);
-                this.htmlOutput.push(`${JSON.stringify(xhr.originalRequest.request.responseBody, null, 4)}`);
-                this.htmlOutput.push(`</pre>`);
+                this.generateXHRRetriesTable(xhr);
 
-
-                // this.htmlOutput.push(`<div><b>Method:</b> ${xhr.originalRequest.method}</div>`);
-                // this.htmlOutput.push(`<div><b>Response status:</b> ${xhr.originalRequest.request.responseStatus}</div>`);
-                // this.htmlOutput.push(`<div><b>Keywords found:</b> </div>`);
-                // request headers
-                //response headers 
-                // response body
-                // searchresults
-                
-                // take last call 
-                //calls minimal headers
-                    // headers
-                    // got headers
-                    // validation result
-                //calls original headers
-                //calls with cookie
                 this.htmlOutput.push('</div>');
                 this.htmlOutput.push('</td>');
-
                 this.htmlOutput.push('</tr>');
 
             }
+            this.htmlOutput.push('</tbody>');
+
             this.htmlOutput.push('</table>');
 
 
@@ -150,17 +142,75 @@ class htmlGenerator {
 
         this.htmlOutput.push(`</div>`);
     }
+    generateXHRRetriesTable(validatedXHR) {
+        this.htmlOutput.push('<table class="pure-table pure-table-bordered" style="width:100%;table-layout: fixed">');
+        this.htmlOutput.push('<tbody>');
+
+        this.XHRRetryTableRow(
+            validatedXHR.callsMinimalHeaders[validatedXHR.callsMinimalHeaders.length - 1],
+            "Call with minimal headers"
+        );
+
+        this.XHRRetryTableRow(
+            validatedXHR.callsPuppeteerHeaders[validatedXHR.callsPuppeteerHeaders.length - 1],
+            "Call with headers obtained from puppeteer"
+        );
+        this.XHRRetryTableRow(
+            validatedXHR.callsPuppeteerHeadersCookie[validatedXHR.callsPuppeteerHeadersCookie.length - 1],
+            "Call with headers obtained from puppeteer"
+        );
+
+        this.htmlOutput.push('</tbody>');
+        this.htmlOutput.push('</table>');
+
+
+
+
+    }
+    XHRRetryTableRow(lastRetry, callType) {
+        const validationResultColor = lastRetry.validationSuccess ? SUCCESS_COLOR : FAILURE_COLOR;
+
+        this.htmlOutput.push(`<tr style="background-color: ${validationResultColor}">`);
+        this.htmlOutput.push(`<td>`);
+        this.htmlOutput.push(`<p><b>${callType}:</b> ${lastRetry.validationSuccess ? "SUCCESS" : "FAIL"}</p>`);
+        this.htmlOutput.push(`</td>`);
+        this.htmlOutput.push(`</tr>`);
+
+        this.htmlOutput.push('<tr>');
+        this.htmlOutput.push('<td>');
+        this.htmlOutput.push(`<div class ="collapsible">Clicke to reveal more info about request</div>`);
+        this.htmlOutput.push(`<div style="display: none">`);
+
+        this.htmlOutput.push(`<p><b>Response status: </b> ${lastRetry.error ? "Response was not sucessfully retrieved." : lastRetry.response.status} </p>`);
+
+        this.htmlOutput.push(`<p><b>Error: </b> ${lastRetry.error ?? "No errors"} </p>`);
+
+        this.htmlOutput.push(`<p><b>Headers:</b></p>`);
+        this.htmlOutput.push(`<pre style="white-space: pre-wrap;">`);
+        this.htmlOutput.push(`${JSON.stringify(lastRetry.request.headers, null, 4)}`);
+        this.htmlOutput.push(`</pre>`);
+
+        this.htmlOutput.push(`<p><b>GotScraping headers:</b></p>`);
+        this.htmlOutput.push(`<pre style="white-space: pre-wrap;">`);
+        this.htmlOutput.push(`${JSON.stringify(lastRetry.gotHeaders, null, 4)}`);
+        this.htmlOutput.push(`</pre>`);
+
+        this.htmlOutput.push(`</div>`);
+        this.htmlOutput.push('</td>');
+        this.htmlOutput.push('</tr>');
+
+    }
 
     generateConclusionTab() {
         this.htmlOutput.push(`<div id="CONCLUSION" class="tabcontent active" style="display: block;" >`);
         this.htmlOutput.push(`
             <div>
-            <h2><b>URL: </b><a href="${this.vod.url}" target="_blank">${this.vod.url}</a></h2>
+            <h4><b>URL: </b><a href="${this.vod.url}" target="_blank">${this.vod.url}</a></h4>
             <h4><b>Searched for:</b> ${this.vod.searchFor}</h4>
             <h4><b>Tests:</b> ${this.vod.tests}</h4>
         `);
 
-        if(this.vod.initialResponseRetrieved) {
+        if (this.vod.initialResponseRetrieved) {
             this.htmlOutput.push(`<div style="background-color: ${SUCCESS_COLOR};">`);
             this.htmlOutput.push(`<h4>Cheerio crawler has sucessfully retrieved and parsed initial response. </h4>`);
             this.htmlOutput.push(`</div>`);
@@ -269,7 +319,7 @@ class htmlGenerator {
         } else {
             this.htmlOutput.push(`<h3><b>${test} found for ${keyword}:</b></h3>`);
 
-            this.htmlOutput.push('<table class="pure-table pure-table-bordered" style="width:100%";table-layout: fixed>');
+            this.htmlOutput.push('<table class="pure-table pure-table-bordered" style="width:100%";table-layout: fixed">');
 
             // table headers row
             this.htmlOutput.push('<thead><tr>');
@@ -321,10 +371,9 @@ class htmlGenerator {
         } else if (!this.vod.validationConclusion[searchForKey].xhr.length) {
             this.htmlOutput.push(`<h3>Keyword was not found in any XHR requests. </h3>`);
         } else {
-            this.htmlOutput.push(`<h3><b>XHR found for ${keyword}:`);
+            this.htmlOutput.push(`<h3><b>XHR found for ${keyword}: </h3> `);
 
-            this.htmlOutput.push('<table class="pure-table pure-table-bordered" style="width:100%";table-layout: fixed>');
-
+            this.htmlOutput.push('<table class="pure-table pure-table-bordered" style="width:100%";table-layout: fixed">');
             // table headers row
             this.htmlOutput.push('<thead><tr>');
             this.htmlOutput.push(`<th>XHR index</th>`);
@@ -342,12 +391,10 @@ class htmlGenerator {
                 this.htmlOutput.push(`<td>${xhrFound.method}</td>`);
                 this.htmlOutput.push(`<td>${xhrFound.success}</td>`);
                 this.htmlOutput.push('</tr>');
-
-                
             }
             this.htmlOutput.push('</tbody>');
             this.htmlOutput.push('</table>');
-            
+
 
         }
 

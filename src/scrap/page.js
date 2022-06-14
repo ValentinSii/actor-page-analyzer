@@ -12,7 +12,7 @@ const USER_AGENTS = [
     'Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko',
 ];
 
-const PAGE_EVALUATE_TIMEOUT = 40 * 1000;
+const PAGE_EVALUATE_TIMEOUT = 50 * 1000;
 
 const promiseWithTimeout = (promise, timeout) => Promise.race([
     promise,
@@ -220,7 +220,7 @@ class PageScrapper {
 
             try {
                 await this.page.goto(url, { waitUntil: 'networkidle2' });
-                // await this.page.waitForTimeout(5000);
+                await this.page.waitForTimeout(10000);
                 this.cookies = await this.page.cookies();
                 // await this.page.reload({ waitUntil: ["networkidle2", "domcontentloaded"] });
             } catch (error) {

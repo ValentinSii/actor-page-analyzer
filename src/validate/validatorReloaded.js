@@ -133,10 +133,6 @@ class ValidatorReloaded {
                 }
                 this.vod.validatedXhr = validatedXhr;
             }
-
-
-
-
             this.analyzerOutput.vod = this.vod;
         } catch (topErr) {
             console.log('Top level error during validation.');
@@ -172,7 +168,6 @@ class ValidatorReloaded {
                 log.debug(`Request ${request.url} failed 15 times.`);
                 this.cheerioCrawlerError = request.errorMessages;
             },
-
         }
         let proxyConfiguration = null;
         if (process.env.APIFY_PROXY_PASSWORD) {
