@@ -6,6 +6,7 @@ const {
     isString,
     isBuffer,
 } = require('lodash');
+const { ConsoleMessage } = require('puppeteer');
 const { normalize } = require('../utils');
 
 const LETTER_DEDUCTION = 0.01;
@@ -123,6 +124,7 @@ class TreeSearcher {
 
             const scorePerString = normalizedSearch.map((searchString => {
                 // if current element does not contain searched text
+
                 if (normalizedText.indexOf(searchString.normalizedSearchString) === -1) {
                     return null;
                 // current element contains searched string

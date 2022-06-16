@@ -1,0 +1,32 @@
+{
+    "title": "Page analyzer input schema",
+    "description": "Input for page analyzer:\n1.  Url of a website to be analyzed\n2.  Keywords to be searched for\n3.  Data sources, where analyzer will search for provided keywords",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+      "url": {
+        "title": "Website url",
+        "type": "string",
+        "description": "Url to a website to by analyzed",
+        "editor": "textfield",
+        "prefill": "https://example.org/"
+      },
+      "searchFor": {
+        "title": "Keywords",
+        "type": "array",
+        "description": "Keywords to be searched for during analysis",
+        "editor": "stringList"
+      },
+      "tests": {
+        "title": "Data sources",
+        "type": "array",
+        "description": "Data sources to be searched",
+        "editor": "stringList",
+        "prefill": "[\"HTML\",\"META\",\"SCHEMA.ORG\",\"JSON-LD\", \"WINDOW\",\"XHR\"]"
+      }
+    },
+    "required": [
+      "url",
+      "searchFor"
+    ]
+  }

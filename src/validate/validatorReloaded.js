@@ -13,7 +13,7 @@ var util = require('util');
 class ValidatorReloaded {
 
 
-    constructor(inputUrl, inputSearchFor, inputTests, analyzerOutput, allCookies) {
+    constructor(inputUrl, inputSearchFor, inputTests, analyzerOutput, domainName, inputIndex, allCookies) {
 
         // data from user input
         this.url = inputUrl;
@@ -21,6 +21,8 @@ class ValidatorReloaded {
         this.searchFor = inputSearchFor;
         this.tests = inputTests;
         this.analyzerOutput = analyzerOutput;
+        this.domainName = domainName;
+        this.inputIndex = inputIndex;
 
         //cookies from page.cookies()
         this.allCookies = allCookies;
@@ -117,14 +119,29 @@ class ValidatorReloaded {
                         }
                         const searchForKey = getKeyByValue(this.vod.keywordMap, keyword);
                         this.vod.validationConclusion[searchForKey].xhr.push(xhrConclusionEntry); 
+
+                        if (validatedXhr[i].validationSuccess) {
+                            this.vod.validationConclusion[searchForKey].retrievedByXHR = true;
+
+                        }
                     }
 
                     validatedXhr[i].originalRequest["keywordsFound"] = keywordsFound;
                 }
                 this.vod.validatedXhr = validatedXhr;
+
+                if (validatedXhr.length) {
+                    try {
+                        const data = JSON.stringify(validatedXhr, null, 4);
+                        await Apify.setValue(this.domainName + "XHRValidation" + this.inputIndex, data, { contentType: 'application/json' });
+                    } catch (err) {
+                        console.log("Failed to save initial response!");
+                        console.log(err.message);
+                    }
+                }
             }
             this.analyzerOutput.vod = this.vod;
-            
+
         } catch (topErr) {
             console.log('Top level error during validation.');
             console.log(topErr);
@@ -283,7 +300,8 @@ class ValidatorReloaded {
                 xhr: [],
                 schema: [],
                 window: [],
-                foundInInitial: false
+                foundInInitial: false,
+                retrievedByXHR: false
             }
         });
     }

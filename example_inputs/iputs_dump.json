@@ -247,11 +247,27 @@
     "searchFor": [
         "PlayStation 5 Media Remote",
         "19,90",
-        "Môžete mať zajtra od 8:00",
+        "Na ceste 1 ks",
         "Diaľkový ovládač – pre PlayStation 5, ľahké ovládanie streamovacích služieb, biely"
     ]
 }
 
+{
+    "url": "https://opensea.io/rankings?sortBy=total_volume",
+    "searchFor": [
+        "CryptoPunks",
+        "Azuki",
+        "Doodles",
+        "19306",
+        "69,931.43",
+        "101 - 201",
+        "Utility",
+        "6999",
+        "Explore",
+        "Create",
+        "Mooncats"
+    ]
+}
 {
     "url": "https://opensea.io/rankings?sortBy=total_volume&category=art&chain=ethereum",
     "searchFor": [

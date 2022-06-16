@@ -32,8 +32,9 @@ class htmlGenerator {
             this.generateKeyWordTab(keyword);
         })
         this.xhrTab();
-
         this.appendScript();
+
+        this.cleanOutput();
         await this.saveValidatorOutput(fileName);
 
 
@@ -82,7 +83,7 @@ class htmlGenerator {
             this.htmlOutput.push(`<h3>There were no XHR requests found containing given keywords.</h3>`);
         } else {
 
-            this.htmlOutput.push('<table class="pure-table pure-table-bordered" style="width:100%";table-layout: fixed">');
+            this.htmlOutput.push('<table class="pure-table pure-table-bordered">');
             this.htmlOutput.push('<tbody>');
 
 
@@ -117,13 +118,13 @@ class htmlGenerator {
                 this.htmlOutput.push(`<p><b>Keywords found:</b>${xhr.originalRequest.keywordsFound} </p>`);
 
                 this.htmlOutput.push(`<p><b>Puppeteer request headers: </b> </p>`);
-                this.htmlOutput.push(`<pre style="white-space: pre-wrap;">`);
+                this.htmlOutput.push(`<pre>`);
                 this.htmlOutput.push(`${JSON.stringify(xhr.originalRequest.request.headers, null, 4)}`);
                 this.htmlOutput.push(`</pre>`);
 
 
                 this.htmlOutput.push(`<p><b>Puppeteer response headers: </b> </p>`);
-                this.htmlOutput.push(`<pre style="white-space: pre-wrap;">`);
+                this.htmlOutput.push(`<pre>`);
                 this.htmlOutput.push(`${JSON.stringify(xhr.originalRequest.request.responseHeaders, null, 4)}`);
                 this.htmlOutput.push(`</pre>`);
 
@@ -144,7 +145,7 @@ class htmlGenerator {
         this.htmlOutput.push(`</div>`);
     }
     generateXHRRetriesTable(validatedXHR) {
-        this.htmlOutput.push('<table class="pure-table pure-table-bordered" style="width:100%;table-layout: fixed">');
+        this.htmlOutput.push('<table class="pure-table pure-table-bordered">');
         this.htmlOutput.push('<tbody>');
 
         this.XHRRetryTableRow(
@@ -187,12 +188,12 @@ class htmlGenerator {
         this.htmlOutput.push(`<p><b>Error: </b> ${lastRetry.error ?? "No errors"} </p>`);
 
         this.htmlOutput.push(`<p><b>Headers:</b></p>`);
-        this.htmlOutput.push(`<pre style="white-space: pre-wrap;">`);
+        this.htmlOutput.push(`<pre>`);
         this.htmlOutput.push(`${JSON.stringify(lastRetry.request.headers, null, 4)}`);
         this.htmlOutput.push(`</pre>`);
 
         this.htmlOutput.push(`<p><b>GotScraping headers:</b></p>`);
-        this.htmlOutput.push(`<pre style="white-space: pre-wrap;">`);
+        this.htmlOutput.push(`<pre>`);
         this.htmlOutput.push(`${JSON.stringify(lastRetry.gotHeaders, null, 4)}`);
         this.htmlOutput.push(`</pre>`);
 
@@ -224,10 +225,6 @@ class htmlGenerator {
         }
 
         this.htmlOutput.push(`</div>`);
-        // this.analyzerOutput.validation.searchFor.forEach(keyword => {
-        //     this.generateKeywordConclusion(keyword);
-
-        // });
         this.generateSummaryTable();
         this.generateTimeStamps();
         this.htmlOutput.push(`</div>`);
@@ -241,6 +238,7 @@ class htmlGenerator {
     generateSummaryTable() {
         this.htmlOutput.push('<table class="pure-table pure-table-bordered" >');
 
+        //TODO: wow, this is dumb, fix me please 
         const tableKeys = [
             'html',
             'json',
@@ -258,6 +256,8 @@ class htmlGenerator {
 
         //column for signalizing if keyword was found sucessfully found in initial html
         this.htmlOutput.push(`<th>Found in initial HTML</th>`);
+        this.htmlOutput.push(`<th>Retrieved by XHR</th>`);
+
 
         this.htmlOutput.push('</tr></thead>');
 
@@ -272,7 +272,12 @@ class htmlGenerator {
             tableKeys.forEach(key => {
                 this.htmlOutput.push(`<td>${keywordData[key].length}</td>`);
             })
-            this.htmlOutput.push(`<td>${keywordData["foundInInitial"]}</td>`)
+            this.htmlOutput.push(`<td>${keywordData["foundInInitial"]}</td>`);
+            if(keywordData.xhr.length){
+                this.htmlOutput.push(`<td>${keywordData["retrievedByXHR"]}</td>`);
+            } else {
+                this.htmlOutput.push(`<td>---</td>`);
+            }
             this.htmlOutput.push('</tr>');
         })
 
@@ -320,7 +325,7 @@ class htmlGenerator {
         } else {
             this.htmlOutput.push(`<h3><b>${test} found for ${keyword}:</b></h3>`);
 
-            this.htmlOutput.push('<table class="pure-table pure-table-bordered" style="width:100%";table-layout: fixed">');
+            this.htmlOutput.push('<table class="pure-table pure-table-bordered">');
 
             // table headers row
             this.htmlOutput.push('<thead><tr>');
@@ -351,7 +356,7 @@ class htmlGenerator {
                     this.htmlOutput.push('<tr>');
                     this.htmlOutput.push('<td colspan=100%>');
                     this.htmlOutput.push(`<div class ="collapsible">Element above was also found in some lists. Click here to expand</div>`);
-                    this.htmlOutput.push(`<pre style="white-space: pre-wrap; display:none">`);
+                    this.htmlOutput.push(`<pre style="display:none">`);
                     this.htmlOutput.push(`${JSON.stringify(data.foundInLists, null, 4)}`)
                     this.htmlOutput.push(`</pre>`);
                     this.htmlOutput.push('</td>');
@@ -374,7 +379,7 @@ class htmlGenerator {
         } else {
             this.htmlOutput.push(`<h3><b>XHR found for ${keyword}: </h3> `);
 
-            this.htmlOutput.push('<table class="pure-table pure-table-bordered" style="width:100%";table-layout: fixed">');
+            this.htmlOutput.push('<table class="pure-table pure-table-bordered" >');
             // table headers row
             this.htmlOutput.push('<thead><tr>');
             this.htmlOutput.push(`<th>XHR index</th>`);
@@ -492,7 +497,16 @@ class htmlGenerator {
           display: none;
           padding: 6px 12px;
         }
-        
+        .collapsible {
+            cursor: pointer;
+        }
+        table {
+            width:100%;
+        }
+
+        pre {
+            white-space: pre-wrap;
+        }
 
         </style>
         </head>`;
@@ -544,6 +558,16 @@ class htmlGenerator {
         </body>
         </html> `;
         this.htmlOutput.push(content);
+    }
+
+    cleanOutput() {
+        // TODO: fix this temporary solution
+        // cleanup data that does not need to be duplicate in the output
+        delete this.analyzerOutput.vod.url;
+        delete this.analyzerOutput.vod.keywordMap;
+        delete this.analyzerOutput.vod.searchFor;
+        delete this.analyzerOutput.vod.tests;
+        delete this.analyzerOutput.vod.validatedXhr;
     }
 }
 module.exports = htmlGenerator;

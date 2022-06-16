@@ -13,6 +13,7 @@ const { readInputAsync } = require('./input/inputReader');
 const htmlGenerator = require('./generate/HtmlOutput');
 const { ValidatorReloaded } = require('./validate/validatorReloaded');
 var util = require('util');
+const { hostname } = require('os');
 
 let lastLog = Date.now();
 
@@ -48,11 +49,11 @@ async function analysePage(browser, url, searchFor, tests, inputIndex) {
 
 
     //create filenames for initial html response and html validation output
-    const hostName = getHostName(url);
-    console.log(hostName);
+    const domainName = getHostName(url);
+    console.log(domainName);
 
-    const initialResposneFileName = hostName + inputIndex;
-    const validationFileName = hostName + 'Validation' + inputIndex;
+    const initialResposneFileName = domainName + inputIndex;
+    const validationFileName = domainName + 'Validation' + inputIndex;
 
     log('analysisStarted');
     output.set('analysisStarted', new Date());
@@ -89,7 +90,8 @@ async function analysePage(browser, url, searchFor, tests, inputIndex) {
         const treeSearcher = new TreeSearcher();
 
         try {
-            await Apify.setValue(initialResposneFileName, html, { contentType: 'text/html' });
+            await Apify.setValue("initialResponse", html, { contentType: 'text/html' });
+            // await Apify.setValue(initialResposneFileName, html, { contentType: 'text/html' });
         } catch (err) {
             log("Failed to save initial response!");
             console.log(err.message);
@@ -304,7 +306,7 @@ async function analysePage(browser, url, searchFor, tests, inputIndex) {
         // validate single url
         // const validator = new Validator(url, searchFor, tests, output.fields, scrapper.cookies);
 
-        const validator = new ValidatorReloaded(url, searchFor, tests, output.fields, scrapper.cookies);
+        const validator = new ValidatorReloaded(url, searchFor, tests, output.fields, domainName, inputIndex, scrapper.cookies);
         output.set('validationStarted', new Date());
         await validator.validate();
         output.set('validationFinished', new Date());
@@ -312,8 +314,9 @@ async function analysePage(browser, url, searchFor, tests, inputIndex) {
         //generate validation html output 
         this.htmlGenerator = new htmlGenerator(output.fields);
 
+        await this.htmlGenerator.generateHtmlFile("Validation");
 
-        await this.htmlGenerator.generateHtmlFile(validationFileName);
+        // await this.htmlGenerator.generateHtmlFile(validationFileName);
 
         // force last write of output data
         log('Force write of output with await');
