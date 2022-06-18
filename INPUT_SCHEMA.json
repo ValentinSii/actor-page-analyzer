@@ -16,13 +16,6 @@
         "type": "array",
         "description": "Keywords to be searched for during analysis",
         "editor": "stringList"
-      },
-      "tests": {
-        "title": "Data sources",
-        "type": "array",
-        "description": "Data sources to be searched",
-        "editor": "stringList",
-        "prefill": "[\"HTML\",\"META\",\"SCHEMA.ORG\",\"JSON-LD\", \"WINDOW\",\"XHR\"]"
       }
     },
     "required": [
