@@ -85,7 +85,7 @@ async function validateAllXHR(analyzerOutput, searchFor, allCookies, proxyUrl = 
     return validatedXhr;
 }
 async function validateXHRRequest(requestObject, searchFor, xhrFound) {
-    const retryCount = 3;
+    const retryCount = 5;
     let validationSuccess = false; 
     const requestCalls = [];
     for (let i = 0; i < retryCount; i++) {

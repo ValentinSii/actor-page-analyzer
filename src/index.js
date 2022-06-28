@@ -336,7 +336,7 @@ Apify.main(async () => {
         const inputFileName = 'INPUT';
         let input = await readInputAsync(inputFileName);
         // TODO: Per page tests
-        const tests = input.tests || ['SCHEMA.ORG', 'JSON-LD', 'WINDOW', 'XHR', 'META', 'HTML', 'VALIDATE'];
+        const tests = input.tests || ['SCHEMA.ORG', 'JSON-LD', 'WINDOW', 'XHR', 'META', 'HTML'];
         output = new OutputGenerator(tests);
 
         const launchPuppeteerContext = {

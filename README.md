@@ -4,7 +4,11 @@ This actor is fork from the original [Page Analyzer](https://github.com/apify/ac
 
 ## Analysis vs Validation
 In this document, we will refer to __Analysis__ as a process of searching the keywords from the INPUT in the data of the website loaded by Chromium controlled by Puppeteer. 
-__Validation__ will be refered to as a process of checking, whether data from __analysis__ can be used for scraping given website. 
+__Validation__ will be refered to as a process of checking, whether data from __analysis__ can be used for scraping given website.
+
+## Keyword 
+Keywords are strings that analyzer will search for in given website. 
+
 
 ## Input
 ```javascript
@@ -17,19 +21,6 @@ __Validation__ will be refered to as a process of checking, whether data from __
         // numbers are also passed as strings
         "125"
         ],
-    // array of strings specifying wich possible data sources should be searched, list in this example contains all of the possible tests
-    "tests" : [
-        // analyze data in content of html tags e.g. <h3 class="willBeFound> About us: </h3>
-        "HTML",
-        // analyze data in <meta> tags e.g.    <meta name="description" content="Example meta">
-        "META"
-        "SCHEMA.ORG",
-        "JSON-LD",
-        // analyze variables assigned to window object
-        "WINDOW",
-        // analyze requests called in puppeteer session
-        "XHR"
-    ]
 }
 ```
 
@@ -41,7 +32,10 @@ Output of this actor is saved in Apify key-value store, it consists of these fil
 {
     ...
     "vod": {
+        // this object contains object with name "keyword + index of input keyword" for each keyword from the input
+        // 
         "validationConclusion": {
+            // 
           "keyword0": {
               // original keyword string from INPUT
             "keywordValue": "example keyword",
@@ -95,13 +89,34 @@ Output of this actor is saved in Apify key-value store, it consists of these fil
 Dashboard with visual presentation of the data found. There are multiple tabs in the top bar:
 - __CONCLUSION__: Displays information about analysis: url, keywords, tests, cheerio crawler response parsing status...
 - __Tabs for each keyword__: Here, analysis data is presented for each test performed.
- If table row is green, data in column __Initial value__was found in initial response. If cheerio crawler failed to retrieve initial response whole table will be red. 
+ If table row is green, data in column __Initial value__was found in initial response. Red row means data was found during analysis but failed validation phase. If cheerio crawler failed to retrieve initial response whole table will be red. 
 - __XHR Found__: Information about xhr requests validation.
 - __OUTPUT.json__: Clicking on this tab will open OUTPUT.json file with full analysis data. 
-3. __InitialBrowser.html__. This file contains initial response from browser session.
-4. __InitialCheerio.html__. This file contains initial response retrieved by cheerioCrawler.
-5. __XHRValidation.json__. This file is only present if some keyword was found in XHR requests. It contains all necessary information about every request needed to replicate it and results from calls by gotScraping (url, method, headers, payload(request body), response status, response body) including information about the original request called by Chromium
+3. __InitialResponse.html__. This file contains initial response retrieved by Chromium browser.
+4. __XHRValidation.json__. This file is only present if some keyword was found in XHR requests. It contains all necessary information about every request needed to replicate it and results from calls by gotScraping (url, method, headers, payload(request body), response status, response body) including information about the original request called by Chromium
 
 ## Validation process
-1. Initial response is loaded and parsed into $.
+1. Initial response is loaded using CheerioCrawler and parsed into $. If loading fails, validation can not be performed, data from analysis is just copied into Validation.html dashboard. 
+2. HTML: Cheerio object is queried with css selectors obtained by analysis. Query result is saved along with a search result from analysis into validationConclusion object for corresponding keyword.
+3. Json-LD, Schema.org,Metadata: are parsed from initial response using Cheerio. JSONPath is used to search data parsed from initial response and saved into validationConclusion object for corresponding keyword.
+4. Window properties:
+5. XHR requests: Validator tries to replicate XHR requests using gotScraping. Headers listed below are headers that are provided into request object for gotScraping. GotScraping will generate some other headers, and merge them together. 
+    1. Minimal headers:
+        - referer
+        - content-type if payload is sent 
+    2. Headers sent in original request from Chromium controlled by Puppeteer (these do not contain cookie)
+    3.  All of the above + cookieString 
+        ```javascript
+        this.cookies = await this.page.cookies();
+        const cookieString = allCookies.map((cookie) => {
+                        return `${cookie.name}=${cookie.value}`;
+                     }).join("; ");
+        ```
+    Response from each request is then searched for keyword from input using DOMSearcher if response is html or TreeSearcher if response is a JSON. 
 
+    Search results are then compared using lodash:
+    ```javascript
+            _.isEqual(analysisSearch, validationSearch);
+    ```
+
+    If response status and search results are identical, request will be deemed as sucessfully validated. 
