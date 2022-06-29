@@ -35,7 +35,7 @@ async function validateAllXHR(analyzerOutput, searchFor, allCookies, proxyUrl = 
 
                 if (proxyUrl.length) { 
                     requestObject.proxyUrl = proxyUrl;
-                    console.log(`Proxy url: ${proxyUrl}`)
+                    // console.log(`Proxy url: ${proxyUrl}`);
                 }
                 //copy request body and content type
                 if (xhrFound.request.postData != null) {
@@ -69,7 +69,7 @@ async function validateAllXHR(analyzerOutput, searchFor, allCookies, proxyUrl = 
                     retryObject.validationSuccess = true;
                 }
 
-                console.log(retryObject);
+                // console.log(retryObject);
 
             }
             catch (err) {

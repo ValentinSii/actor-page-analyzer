@@ -133,7 +133,7 @@ class ValidatorReloaded {
                 if (validatedXhr.length) {
                     try {
                         const data = JSON.stringify(validatedXhr, null, 4);
-                        await Apify.setValue(this.domainName + "XHRValidation" + this.inputIndex, data, { contentType: 'application/json' });
+                        await Apify.setValue(this.domainName + "_XHRValidation", data, { contentType: 'application/json' });
                     } catch (err) {
                         console.log("Failed to save initial response!");
                         console.log(err.message);
@@ -181,7 +181,7 @@ class ValidatorReloaded {
         if (process.env.APIFY_PROXY_PASSWORD) {
             proxyConfiguration = await Apify.createProxyConfiguration(
             );
-            console.log("Proxy configuration" + util.inspect(proxyConfiguration, { depth: null }));
+            // console.log("Proxy configuration" + util.inspect(proxyConfiguration, { depth: null }));
             cheerioCrawlerOptions.proxyConfiguration = proxyConfiguration;
             this.proxyUrl = proxyConfiguration.newUrl();
         }
@@ -443,7 +443,7 @@ class ValidatorReloaded {
                 // }
             }
 
-            console.log("Object selectors: " + util.inspect(windowObjectSelectors, { depth: null }));
+            // console.log("Object selectors: " + util.inspect(windowObjectSelectors, { depth: null }));
             // some window properties are sent as json in script with id representing their name
             const scriptIds = windowObjectSelectors.map(wp => { return wp.name });
             // find all scripts of type application/json with given IDs and parse them to object 
@@ -462,7 +462,7 @@ class ValidatorReloaded {
                     return true;
                 });
             }
-            console.log("Object selectors left: " + util.inspect(windowObjectSelectors, { depth: null }));
+            // console.log("Object selectors left: " + util.inspect(windowObjectSelectors, { depth: null }));
 
             // if we didnt find window properties sent as script, we will look for them as object with property 
             for (const windowProperty of windowObjectSelectors) {

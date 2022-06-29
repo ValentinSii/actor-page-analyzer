@@ -52,8 +52,10 @@ async function analysePage(browser, url, searchFor, tests, inputIndex) {
     const domainName = getHostName(url);
     console.log(domainName);
 
-    const initialResposneFileName = domainName + inputIndex;
-    const validationFileName = domainName + 'Validation' + inputIndex;
+    const initialResposneFileName = domainName + '_initialResponse';
+    // const validationFileName = domainName + 'Validation' + inputIndex;
+    const validationFileName = domainName + '_validation';
+
 
     log('analysisStarted');
     output.set('analysisStarted', new Date());
@@ -90,8 +92,8 @@ async function analysePage(browser, url, searchFor, tests, inputIndex) {
         const treeSearcher = new TreeSearcher();
 
         try {
-            await Apify.setValue("initialResponse", html, { contentType: 'text/html' });
-            // await Apify.setValue(initialResposneFileName, html, { contentType: 'text/html' });
+            // await Apify.setValue("initialResponse", html, { contentType: 'text/html' });
+            await Apify.setValue(initialResposneFileName, html, { contentType: 'text/html; charset=utf-8' });
         } catch (err) {
             log("Failed to save initial response!");
             console.log(err.message);
@@ -314,9 +316,9 @@ async function analysePage(browser, url, searchFor, tests, inputIndex) {
         //generate validation html output 
         this.htmlGenerator = new htmlGenerator(output.fields);
 
-        await this.htmlGenerator.generateHtmlFile("Validation");
+        // await this.htmlGenerator.generateHtmlFile("Validation");
 
-        // await this.htmlGenerator.generateHtmlFile(validationFileName);
+        await this.htmlGenerator.generateHtmlFile(validationFileName);
 
         // force last write of output data
         log('Force write of output with await');
@@ -350,15 +352,15 @@ Apify.main(async () => {
             }
         };
 
-        console.log("env objct: " + util.inspect(process.env, { depth: null }));
+        // console.log("env objct: " + util.inspect(process.env, { depth: null }));
 
-        // if (process.env.APIFY_PROXY_PASSWORD) {
-        //     const proxyConfiguration = await Apify.createProxyConfiguration(
-        //     );
-        //     launchPuppeteerContext.proxyUrl = proxyConfiguration.newUrl();
+        if (process.env.APIFY_PROXY_PASSWORD) {
+            const proxyConfiguration = await Apify.createProxyConfiguration(
+            );
+            launchPuppeteerContext.proxyUrl = proxyConfiguration.newUrl();
 
-        //     console.log("Proxy configuration" + util.inspect(proxyConfiguration, { depth: null }));
-        // }
+            // console.log("Proxy configuration" + util.inspect(proxyConfiguration, { depth: null }));
+        }
 
         // if (process.env.PROXY_GROUP && process.env.PROXY_PASSWORD) {
         //     const { PROXY_PASSWORD, PROXY_GROUP, PROXY_ADDRESS } = process.env;
