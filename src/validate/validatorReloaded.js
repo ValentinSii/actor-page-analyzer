@@ -133,7 +133,9 @@ class ValidatorReloaded {
                 if (validatedXhr.length) {
                     try {
                         const data = JSON.stringify(validatedXhr, null, 4);
-                        await Apify.setValue(this.domainName + "_XHRValidation", data, { contentType: 'application/json' });
+                        // await Apify.setValue(this.domainName + "_XHRValidation", data, { contentType: 'application/json' });
+                        await Apify.setValue("XHRValidation", data, { contentType: 'application/json' });
+
                     } catch (err) {
                         console.log("Failed to save initial response!");
                         console.log(err.message);

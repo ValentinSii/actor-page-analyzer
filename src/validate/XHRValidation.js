@@ -33,6 +33,7 @@ async function validateAllXHR(analyzerOutput, searchFor, allCookies, proxyUrl = 
                     method: xhrFound.request.method
                 };
 
+                // TODO: Proxy
                 if (proxyUrl.length) { 
                     requestObject.proxyUrl = proxyUrl;
                     // console.log(`Proxy url: ${proxyUrl}`);

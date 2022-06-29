@@ -82,6 +82,9 @@ class htmlGenerator {
         } else if (!this.vod.validatedXhr.length) {
             this.htmlOutput.push(`<h3>There were no XHR requests found containing given keywords.</h3>`);
         } else {
+            this.htmlOutput.push(`<h3>Click <a href="./XHRValidation .json" target="_blank">HERE</a> to open file with full details of XHR validation.</h3>`);
+            // <a href="#"></a>
+            // this.htmlOutput.push(`<button onclick=" window.open('./OUTPUT.json','_blank')">OUTPUT.JSON</button>`);
 
             this.htmlOutput.push('<table class="pure-table pure-table-bordered">');
             this.htmlOutput.push('<tbody>');
@@ -96,7 +99,7 @@ class htmlGenerator {
 
                 this.htmlOutput.push(`<tr style="background-color: ${validationResultColor};">`);
                 this.htmlOutput.push(`<td colspan=100%>`);
-                this.htmlOutput.push(`<h4 class ="collapsible"><b> ${i}: </b> ${xhr.originalRequest.url}</h4>`);
+                this.htmlOutput.push(`<h4><b> ${i}: </b> ${xhr.originalRequest.url}</h4>`);
                 this.htmlOutput.push('</td>');
                 this.htmlOutput.push('</tr>');
 
@@ -106,11 +109,6 @@ class htmlGenerator {
 
                 this.htmlOutput.push('<div style="white-space: pre-wrap; display: none">');
                 this.htmlOutput.push(`<p><b>Validation result:</b> ${xhr.validationSuccess ? "SUCCESS" : "FAIL"}</p>`);
-
-
-
-
-
 
 
                 this.htmlOutput.push(`<p><b>Method:</b> ${xhr.originalRequest.method}</p>`);
