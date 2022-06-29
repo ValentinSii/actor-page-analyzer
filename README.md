@@ -120,3 +120,11 @@ Dashboard with visual presentation of the data found. There are multiple tabs in
     ```
 
     If response status and search results are identical, request will be deemed as sucessfully validated. 
+
+
+## Planned features
+
+* flexible formatting of numbers & strings (4,400 <=> 4000)
+* testing different proxy configurations (datacenter -> residential)
+* generation of scraper code
+* custom clicks

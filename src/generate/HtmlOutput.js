@@ -82,7 +82,7 @@ class htmlGenerator {
         } else if (!this.vod.validatedXhr.length) {
             this.htmlOutput.push(`<h3>There were no XHR requests found containing given keywords.</h3>`);
         } else {
-            this.htmlOutput.push(`<h3>Click <a href="./XHRValidation .json" target="_blank">HERE</a> to open file with full details of XHR validation.</h3>`);
+            this.htmlOutput.push(`<h3>Click <a href="./XHRValidation.json" target="_blank">HERE</a> to open file with full details of XHR validation.</h3>`);
             // <a href="#"></a>
             // this.htmlOutput.push(`<button onclick=" window.open('./OUTPUT.json','_blank')">OUTPUT.JSON</button>`);
 

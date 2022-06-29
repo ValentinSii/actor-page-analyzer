@@ -295,3 +295,15 @@
         "Jun 16"
     ]
 }
+
+{
+    "url": "https://www.imdb.com/",
+    "searchFor": [
+        "The Batman",
+        "Arrival",
+        "Dunkirk",
+        "7.4",
+        "Hustle"
+
+    ]
+}
