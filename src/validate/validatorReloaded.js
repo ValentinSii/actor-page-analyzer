@@ -180,6 +180,7 @@ class ValidatorReloaded {
             },
         }
         let proxyConfiguration = null;
+        // TODO: Proxy
         if (process.env.APIFY_PROXY_PASSWORD) {
             proxyConfiguration = await Apify.createProxyConfiguration(
             );

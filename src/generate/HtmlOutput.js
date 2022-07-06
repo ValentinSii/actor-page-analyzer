@@ -68,7 +68,7 @@ class htmlGenerator {
         // Generate tab for XHR found requests
         this.htmlOutput.push(`<button class="tablinks" onclick="openTab(event, 'XHR')">XHR Found</button>`);
         // open OUTPUT.json in new tab
-        this.htmlOutput.push(`<button class="tablinks" onclick=" window.open('./OUTPUT.json','_blank')">OUTPUT.JSON</button>`);
+        this.htmlOutput.push(`<button class="tablinks" onclick=" window.open('./OUTPUT','_blank')">OUTPUT.JSON</button>`);
         //end of top bar 
         this.htmlOutput.push(`</div>`);
     }
@@ -82,7 +82,7 @@ class htmlGenerator {
         } else if (!this.vod.validatedXhr.length) {
             this.htmlOutput.push(`<h3>There were no XHR requests found containing given keywords.</h3>`);
         } else {
-            this.htmlOutput.push(`<h3>Click <a href="./XHRValidation.json" target="_blank">HERE</a> to open file with full details of XHR validation.</h3>`);
+            this.htmlOutput.push(`<h3>Click <a href="./XHRValidation" target="_blank">HERE</a> to open file with full details of XHR validation.</h3>`);
             // <a href="#"></a>
             // this.htmlOutput.push(`<button onclick=" window.open('./OUTPUT.json','_blank')">OUTPUT.JSON</button>`);
 
@@ -151,22 +151,22 @@ class htmlGenerator {
             "Call with minimal headers"
         );
 
-        this.XHRRetryTableRow(
-            validatedXHR.callsPuppeteerHeaders[validatedXHR.callsPuppeteerHeaders.length - 1],
-            "Call with headers obtained from puppeteer"
-        );
-        this.XHRRetryTableRow(
+
+        if (validatedXHR.callsPuppeteerHeaders) {
+            this.XHRRetryTableRow(
+                validatedXHR.callsPuppeteerHeaders[validatedXHR.callsPuppeteerHeaders.length - 1],
+                "Call with headers obtained from puppeteer"
+            );
+        } 
+        if (validatedXHR.callsPuppeteerHeadersCookie) {
             validatedXHR.callsPuppeteerHeadersCookie[validatedXHR.callsPuppeteerHeadersCookie.length - 1],
-            "Call with headers obtained from puppeteer"
-        );
+                "Call with headers obtained from puppeteer"
+        } 
 
         this.htmlOutput.push('</tbody>');
         this.htmlOutput.push('</table>');
-
-
-
-
     }
+
     XHRRetryTableRow(lastRetry, callType) {
         const validationResultColor = lastRetry.validationSuccess ? SUCCESS_COLOR : FAILURE_COLOR;
 
@@ -236,25 +236,25 @@ class htmlGenerator {
     generateSummaryTable() {
         this.htmlOutput.push('<table class="pure-table pure-table-bordered" >');
 
-        //TODO: wow, this is dumb, fix me please 
-        const tableKeys = [
-            'html',
-            'json',
-            'meta',
-            'xhr',
-            'schema',
-            'window'
-        ];
         // table headers row
         this.htmlOutput.push('<thead><tr>');
         this.htmlOutput.push(`<th>Keyword</th>`);
-        tableKeys.forEach(key => {
-            this.htmlOutput.push(`<th>${key}</th>`);
-        })
+
+        this.htmlOutput.push(`<th>html</th>`);
+        this.htmlOutput.push(`<th>json</th>`);
+        this.htmlOutput.push(`<th>meta</th>`);
+        this.htmlOutput.push(`<th>xhr</th>`);
+        this.htmlOutput.push(`<th>schema</th>`);
+        this.htmlOutput.push(`<th>window</th>`);
 
         //column for signalizing if keyword was found sucessfully found in initial html
-        this.htmlOutput.push(`<th>Found in initial HTML</th>`);
-        this.htmlOutput.push(`<th>Retrieved by XHR</th>`);
+        this.htmlOutput.push(`<th class="tooltip">Found in initial HTML**</th>`);
+        // this.htmlOutput.push(`<th class="tooltip">Found in initial HTML 
+        // <span class="tooltiptext">
+        // Value indicates whether it's possible to scrape given keyword from initial response retrieved by CheerioCrawler. 
+        // </span>
+        // </th>`);
+        this.htmlOutput.push(`<th>Retrieved by XHR***</th>`);
 
 
         this.htmlOutput.push('</tr></thead>');
@@ -267,12 +267,18 @@ class htmlGenerator {
             const searchForKey = getKeyByValue(this.vod.keywordMap, keyword);
             const keywordData = this.vod.validationConclusion[searchForKey];
             this.htmlOutput.push(`<td>${keyword}</td>`);
-            tableKeys.forEach(key => {
-                this.htmlOutput.push(`<td>${keywordData[key].length}</td>`);
-            })
-            this.htmlOutput.push(`<td>${keywordData["foundInInitial"]}</td>`);
-            if(keywordData.xhr.length){
-                this.htmlOutput.push(`<td>${keywordData["retrievedByXHR"]}</td>`);
+
+            this.htmlOutput.push(`<td>${keywordData.html.length}</td>`);
+            this.htmlOutput.push(`<td>${keywordData.json.length}</td>`);
+            this.htmlOutput.push(`<td>${keywordData.meta.length}</td>`);
+            this.htmlOutput.push(`<td>${keywordData.xhr.length}</td>`);
+            this.htmlOutput.push(`<td>${keywordData.schema.length}</td>`);
+            this.htmlOutput.push(`<td>${keywordData.window.length}</td>`);
+
+
+            this.htmlOutput.push(`<td>${keywordData.foundInInitial}</td>`);
+            if (keywordData.xhr.length) {
+                this.htmlOutput.push(`<td>${keywordData.retrievedByXHR}</td>`);
             } else {
                 this.htmlOutput.push(`<td>---</td>`);
             }
@@ -283,7 +289,14 @@ class htmlGenerator {
         //table end 
         this.htmlOutput.push('</tbody>');
         this.htmlOutput.push('</table>');
-        this.htmlOutput.push(`<p>* Table contains number of possible options to retrieve keywords from given source</p>`);
+        this.htmlOutput.push(`<p>* Table contains number of possible options to retrieve keywords from given data source</p>`);
+        this.htmlOutput.push(`<p>** Value indicates whether it's possible to scrape given keyword from initial response retrieved by CheerioCrawler.</p>`);
+        this.htmlOutput.push(`<p>***  Value " -- " indicates, that keyword was not found in any XHR requests. Value "false" indicates, that keyword was found in some XHR request, but analyzer failed to replicate the call. Value "true" indicates, that keyword was found in some XHR request and request was sucessfully replicated by simple HTTP client (gotScraping)</p>`);
+
+
+
+
+
     }
 
     //generates data for TAB with validated data found for each keyword
@@ -507,6 +520,32 @@ class htmlGenerator {
             white-space: pre-wrap;
         }
 
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+          }
+          
+          /* Tooltip text */
+          .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 240px;
+            background-color: black;
+            color: #fff;
+            text-align: center;
+            padding: 5px 0;
+            border-radius: 6px;           
+            position: absolute;
+            z-index: 1;
+            bottom: 100%;
+            left: 50%;
+            margin-left: -120px; /* Use half of the width (120/2 = 60), to center the tooltip */
+          }
+          
+          /* Show the tooltip text when you mouse over the tooltip container */
+          .tooltip:hover .tooltiptext {
+            visibility: visible;
+          }
         </style>
         </head>`;
 
@@ -535,9 +574,7 @@ class htmlGenerator {
         
 
         
-        </script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        
+        </script>        
         <script type="module">
         var coll = document.getElementsByClassName("collapsible");
         var i;

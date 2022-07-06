@@ -8,17 +8,15 @@ async function validateAllXHR(analyzerOutput, searchFor, allCookies, proxyUrl = 
     let validatedXhr = [];
     if (analyzerOutput.xhrRequestsFound.length > 0) {
 
-
         for (const xhrFound of analyzerOutput.xhrRequestsFound) {
 
             let retryObject = {
-                originalRequest: { ...xhrFound },
+                originalRequest: {...xhrFound},
                 callsMinimalHeaders: null,
                 callsPuppeteerHeaders: null,
                 callsPuppeteerHeadersCookie: null,
                 validationSuccess: false,
             }
-
             try {
 
 
@@ -48,6 +46,8 @@ async function validateAllXHR(analyzerOutput, searchFor, allCookies, proxyUrl = 
                  retryObject.callsMinimalHeaders = result.requestCalls;
                  if(result.validationSuccess) {
                      retryObject.validationSuccess = true;
+                     validatedXhr.push(retryObject);
+                     continue;
                  }
 
 
@@ -57,6 +57,8 @@ async function validateAllXHR(analyzerOutput, searchFor, allCookies, proxyUrl = 
                 retryObject.callsPuppeteerHeaders = result.requestCalls;
                 if(result.validationSuccess) {
                     retryObject.validationSuccess = true;
+                    validatedXhr.push(retryObject);
+                    continue;
                 }
 
                 //use all headers from puppeteer session, also add all cookies retrieved from puppeteer calling page.cookies();
@@ -68,6 +70,8 @@ async function validateAllXHR(analyzerOutput, searchFor, allCookies, proxyUrl = 
                 retryObject.callsPuppeteerHeadersCookie = result.requestCalls;
                 if(result.validationSuccess) {
                     retryObject.validationSuccess = true;
+                    validatedXhr.push(retryObject);
+                    continue;
                 }
 
                 // console.log(retryObject);
@@ -78,8 +82,9 @@ async function validateAllXHR(analyzerOutput, searchFor, allCookies, proxyUrl = 
                 console.log(`Failed validation of XHR request: ${xhrFound.request.url}`);
                 return null;
             }
-            validatedXhr.push(retryObject);
+            validatedXhr.push(retryObject);            
         }
+        
 
     }
 
