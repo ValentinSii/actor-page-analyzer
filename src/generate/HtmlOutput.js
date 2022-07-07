@@ -58,8 +58,8 @@ class htmlGenerator {
             const searchForKey = getKeyByValue(this.vod.keywordMap, keyword)
 
             let keyWordTabString = keyword;
-            if (keyword.length >= 10) {
-                keyWordTabString = keyword.substring(0, 9) + "..";
+            if (keyword.length >= 15) {
+                keyWordTabString = keyword.substring(0, 14) + "..";
             }
 
             this.htmlOutput.push(`<button class="tablinks" onclick="openTab(event, '${searchForKey}')">${keyWordTabString}</button>`)
@@ -157,11 +157,11 @@ class htmlGenerator {
                 validatedXHR.callsPuppeteerHeaders[validatedXHR.callsPuppeteerHeaders.length - 1],
                 "Call with headers obtained from puppeteer"
             );
-        } 
+        }
         if (validatedXHR.callsPuppeteerHeadersCookie) {
             validatedXHR.callsPuppeteerHeadersCookie[validatedXHR.callsPuppeteerHeadersCookie.length - 1],
                 "Call with headers obtained from puppeteer"
-        } 
+        }
 
         this.htmlOutput.push('</tbody>');
         this.htmlOutput.push('</table>');
@@ -224,6 +224,7 @@ class htmlGenerator {
 
         this.htmlOutput.push(`</div>`);
         this.generateSummaryTable();
+        this.generateExampleTable();
         this.generateTimeStamps();
         this.htmlOutput.push(`</div>`);
 
@@ -295,6 +296,104 @@ class htmlGenerator {
 
 
 
+
+
+    }
+
+    generateExampleTable() {
+        const exampleTableData = [
+            {
+                path: ".exampleSelector",
+                value: "data",
+                valueFound: "data",
+                foundInLists: null,
+            },
+            {
+                path: ".another.exampleSelector",
+                value: "Some data",
+                valueFound: "Different data",
+                foundInLists: null,
+            },
+            {
+                path: ".anotherSelector",
+                value: "data",
+                valueFound: null,
+                foundInLists: null,
+            },
+            {
+                path: ".pathToArray[0].object.value",
+                value: "keyword data is substring of this entry",
+                valueFound: "keyword data is substring of this entry",
+                originalSearchString: "data",
+                foundInLists: [
+                  {
+                    arrayPath: ".pathToArray",
+                    childPath: ".object.value",
+                    possibleIndexes: {
+                      0: "keyword data is substring of this entry",
+                      1: "different entry in the same list at index 1",
+                      2: "different entry in the same list at index 2",
+                      3: "...",
+                    }
+                  }
+                ]
+              },
+
+        ]
+
+        this.htmlOutput.push(`<h3><b>Interpretation of the result in tables. </b></h3>`);
+        this.htmlOutput.push(`<p>For each keyword, multiple tables are presented in it's tab. Table contains 3 columns. </p>`);
+        this.htmlOutput.push(`<p>1. Path: In case of html table it contains selector, that can be directly used to retrieve the data </p>`);
+        this.htmlOutput.push(`<p>2. Value: data matching the keyword or containign the keyword as a substring obtained during validation</p>`);
+        this.htmlOutput.push(`<p>2. Value: data foudn with given selector in initial response</p>`);
+        this.htmlOutput.push(`<p>If the row is <b style="background-color: ${SUCCESS_COLOR}">GREEN</b> data found during analysis was sucessfully validated (it is the same) and can be found in initial response. </p>`);
+        this.htmlOutput.push(`<p>If the row is <b style="background-color: ${FAILURE_COLOR}">RED</b> data found with selector from initial response is <b>NOT</b> matching value found during analysis or it's not present at all - value of the cell will be null). This selector can not be used for scraping.</p>`);
+        this.htmlOutput.push(`<p>Some keywords can also be found in lists. In such case, additional row will be displayed, this row can be expaneded by clicking and will show additional information on how to find the array and it's possible indexes. </p>`);
+
+
+
+
+
+        // this.generateDataSourceTable('Example search results ', "example keyword: \"data\"", true, exampleTableData);
+
+        this.htmlOutput.push('<table class="pure-table pure-table-bordered" >');
+
+        // table headers row
+        this.htmlOutput.push('<thead><tr>');
+        this.htmlOutput.push(`<th>Path</th>`);
+        this.htmlOutput.push(`<th>Value</th>`);
+        this.htmlOutput.push(`<th>Value found</th>`);
+        this.htmlOutput.push('</tr></thead>');
+
+        this.htmlOutput.push('<tbody>');
+
+        exampleTableData.forEach(data => {
+            //if html was found in initial response and is the same as the one ine browser 
+            const validationResultColor = data.value == data.valueFound ? SUCCESS_COLOR : FAILURE_COLOR;
+            this.htmlOutput.push(`<tr style="background-color: ${validationResultColor};">`);
+            this.htmlOutput.push(`<td>${data.path}</td>`);
+            this.htmlOutput.push(`<td>${data.value}</td>`);
+            this.htmlOutput.push(`<td>${data.valueFound}</td>`);
+
+            this.htmlOutput.push('</tr>');
+            if (data.foundInLists) {
+                this.htmlOutput.push('<tr>');
+                this.htmlOutput.push('<td colspan=100%>');
+                this.htmlOutput.push(`<div class ="collapsible">Element above was also found in some lists. Click here to expand</div>`);
+                this.htmlOutput.push(`<pre style="display:none">`);
+                this.htmlOutput.push(`${JSON.stringify(data.foundInLists, null, 4)}`)
+                this.htmlOutput.push(`</pre>`);
+                this.htmlOutput.push('</td>');
+                this.htmlOutput.push('</tr>');
+            }
+        });
+
+
+
+
+        //table end 
+        this.htmlOutput.push('</tbody>');
+        this.htmlOutput.push('</table>');
 
 
     }
@@ -430,6 +529,8 @@ class htmlGenerator {
             "xhrRequestsSearched",
             "analysisEnded"
         ];
+        this.htmlOutput.push(`<h3>Timestamps:</h3>`);
+
 
         this.htmlOutput.push('<table class="pure-table pure-table-bordered">');
 

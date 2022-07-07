@@ -1,6 +1,6 @@
 {
     "title": "Page analyzer input schema",
-    "description": "Input for page analyzer:\n1.  Url of a website to be analyzed\n2.  Keywords to be searched for\n3.  Data sources, where analyzer will search for provided keywords",
+    "description": "Input for page analyzer:\n1.  Url of a website to be analyzed\n2.  Keywords to be searched for",
     "type": "object",
     "schemaVersion": 1,
     "properties": {
